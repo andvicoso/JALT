@@ -9,7 +9,6 @@ import java.util.Set;
 import org.emast.model.action.Action;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
-import org.emast.util.Utils;
 
 /**
  *

@@ -6,7 +6,7 @@ package org.emast.model.model;
  */
 public interface Grid {
 
-    int getRow();
+    int getRows();
 
-    int getCol();
+    int getCols();
 }

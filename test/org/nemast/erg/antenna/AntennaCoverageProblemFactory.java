@@ -2,7 +2,7 @@ package org.nemast.erg.antenna;
 
 import java.util.*;
 import org.emast.model.function.PropositionFunction;
-import org.emast.model.model.GridMDPModel;
+import org.emast.model.model.impl.GridModel;
 import org.emast.model.problem.Problem;
 import org.emast.model.problem.ProblemFactory;
 import org.emast.model.propositional.Proposition;
@@ -94,7 +94,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         final Collection<State> antennaStates = pf.getStatesWithProposition(antenna);
         for (final State state : pModelStates) {
             for (final State stateAntenna : antennaStates) {
-                if (GridMDPModel.getCityBlockDistance(state, stateAntenna) <= pAntennaSignalRadius) {
+                if (GridModel.getCityBlockDistance(state, stateAntenna) <= pAntennaSignalRadius) {
                     pf.add(state, coverage);
                 }
             }

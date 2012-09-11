@@ -8,7 +8,15 @@ import org.emast.model.propositional.Proposition;
  */
 public interface BadReward {
 
-    Proposition getBadReward();
+    Proposition getBadRewardProp();
 
-    double getBadRewardValue();
+    double getBadReward();
+
+    void setBadRewardProp(Proposition pProposition);
+
+    void setBadReward(double pValue);
+
+    double getOtherwiseValue();
+
+    void setOtherwiseValue(double pOtherwiseValue);
 }

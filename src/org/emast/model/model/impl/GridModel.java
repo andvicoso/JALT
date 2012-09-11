@@ -1,4 +1,4 @@
-package org.emast.model.model;
+package org.emast.model.model.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 import org.emast.model.action.Action;
 import org.emast.model.agent.Agent;
 import org.emast.model.function.TransitionFunction;
+import org.emast.model.model.Grid;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
 
@@ -14,29 +15,31 @@ import org.emast.util.CollectionsUtils;
  *
  * @author Anderson
  */
-public abstract class GridMDPModel extends MDPModel {
+public abstract class GridModel extends MDPModel implements Grid {
 
     private static final String GRID_STATE_SEP = "x";
     private int rows;
     private int cols;
 
-    public GridMDPModel(int pRows, int pCols, int pAgents) {
-        super(createGridStates(pRows, pCols), createGridMovementActions(),
+    public GridModel(int pRows, int pCols, int pAgents) {
+        super(createStates(pRows, pCols), createGridMovementActions(),
                 CollectionsUtils.createList(Agent.class, pAgents));
         this.rows = pRows;
         this.cols = pCols;
     }
 
-    public GridMDPModel(final GridMDPModel pModel) {
+    public GridModel(final GridModel pModel) {
         super(pModel);
         this.rows = pModel.getRows();
         this.cols = pModel.getCols();
     }
 
+    @Override
     public int getRows() {
         return rows;
     }
 
+    @Override
     public int getCols() {
         return cols;
     }
@@ -95,7 +98,7 @@ public abstract class GridMDPModel extends MDPModel {
         return getState(getGridStateName(pRow, pCol));
     }
 
-    public static List<State> createGridStates(final int pRows, final int pCols) {
+    public static List<State> createStates(final int pRows, final int pCols) {
         final List<State> states = new ArrayList<State>();
         for (int i = 0; i < pRows; i++) {
             for (int j = 0; j < pCols; j++) {
@@ -106,7 +109,7 @@ public abstract class GridMDPModel extends MDPModel {
         return states;
     }
 
-    public static State getGridState(final int pRow, final int pCol) {
+    public static State createGridState(final int pRow, final int pCol) {
         return new State(getGridStateName(pRow, pCol));
     }
 

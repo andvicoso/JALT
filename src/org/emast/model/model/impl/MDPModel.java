@@ -1,4 +1,4 @@
-package org.emast.model.model;
+package org.emast.model.model.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import org.emast.model.action.Action;
 import org.emast.model.agent.Agent;
 import org.emast.model.function.RewardFunction;
 import org.emast.model.function.TransitionFunction;
+import org.emast.model.model.MDP;
 import org.emast.model.state.State;
 
 public abstract class MDPModel implements MDP, Serializable {

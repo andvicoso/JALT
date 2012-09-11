@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import org.emast.model.model.ERG;
-import org.emast.model.model.MDPModel;
+import org.emast.model.model.impl.MDPModel;
 import org.emast.model.state.State;
 
 /**

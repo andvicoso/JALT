@@ -1,6 +1,7 @@
 package org.emast.model.model;
 
 import java.util.Set;
+import org.emast.model.function.ObservationFunction;
 import org.emast.model.observation.Observation;
 
 /**
@@ -10,4 +11,6 @@ import org.emast.model.observation.Observation;
 public interface PO {
 
     Set<Observation> getObservations();
+
+    ObservationFunction getObservationFunction();
 }

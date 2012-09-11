@@ -2,7 +2,7 @@ package org.emast.model.function;
 
 import java.util.*;
 import net.sourceforge.jeval.EvaluationException;
-import org.emast.model.model.GridMDPModel;
+import org.emast.model.model.impl.GridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Interpretation;
 import org.emast.model.propositional.Proposition;
@@ -93,13 +93,13 @@ public class PropositionFunction {
     }
 
     public void addGridStatePropositions(int pRow, int pCol, String... pPropsNames) {
-        List<Proposition> props = new ArrayList<Proposition>(pPropsNames.length);
+        final List<Proposition> props = new ArrayList<Proposition>(pPropsNames.length);
 
-        for (String propName : pPropsNames) {
+        for (final String propName : pPropsNames) {
             props.add(new Proposition(propName));
         }
 
-        add(GridMDPModel.getGridState(pRow, pCol), props.toArray(new Proposition[props.size()]));
+        add(GridModel.createGridState(pRow, pCol), props.toArray(new Proposition[props.size()]));
     }
 
     public Expression getExpressionForState(State pState) {
@@ -108,6 +108,6 @@ public class PropositionFunction {
     }
 
     public void addGridStatePropositions(int pRow, int pCol, Proposition... pProps) {
-        add(GridMDPModel.getGridState(pRow, pCol), pProps);
+        add(GridModel.createGridState(pRow, pCol), pProps);
     }
 }
