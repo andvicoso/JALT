@@ -10,6 +10,8 @@ import org.emast.model.test.Test;
  */
 public class MarsRoverTest extends Test {
 
+    private static final MarsRoverProblemFactory factory = new MarsRoverProblemFactory();
+
     public MarsRoverTest() {
         super(createProblem(), new ValueIterationAlgorithm());
     }
@@ -19,7 +21,7 @@ public class MarsRoverTest extends Test {
         final int cols = 9;
         final int agents = 5;
         final int obstacles = 35;
-        final MarsRoverProblemFactory factory = new MarsRoverProblemFactory();
+
         return factory.createProblem(rows, cols, agents, obstacles);
     }
 

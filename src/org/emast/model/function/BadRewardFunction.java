@@ -16,16 +16,16 @@ public class BadRewardFunction<M extends MDP & ERG & BadReward> implements Rewar
 
     private final M model;
 
-    public BadRewardFunction(M pModel) {
+    public BadRewardFunction(final M pModel) {
         model = pModel;
     }
 
     @Override
-    public double getValue(State pState, Action pAction) {
-        final Proposition water = model.getBadRewardProp();
+    public double getValue(final State pState, final Action pAction) {
+        final Proposition badProp = model.getBadRewardProp();
         final PropositionFunction pf = model.getPropositionFunction();
-        final Collection<State> badStates = pf.getStatesWithProposition(water);
-        //any state that leads to a water proposition gives an getBadReward()
+        final Collection<State> badStates = pf.getStatesWithProposition(badProp);
+        //any state that leads to a bad proposition gives a getBadReward()
         final Collection<State> nextStates = model.getTransitionFunction().getFinalStates(
                 model.getStates(), pState, pAction);
         for (final State state : nextStates) {

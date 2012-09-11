@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.emast.model.action.Action;
 import org.emast.model.agent.Agent;
+import org.emast.model.function.RewardFunction;
 import org.emast.model.function.TransitionFunction;
 import org.emast.model.model.Grid;
 import org.emast.model.state.State;
@@ -32,6 +33,16 @@ public abstract class GridModel extends MDPModel implements Grid {
         super(pModel);
         this.rows = pModel.getRows();
         this.cols = pModel.getCols();
+    }
+
+    @Override
+    public GridModel copy() {
+        return new GridModel(this) {
+            @Override
+            public RewardFunction getRewardFunction() {
+                return GridModel.this.getRewardFunction();
+            }
+        };
     }
 
     @Override

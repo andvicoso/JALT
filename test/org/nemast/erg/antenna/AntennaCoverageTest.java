@@ -10,6 +10,8 @@ import org.emast.model.test.Test;
  */
 public class AntennaCoverageTest extends Test {
 
+    private static final AntennaCoverageProblemFactory factory = new AntennaCoverageProblemFactory();
+
     public AntennaCoverageTest() {
         super(createProblem(), new PPFERG());
     }
@@ -24,7 +26,7 @@ public class AntennaCoverageTest extends Test {
         final int obstacles = (int) (rows * cols * obstaclesRatio);
         final int antennas = (int) (rows * cols * antennasRatio);
         final int antennaRadius = 3;
-        final AntennaCoverageProblemFactory factory = new AntennaCoverageProblemFactory();
+
         final Problem problem = factory.createProblem(rows, cols,
                 agents, obstacles, antennas, antennaRadius);
 

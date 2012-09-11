@@ -1,6 +1,5 @@
 package org.nemast.erg.antenna;
 
-import org.emast.model.function.PropositionFunction;
 import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -16,8 +15,6 @@ import org.emast.util.CollectionsUtils;
  * @author anderson
  */
 public class AntennaCoverageModel extends ERGGridModel {
-
-    private PropositionFunction pf;
 
     public AntennaCoverageModel(final int pRows, final int pCols, final int pAgents,
             final int pAntennaSignalCityBlockRadius) {

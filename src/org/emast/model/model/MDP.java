@@ -8,7 +8,7 @@ import org.emast.model.function.RewardFunction;
 import org.emast.model.function.TransitionFunction;
 import org.emast.model.state.State;
 
-public interface MDP extends Cloneable {
+public interface MDP {
 
     <M extends MDP> M copy();
 

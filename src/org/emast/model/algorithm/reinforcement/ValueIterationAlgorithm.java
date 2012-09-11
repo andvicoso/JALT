@@ -34,10 +34,10 @@ public class ValueIterationAlgorithm<M extends MDP> implements Algorithm<M, Poli
             pi = new Policy();
             //for each state
             for (final State state : model.getStates()) {
-                final Map<State, Double> pValues = iterations == 0
+                final Map<State, Double> currValues = iterations == 0
                         ? null
                         : values.get(iterations - 1);
-                final Map<Double, Action> q = getQ(model, pValues, state);
+                final Map<Double, Action> q = getQ(model, currValues, state);
                 //if found some action and value
                 if (!q.isEmpty()) {
                     // get the max value for q

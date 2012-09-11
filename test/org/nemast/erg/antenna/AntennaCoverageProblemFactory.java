@@ -15,9 +15,11 @@ import org.emast.util.CollectionsUtils;
  */
 public class AntennaCoverageProblemFactory extends ProblemFactory {
 
-    public Problem createProblem(final int pRows, final int pCols, final int pAgents,
+    public Problem createProblem(
+            final int pRows, final int pCols, final int pAgents,
             final int pNumberOfObstacles, final int pNumberOfAntennas,
             final int pAntennaSignalCityBlockRadius) {
+
         final AntennaCoverageModel model = new AntennaCoverageModel(pRows, pCols, pAgents,
                 pAntennaSignalCityBlockRadius);
 
@@ -46,11 +48,10 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         createAntennaCoverage(model.getStates(), pf, antenna, coverage, pAntennaSignalCityBlockRadius,
                 model.getPropositions());
 
-        final Set<State> sts = model.getPropositionFunction().getStatesWithProposition(coverage);
+        final Set<State> sts = pf.getStatesWithProposition(coverage);
         //put true(up) and fake(down) goals over the grid
         pf.add(getRandom(sts), up, exit);
         pf.add(getRandom(sts), down, exit);
-
         //create initial states
         final List<State> initStates = getRandomEmptyStates(model, pAgents);
 
