@@ -10,4 +10,6 @@ import org.emast.model.problem.Problem;
 public interface Algorithm<M extends MDP, R> {
 
     R run(Problem<M> pProblem);
+
+    String printResults();
 }

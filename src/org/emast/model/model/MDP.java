@@ -10,7 +10,7 @@ import org.emast.model.state.State;
 
 public interface MDP {
 
-    <M extends MDP> M copy();
+    MDP copy();
 
     Collection<State> getStates();
 

@@ -30,7 +30,7 @@ public class ERGAgentIterator<M extends MDP & ERG> extends AgentIterator<M> {
 
         @Override
         public ERGAgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState) {
-            final M newModel = pModel.copy();
+            final M newModel = (M)pModel.copy();
             return new ERGAgentIterator(newModel, pPolicy, pAgent, pInitialState);
         }
     }

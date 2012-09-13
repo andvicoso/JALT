@@ -6,17 +6,40 @@ import org.emast.model.propositional.Proposition;
  *
  * @author Anderson
  */
-public interface BadReward {
+public class BadReward {
 
-    Proposition getBadRewardProp();
+    private Proposition prop;
+    private double badReward;
 
-    double getBadReward();
+    public BadReward() {
+    }
 
-    void setBadRewardProp(Proposition pProposition);
+    public BadReward(Proposition prop, double badReward) {
+        this.prop = prop;
+        this.badReward = badReward;
+    }
 
-    void setBadReward(double pValue);
+    public double getBadReward() {
+        return badReward;
+    }
 
-    double getOtherwiseValue();
+    public void setBadReward(double badReward) {
+        this.badReward = badReward;
+    }
 
-    void setOtherwiseValue(double pOtherwiseValue);
+    public Proposition getBadRewardProp() {
+        return prop;
+    }
+
+    public void setBadRewardProp(Proposition badRewardProp) {
+        this.prop = badRewardProp;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(prop).append("=").append(badReward);
+
+        return sb.toString();
+    }
 }

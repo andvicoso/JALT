@@ -2,12 +2,12 @@ package org.emast.model.function;
 
 import java.util.*;
 import net.sourceforge.jeval.EvaluationException;
-import org.emast.model.model.impl.GridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Interpretation;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.state.State;
+import org.emast.util.GridUtils;
 
 /**
  *
@@ -99,7 +99,7 @@ public class PropositionFunction {
             props.add(new Proposition(propName));
         }
 
-        add(GridModel.createGridState(pRow, pCol), props.toArray(new Proposition[props.size()]));
+        add(GridUtils.createGridState(pRow, pCol), props.toArray(new Proposition[props.size()]));
     }
 
     public Expression getExpressionForState(State pState) {
@@ -108,6 +108,19 @@ public class PropositionFunction {
     }
 
     public void addGridStatePropositions(int pRow, int pCol, Proposition... pProps) {
-        add(GridModel.createGridState(pRow, pCol), pProps);
+        add(GridUtils.createGridState(pRow, pCol), pProps);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("\n");
+        for (Map.Entry<State, Set<Proposition>> entry : table.entrySet()) {
+            State state = entry.getKey();
+            Set<Proposition> set = entry.getValue();
+
+            sb.append(state).append(set).append("\n");
+        }
+
+        return sb.toString();
     }
 }

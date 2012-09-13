@@ -2,7 +2,9 @@ package org.emast.model.problem;
 
 import java.util.Map;
 import org.emast.model.model.MDP;
+import org.emast.model.model.impl.GridModel;
 import org.emast.model.state.State;
+import org.emast.util.GridPrinter;
 import org.emast.util.Utils;
 
 /**
@@ -44,11 +46,27 @@ public class Problem<M extends MDP> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Initial States: ");
-        sb.append(initialStates);
-        sb.append("\n");
-        sb.append(model.toString());
+        final StringBuilder sb = new StringBuilder();
+        sb.append("\nInitial states: ").append(initialStates);
+
+        if (model instanceof GridModel) {
+            final GridPrinter gridPrinter = new GridPrinter();
+            final String grid = gridPrinter.print((GridModel) model, initialStates, null);
+            sb.append("\n").append(grid);
+        }
+
+        return sb.toString();
+    }
+
+    public String toString(Object pResult) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("\nResult: ").append(pResult);
+
+        if (model instanceof GridModel) {
+            final GridPrinter gridPrinter = new GridPrinter();
+            final String grid = gridPrinter.print((GridModel) model, initialStates, pResult);
+            sb.append("\n").append(grid);
+        }
 
         return sb.toString();
     }

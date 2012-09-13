@@ -1,6 +1,7 @@
 package org.emast.util;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import org.emast.model.action.Action;
@@ -8,7 +9,6 @@ import org.emast.model.model.ERG;
 import org.emast.model.model.Grid;
 import org.emast.model.model.MDP;
 import org.emast.model.model.impl.GridModel;
-import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
@@ -18,64 +18,57 @@ import org.emast.model.state.State;
  * @author Anderson
  */
 public class GridPrinter {
-
+    
     private static final int MAX_STR_SIZE = 3;
-
-    public <M extends MDP & Grid> String print(final M pModel, final boolean pAddIndexes) {
-        String[][] grid = getGrid(pModel, null, pAddIndexes);
+    
+    public <M extends MDP & Grid> String print(M pModel) {
+        String[][] grid = getGrid(pModel, Collections.EMPTY_MAP);
+        
         return toTable(grid);
     }
-
-    public <M extends MDP & Grid> String print(final Problem<M> pProblem, final Policy pPolicy,
-            final boolean pAddIndexes) {
-        String[][] grid = getGrid(pProblem, pAddIndexes);
-        grid = fillWithActions(pProblem, grid, pPolicy, pAddIndexes);
+    
+    public <M extends MDP & Grid> String print(M pModel, Map<Integer, State> pInitialStates, Object pResult) {
+        String[][] grid = getGrid(pModel, pInitialStates);
+        
+        if (pResult != null && pResult instanceof Policy) {
+            fillWithActions(grid, (Policy) pResult);
+        }
+        
         return toTable(grid);
     }
-
-    private <M extends MDP & Grid> String[][] getGrid(final M pModel, Map<Integer, State> pInitialStates,
-            final boolean pAddIndexes) {
+    
+    private <M extends MDP & Grid> String[][] getGrid(M pModel, Map<Integer, State> pInitialStates) {
         String[][] grid = createGrid(pModel);
-
+        
         if (pModel instanceof ERG) {
             addPropositions((ERG) pModel, pModel.getStates(), grid);
         }
-
-        if (pInitialStates != null && !pInitialStates.isEmpty()) {
-            addInitialStates(pInitialStates, grid);
-        }
-
-        if (pAddIndexes) {
-            grid = addIndexes(grid, pModel.getRows(), pModel.getCols());
-        }
-
+        
+        addInitialStates(pInitialStates, grid);
+        
+        grid = addIndexes(grid, pModel.getRows(), pModel.getCols());
+        
         return grid;
     }
-
-    private <M extends MDP & Grid> String[][] getGrid(final Problem<M> pProblem, final boolean pAddIndexes) {
-        final M model = pProblem.getModel();
-
-        return getGrid(model, pProblem.getInitialStates(), pAddIndexes);
-    }
-
-    private void addInitialStates(Map<Integer, State> initialStates, String[][] grid) {
+    
+    private void addInitialStates(Map<Integer, State> pInitialStates, String[][] pGrid) {
         int agent = 0;
-        for (final State initState : initialStates.values()) {
-            final int row = GridModel.getRow(initState);
-            final int col = GridModel.getCol(initState);
-            grid[row][col] = agent + " " + grid[row][col];
+        for (State initState : pInitialStates.values()) {
+            int row = GridUtils.getRow(initState);
+            int col = GridUtils.getCol(initState);
+            pGrid[row][col] = agent + " " + pGrid[row][col];
             agent++;
         }
     }
-
-    public String toTable(final String[][] pGrid) {
+    
+    public String toTable(String[][] pGrid) {
         // Find out what the maximum number of columns is in any row
         int maxColumns = 0;
         for (int i = 0; i < pGrid.length; i++) {
             maxColumns = Math.max(pGrid[i].length, maxColumns);
         }
         // Find the maximum length of a string in each column
-        final int[] lengths = new int[maxColumns];
+        int[] lengths = new int[maxColumns];
         for (int i = 0; i < pGrid.length; i++) {
             for (int j = 0; j < pGrid[i].length; j++) {
                 Object object = pGrid[i][j];
@@ -85,33 +78,29 @@ public class GridPrinter {
             }
         }
         // Generate a format string for each column
-        final String[] formats = new String[lengths.length];
+        String[] formats = new String[lengths.length];
         for (int i = 0; i < lengths.length; i++) {
             formats[i] = "%1$" + lengths[i] + "s"
                     + (i + 1 == lengths.length ? "|\n" : "");
         }
         // format 'em
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < pGrid.length; i++) {
             for (int j = 0; j < pGrid[i].length; j++) {
                 sb.append("|");
                 sb.append(String.format(formats[j], pGrid[i][j].toString()));
             }
         }
-
+        
         return sb.toString();
     }
-
-    public <M extends MDP & Grid> String[][] fillWithActions(final Problem<M> pProblem, final String[][] pGrid,
-            final Policy pPolicy, final boolean pAddIndexes) {
-
-        for (final State state : pPolicy.getStates()) {
-            final Action action = pPolicy.get(state);
-            int row = GridModel.getRow(state);
-            int col = GridModel.getCol(state);
-            row = pAddIndexes ? row + 1 : row;
-            col = pAddIndexes ? col + 1 : col;
-
+    
+    public void fillWithActions(String[][] pGrid, Policy pPolicy) {
+        for (State state : pPolicy.getStates()) {
+            Action action = pPolicy.get(state);
+            int row = GridUtils.getRow(state) + 1;
+            int col = GridUtils.getCol(state) + 1;
+            
             if (action.getName().equals("north")) {
                 pGrid[row][col] = pGrid[row][col] + " ^";
             } else if (action.getName().equals("south")) {
@@ -122,35 +111,31 @@ public class GridPrinter {
                 pGrid[row][col] = pGrid[row][col] + " >";
             }
         }
-
-        return pGrid;
     }
-
-    private String[][] addIndexes(String[][] grid, int rows, int cols) {
-        final String[][] grid2 = new String[rows + 1][cols + 1];
+    
+    private String[][] addIndexes(String[][] pGrid, int pRows, int pCols) {
+        String[][] grid2 = new String[pRows + 1][pCols + 1];
         grid2[0][0] = " ";
-
-        for (int j = 1; j < cols + 1; j++) {
+        
+        for (int j = 1; j < pCols + 1; j++) {
             grid2[0][j] = j - 1 + "";
         }
-
-        for (int i = 1; i < rows + 1; i++) {
+        
+        for (int i = 1; i < pRows + 1; i++) {
             grid2[i][0] = i - 1 + "";
-            System.arraycopy(grid[i - 1], 0, grid2[i], 1, cols);
+            System.arraycopy(pGrid[i - 1], 0, grid2[i], 1, pCols);
         }
-
+        
         return grid2;
     }
-
-    private void addPropositions(ERG pModel, Collection<State> pStates, String[][] grid) {
-        for (State state : pStates) {
-            final int row = GridModel.getRow(state);
-            final int col = GridModel.getCol(state);
-            final Set<Proposition> props = pModel.getPropositionFunction().getPropositionsForState(state);
+    
+    private void addPropositions(ERG pModel, Collection<State> pModelStates, String[][] pGrid) {
+        for (State state : pModelStates) {
+            Set<Proposition> props = pModel.getPropositionFunction().getPropositionsForState(state);
             if (props != null) {
-                final StringBuilder sb = new StringBuilder();
-
-                for (final Proposition proposition : props) {
+                StringBuilder sb = new StringBuilder();
+                
+                for (Proposition proposition : props) {
                     if (proposition != null) {
                         String str = proposition.getName();
                         //truncate
@@ -160,21 +145,23 @@ public class GridPrinter {
                         sb.append(" ");
                     }
                 }
-
-                grid[row][col] = sb.toString().trim();//list.toTable().replace("[", "").replace("]", "");
+                
+                int row = GridUtils.getRow(state);
+                int col = GridUtils.getCol(state);
+                pGrid[row][col] = sb.toString().trim();//list.toTable().replace("[", "").replace("]", "");
             }
         }
     }
-
+    
     private <M extends MDP & Grid> String[][] createGrid(M pModel) {
         String[][] grid = new String[pModel.getRows()][pModel.getCols()];
-
-        for (final State state : pModel.getStates()) {
-            final int row = GridModel.getRow(state);
-            final int col = GridModel.getCol(state);
+        
+        for (State state : pModel.getStates()) {
+            int row = GridUtils.getRow(state);
+            int col = GridUtils.getCol(state);
             grid[row][col] = " ";
         }
-
+        
         return grid;
     }
 }

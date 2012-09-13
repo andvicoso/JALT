@@ -11,7 +11,7 @@ import org.emast.model.function.TransitionFunction;
 import org.emast.model.model.Grid;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
-import org.emast.util.GridPrinter;
+import org.emast.util.GridUtils;
 
 /**
  *
@@ -19,12 +19,11 @@ import org.emast.util.GridPrinter;
  */
 public abstract class GridModel extends MDPModel implements Grid {
 
-    private static final String GRID_STATE_SEP = "x";
     private int rows;
     private int cols;
 
     public GridModel(int pRows, int pCols, int pAgents) {
-        super(createStates(pRows, pCols), createGridMovementActions(),
+        super(GridUtils.createStates(pRows, pCols), createGridMovementActions(),
                 CollectionsUtils.createList(Agent.class, pAgents));
         this.rows = pRows;
         this.cols = pCols;
@@ -67,7 +66,7 @@ public abstract class GridModel extends MDPModel implements Grid {
     }
 
     private Map<State, Action> getTransitions(final State pState) {
-        return getTransitions(getRow(pState), getCol(pState));
+        return getTransitions(GridUtils.getRow(pState), GridUtils.getCol(pState));
     }
 
     private Map<State, Action> getTransitions(int pRow, int pCol) {
@@ -111,48 +110,16 @@ public abstract class GridModel extends MDPModel implements Grid {
     }
 
     private State getState(final int pRow, final int pCol) {
-        return getState(getGridStateName(pRow, pCol));
+        return getState(GridUtils.getGridStateName(pRow, pCol));
     }
 
     @Override
     public String toString() {
-        final GridPrinter gridPrinter = new GridPrinter();
-        return gridPrinter.print(this, true);
-    }
+        final StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append("\nRows: ").append(getRows());
+        sb.append("\nCols: ").append(getCols());
 
-    public static List<State> createStates(final int pRows, final int pCols) {
-        final List<State> states = new ArrayList<State>();
-        for (int i = 0; i < pRows; i++) {
-            for (int j = 0; j < pCols; j++) {
-                String stName = getGridStateName(i, j);
-                states.add(new State(stName));
-            }
-        }
-        return states;
-    }
-
-    public static State createGridState(final int pRow, final int pCol) {
-        return new State(getGridStateName(pRow, pCol));
-    }
-
-    public static String getGridStateName(final int pRow, final int pCol) {
-        String srow = Integer.toString(pRow);
-        String scol = Integer.toString(pCol);
-        int size = Math.max(srow.length(), scol.length());
-        String format = "%0" + size + "d";
-
-        return String.format(format, pRow) + GRID_STATE_SEP + String.format(format, pCol);
-    }
-
-    public static int getRow(final State pState) {
-        return Integer.parseInt(pState.getName().split(GRID_STATE_SEP)[0]);
-    }
-
-    public static int getCol(final State pState) {
-        return Integer.parseInt(pState.getName().split(GRID_STATE_SEP)[1]);
-    }
-
-    public static int getCityBlockDistance(final State pS1, final State pS2) {
-        return Math.abs(getRow(pS1) - getRow(pS2)) + Math.abs(getCol(pS1) - getCol(pS2));
+        return sb.toString();
     }
 }

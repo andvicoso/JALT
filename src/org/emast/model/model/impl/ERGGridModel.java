@@ -1,7 +1,9 @@
 package org.emast.model.model.impl;
 
+import java.util.Collection;
 import java.util.Set;
 import org.emast.model.BadReward;
+import org.emast.model.BadRewarder;
 import org.emast.model.function.BadRewardFunction;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.function.RewardFunction;
@@ -13,18 +15,27 @@ import org.emast.model.propositional.Proposition;
  *
  * @author Anderson
  */
-public abstract class ERGGridModel extends GridModel implements ERG, BadReward {
+public abstract class ERGGridModel extends GridModel implements ERG, BadRewarder {
 
     private Expression goal;
     private Expression preservationGoal;
     private PropositionFunction pf;
     private Set<Proposition> propositions;
-    private Proposition badRewardProp;
-    private double badReward;
+    private Collection<BadReward> badRewards;
     private double otherwiseValue = -1d;
 
     public ERGGridModel(final int pRows, final int pCols, final int pAgents) {
         super(pRows, pCols, pAgents);
+    }
+
+    @Override
+    public Collection<BadReward> getBadRewards() {
+        return badRewards;
+    }
+
+    @Override
+    public void setBadRewards(Collection<BadReward> badRewards) {
+        this.badRewards = badRewards;
     }
 
     @Override
@@ -73,26 +84,6 @@ public abstract class ERGGridModel extends GridModel implements ERG, BadReward {
     }
 
     @Override
-    public double getBadReward() {
-        return badReward;
-    }
-
-    @Override
-    public void setBadReward(double badReward) {
-        this.badReward = badReward;
-    }
-
-    @Override
-    public Proposition getBadRewardProp() {
-        return badRewardProp;
-    }
-
-    @Override
-    public void setBadRewardProp(Proposition badRewardProp) {
-        this.badRewardProp = badRewardProp;
-    }
-
-    @Override
     public void setOtherwiseValue(double pOtherwiseValue) {
         otherwiseValue = pOtherwiseValue;
     }
@@ -100,5 +91,17 @@ public abstract class ERGGridModel extends GridModel implements ERG, BadReward {
     @Override
     public double getOtherwiseValue() {
         return otherwiseValue;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString());
+        sb.append("\nPropositions: ").append(getPropositions());
+        sb.append("\nProposition Function: ").append(getPropositionFunction());
+        sb.append("\nFinal Goal: ").append(getGoal());
+        sb.append("\nPreservation Goal: ").append(getPreservationGoal());
+        sb.append("\nBad Reward Propositions: ").append(getBadRewards());
+
+        return sb.toString();
     }
 }

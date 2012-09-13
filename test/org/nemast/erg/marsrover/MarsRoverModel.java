@@ -1,5 +1,7 @@
 package org.nemast.erg.marsrover;
 
+import java.util.Collections;
+import org.emast.model.BadReward;
 import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -19,9 +21,9 @@ public class MarsRoverModel extends ERGGridModel {
         //set goals
         setPreservationGoal(new Expression("!hole & !stone"));
         setGoal(new Expression("exit"));
-        //reward
-        setBadReward(-20d);
-        setOtherwiseValue(-1d);
-        setBadRewardProp(new Proposition("water"));
+        //set bad rewards
+        final BadReward badReward = new BadReward(new Proposition("water"), -20);
+        setBadRewards(Collections.singleton(badReward));
+        setOtherwiseValue(-1);
     }
 }

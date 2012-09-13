@@ -122,7 +122,7 @@ public class CommAgentIterator<M extends MDP & ERG> extends PropReputationAgentI
 
         @Override
         public CommAgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState) {
-            final M newModel = pModel.copy();
+            final M newModel = (M) pModel.copy();
             return new CommAgentIterator(newModel, pPolicy, pAgent, pInitialState,
                     messageCost, badRewardThreshold, badMessageThreshold);
         }

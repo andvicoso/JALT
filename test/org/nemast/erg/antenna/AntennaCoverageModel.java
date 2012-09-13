@@ -1,5 +1,7 @@
 package org.nemast.erg.antenna;
 
+import java.util.Collections;
+import org.emast.model.BadReward;
 import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -19,17 +21,17 @@ public class AntennaCoverageModel extends ERGGridModel {
     public AntennaCoverageModel(final int pRows, final int pCols, final int pAgents,
             final int pAntennaSignalCityBlockRadius) {
         super(pRows, pCols, pAgents);
-
+        //set props
         String[] props = {"hole", "stone", "water", "exit", "up", "down", "antenna", "coverage"};
         setPropositions(CollectionsUtils.createSet(Proposition.class, props));
-
+        //set goals
         setGoal(new Expression("up & exit"));
         setPreservationGoal(new Expression("!hole & !stone & coverage"));
-
-        setBadRewardProp(new Proposition("water"));
-        setBadReward(-30d);
-        setOtherwiseValue(-3d);
-
+        //set bad rewards
+        final BadReward badReward = new BadReward(new Proposition("water"), -30);
+        setBadRewards(Collections.singleton(badReward));
+        setOtherwiseValue(-1);
+        //create antenna coverage
         AntennaCoverageProblemFactory.createAntennaCoverage(getStates(),
                 getPropositionFunction(), new Proposition("antenna"),
                 new Proposition("coverage"), pAntennaSignalCityBlockRadius, getPropositions());

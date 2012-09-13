@@ -21,29 +21,29 @@ public class Test implements Runnable {
         algorithms = pAlgorithms;
     }
 
-    protected void init() {
-        out.println("Problem:\n");
-        out.println(problem.toString());
-        out.println("\nExecution:");
-    }
-
     @Override
     public void run() {
-        init();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(problem.getModel().toString());
+        sb.append(problem.toString());
+        sb.append("\nExecution:");
 
         for (Algorithm algorithm : algorithms) {
+            sb.append("\nAlgorithm: ").append(algorithm.getClass().getSimpleName());
+            //execute
             long initMsecs = System.currentTimeMillis();
             Object result = algorithm.run(problem);
             msecs = System.currentTimeMillis() - initMsecs;
-
-            out.println("\nTime: ");
-            out.println(toTimeString(msecs));
-
+            //print time
+            sb.append("\nTime: ").append(toTimeString(msecs));
+            sb.append(algorithm.printResults());
             //if a solution was found...
             if (result != null) {
-                out.println(result.toString() + "\n");
+                sb.append(problem.toString(result));
             }
         }
+
+        out.print(sb);
     }
 
     public static String toTimeString(final long pMsecs) {

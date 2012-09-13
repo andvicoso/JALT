@@ -23,9 +23,7 @@ public class PPF<M extends MDP & SRG> implements Algorithm<M, Policy> {
 
     private M model;
     private double gama = 0.9;
-
-    public PPF() {
-    }
+    private int iterations = 0;
 
     @Override
     public Policy run(Problem<M> pProblem) {
@@ -53,6 +51,7 @@ public class PPF<M extends MDP & SRG> implements Algorithm<M, Policy> {
             final Set<Transition> prunedStrongImage = prune(getStrongImage(c), c);
             pi = choose(values, prunedStrongImage);
             pi.putAll(pi2);
+            iterations++;
         } while (!pi.equals(pi2));
 
         return pi;
@@ -170,5 +169,13 @@ public class PPF<M extends MDP & SRG> implements Algorithm<M, Policy> {
 
     private Iterable<Action> getActionsFrom(final State pState) {
         return model.getTransitionFunction().getActionsFrom(model.getActions(), pState);
+    }
+
+    @Override
+    public String printResults() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("\nIterations: ").append(iterations);
+
+        return sb.toString();
     }
 }

@@ -11,6 +11,7 @@ import org.emast.model.transition.Transition;
 
 public class PPFERG<M extends MDP & ERG> extends PPF<M> {
 
+    private int iterations = 0;
     /**
      * if is true, then the algorithm will stop when it finds a valid path to some agent's initial position.
      * Else, it will find all the paths for all valid states.
@@ -66,6 +67,7 @@ public class PPFERG<M extends MDP & ERG> extends PPF<M> {
                     c, preserveIntension);
             pi = choose(values, prunedStrongImage);
             pi.putAll(pi2);
+            iterations++;
         } while (!pi.equals(pi2) && !preserveIntension.equals(c));
 
         return pi;
@@ -86,5 +88,13 @@ public class PPFERG<M extends MDP & ERG> extends PPF<M> {
 
     public boolean isStopWhenOneAgentFindPath() {
         return stopWhenOneAgentFindPath;
+    }
+
+    @Override
+    public String printResults() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("\nIterations: ").append(iterations);
+
+        return sb.toString();
     }
 }

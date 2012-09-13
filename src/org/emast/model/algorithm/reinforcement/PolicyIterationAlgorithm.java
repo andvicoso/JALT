@@ -14,11 +14,11 @@ import org.emast.util.PolicyUtils;
 public class PolicyIterationAlgorithm implements Algorithm<MDP, Policy> {
 
     private double gama = 0.9d;
+    private int iterations = 0;
 
     @Override
     public Policy run(Problem<MDP> pProblem) {
         MDP model = pProblem.getModel();
-        int n = 0;
         boolean changed;
         final Policy pi = PolicyUtils.createRandom(model);
         // Start the main loop
@@ -54,7 +54,7 @@ public class PolicyIterationAlgorithm implements Algorithm<MDP, Policy> {
                     changed = true;
                 }
             }
-            n++;
+            iterations++;
         } while (changed);
 
         return pi;
@@ -89,5 +89,13 @@ public class PolicyIterationAlgorithm implements Algorithm<MDP, Policy> {
 
     public double getGama() {
         return gama;
+    }
+
+    @Override
+    public String printResults() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("\nIterations: ").append(iterations);
+
+        return sb.toString();
     }
 }

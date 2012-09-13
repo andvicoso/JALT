@@ -80,7 +80,7 @@ public class PropReputationAgentIterator<M extends MDP & ERG> extends ERGAgentIt
     }
 
     protected Problem<M> cloneProblem(final Expression pNewPreservGoal) {
-        final M cloneModel = getModel().copy();
+        final M cloneModel = (M)getModel().copy();
         //set new preservation goal
         cloneModel.setPreservationGoal(pNewPreservGoal);
         //set the initial state only for the current agent
@@ -182,7 +182,7 @@ public class PropReputationAgentIterator<M extends MDP & ERG> extends ERGAgentIt
 
         @Override
         public PropReputationAgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState) {
-            final M newModel = pModel.copy();
+            final M newModel = (M)pModel.copy();
             return new PropReputationAgentIterator(newModel, pPolicy, pAgent, pInitialState, badRewardThreshold);
         }
     }

@@ -16,13 +16,14 @@ import org.emast.model.state.State;
 public class ValueIterationSRGAlgorithm<M extends MDP & SRG>
         extends ValueIterationAlgorithm<M> {
 
+    private int iterations = 0;
+
     @Override
     public Policy run(Problem<M> pProblem) {
         M model = pProblem.getModel();
         // Initialize the variables
         final List<Map<State, Double>> values = new ArrayList<Map<State, Double>>();
         final List<Policy> pis = new ArrayList<Policy>();
-        int n = 0;
         // Initilize the policies with random values
         for (final State state : model.getStates()) {
             try {
@@ -35,19 +36,29 @@ public class ValueIterationSRGAlgorithm<M extends MDP & SRG>
         // When the maximmum error is greater than the defined error,
         // the best policy is found
         do {
+            pis.add(new Policy());
+            
             for (final State state : model.getStates()) {
-                final Map<Double, Action> q = getQ(model, n == 0
-                        ? null : values.get(n - 1), state);
+                final Map<Double, Action> q = getQ(model, iterations == 0
+                        ? null : values.get(iterations - 1), state);
                 // get the max value for q
                 final Double max = Collections.max(q.keySet());
                 final Action actions = q.get(max);
                 // save the max value and position in the policy
-                values.get(n).put(state, max);
-                pis.get(n).put(state, actions);
+                values.get(iterations).put(state, max);
+                pis.get(iterations).put(state, actions);
             }
-            n++;
-        } while (getMaxError(values, n) > (1.0 - pProblem.getError()));
+            iterations++;
+        } while (getMaxError(values, iterations) > (1.0 - pProblem.getError()));
 
-        return pis.get(n);
+        return pis.get(iterations);
+    }
+
+    @Override
+    public String printResults() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("\nIterations: ").append(iterations);
+
+        return sb.toString();
     }
 }
