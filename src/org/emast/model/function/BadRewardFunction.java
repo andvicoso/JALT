@@ -44,7 +44,7 @@ public class BadRewardFunction<M extends MDP & ERG & BadRewarder> implements Rew
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(model.getBadRewards());
-        sb.append(" Otherwise=").append(model.getOtherwiseValue());
+        sb.append(", otherwise=").append(model.getOtherwiseValue());
         return sb.toString();
     }
 }

@@ -13,7 +13,7 @@ import org.emast.util.Utils;
  */
 public class Problem<M extends MDP> {
 
-    private double error = 0.009;
+    private double error = 0.09;
     private Map<Integer, State> initialStates;
     private M model;
 
@@ -48,6 +48,7 @@ public class Problem<M extends MDP> {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("\nInitial states: ").append(initialStates);
+        sb.append("\nError: ").append(error);
 
         if (model instanceof GridModel) {
             final GridPrinter gridPrinter = new GridPrinter();
@@ -60,7 +61,8 @@ public class Problem<M extends MDP> {
 
     public String toString(Object pResult) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("\nResult: ").append(pResult);
+        final String resultName = pResult.getClass().getSimpleName();
+        sb.append("\n").append(resultName).append(": ").append(pResult);
 
         if (model instanceof GridModel) {
             final GridPrinter gridPrinter = new GridPrinter();

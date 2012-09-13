@@ -11,12 +11,12 @@ import org.emast.model.transition.Transition;
 
 public class PPFERG<M extends MDP & ERG> extends PPF<M> {
 
-    private int iterations = 0;
     /**
      * if is true, then the algorithm will stop when it finds a valid path to some agent's initial position.
      * Else, it will find all the paths for all valid states.
      */
     private final boolean stopWhenOneAgentFindPath;
+    private static final Double INITIAL_VALUE = 1d;
 
     /**
      *
@@ -33,12 +33,13 @@ public class PPFERG<M extends MDP & ERG> extends PPF<M> {
 
     @Override
     public Policy run(Problem<M> pProblem) {
-        M model = pProblem.getModel();
+        model = pProblem.getModel();
         //get the initial state for only one agent
         final Collection<State> preserveIntension = intension(model.getPreservationGoal());
         final Collection<State> goalsIntension = intension(model.getGoal());
-        Collection<State> c;
+        final Collection<State> initialStates = pProblem.getInitialStates().values();
         final Map<State, Double> values = new HashMap<State, Double>();
+        Collection<State> c;
         Policy pi = new Policy();
         Policy pi2;
         //there isn't a state which satisfies the problem goal
@@ -47,7 +48,7 @@ public class PPFERG<M extends MDP & ERG> extends PPF<M> {
         }
 
         for (final State state : goalsIntension) {
-            values.put(state, 1d);
+            values.put(state, INITIAL_VALUE);
             pi.put(state, Action.TRIVIAL_ACTION);
         }
 
@@ -57,7 +58,7 @@ public class PPFERG<M extends MDP & ERG> extends PPF<M> {
             //will stop when it finds a valid path to some agent's initial position.
             //Else, it will find all paths for all states.
             if (stopWhenOneAgentFindPath
-                    && !Collections.disjoint(c, pProblem.getInitialStates().values())) {
+                    && !Collections.disjoint(c, initialStates)) {
                 break;
             }
 
@@ -88,13 +89,5 @@ public class PPFERG<M extends MDP & ERG> extends PPF<M> {
 
     public boolean isStopWhenOneAgentFindPath() {
         return stopWhenOneAgentFindPath;
-    }
-
-    @Override
-    public String printResults() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("\nIterations: ").append(iterations);
-
-        return sb.toString();
     }
 }

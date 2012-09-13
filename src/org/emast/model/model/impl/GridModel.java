@@ -98,13 +98,18 @@ public abstract class GridModel extends MDPModel implements Grid {
             @Override
             public double getValue(State pState, State pFinalState, Action pAction) {
                 final Map<State, Action> targets = getTransitions(pState);
-                double value = 0;
 
-                if (targets.values().contains(pAction)) {
-                    value = 1d / targets.size();
+                for (Map.Entry<State, Action> entry : targets.entrySet()) {
+                    State state = entry.getKey();
+                    Action action = entry.getValue();
+
+                    if (isValidAction(pAction, action)
+                            && isValidState(state, pFinalState)) {
+                        return 1d / targets.size();
+                    }
                 }
 
-                return value;
+                return 0;
             }
         };
     }
@@ -117,8 +122,10 @@ public abstract class GridModel extends MDPModel implements Grid {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
-        sb.append("\nRows: ").append(getRows());
-        sb.append("\nCols: ").append(getCols());
+        sb.append("\nGrid Size: ");
+        sb.append(getRows()).append("x").append(getCols());
+//        sb.append("\nRows: ").append(getRows());
+//        sb.append("\nCols: ").append(getCols());
 
         return sb.toString();
     }

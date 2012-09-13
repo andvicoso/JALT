@@ -44,13 +44,13 @@ public abstract class TransitionFunction {
     }
 
     public Set<State> getReachableStates(final Collection<State> pModelStates,
-            final State pState, final Action pActions) {
-        return getReachableStatesValues(pModelStates, pState, pActions).keySet();
+            final State pState, final Action pAction) {
+        return getReachableStatesValues(pModelStates, pState, pAction).keySet();
     }
 
     public Collection<State> getFinalStates(final Collection<State> pModelStates,
-            final State pState, final Action pActions) {
-        Map<State, Double> stsv = getReachableStatesValues(pModelStates, pState, pActions);
+            final State pState, final Action pAction) {
+        Map<State, Double> stsv = getReachableStatesValues(pModelStates, pState, pAction);
         if (stsv != null && !stsv.isEmpty()) {
             Double max = Collections.max(stsv.values());
             return CollectionsUtils.getKeysForValue(stsv, max);
@@ -69,5 +69,13 @@ public abstract class TransitionFunction {
         }
 
         return list;
+    }
+
+    protected boolean isValidAction(Action pAction1, Action pAction2) {
+        return pAction1.equals(pAction2) || pAction1.equals(Action.ANY) || pAction2.equals(Action.ANY);
+    }
+
+    protected boolean isValidState(State pState1, State pState2) {
+        return pState1.equals(pState2) || pState1.equals(State.ANY) || pState2.equals(State.ANY);
     }
 }

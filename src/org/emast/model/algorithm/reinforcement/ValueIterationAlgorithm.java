@@ -134,7 +134,8 @@ public class ValueIterationAlgorithm<M extends MDP> implements Algorithm<M, Poli
     public String printResults() {
         final StringBuilder sb = new StringBuilder();
         sb.append("\nIterations: ").append(iterations);
-
+        sb.append("\nGama: ").append(gama);
+        
         return sb.toString();
     }
 }

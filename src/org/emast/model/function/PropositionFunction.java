@@ -32,6 +32,14 @@ public class PropositionFunction {
         props.addAll(Arrays.asList(pProps));
     }
 
+    /**
+     * return states that satisfies expressions
+     *
+     * @param pExpression
+     * @param pPropositions
+     * @return
+     * @throws EvaluationException
+     */
     public Collection<State> intension(final Collection<State> pModelStates,
             final Set<Proposition> pModelProps, final Expression pExpression)
             throws EvaluationException {
@@ -113,12 +121,11 @@ public class PropositionFunction {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("\n");
+        final StringBuilder sb = new StringBuilder();
         for (Map.Entry<State, Set<Proposition>> entry : table.entrySet()) {
             State state = entry.getKey();
             Set<Proposition> set = entry.getValue();
-
-            sb.append(state).append(set).append("\n");
+            sb.append(state).append(set).append(", ");
         }
 
         return sb.toString();

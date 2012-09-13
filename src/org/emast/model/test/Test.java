@@ -24,7 +24,9 @@ public class Test implements Runnable {
     @Override
     public void run() {
         final StringBuilder sb = new StringBuilder();
+        sb.append("\nModel:");
         sb.append(problem.getModel().toString());
+        sb.append("\n\nProblem:");
         sb.append(problem.toString());
         sb.append("\nExecution:");
 
@@ -39,6 +41,7 @@ public class Test implements Runnable {
             sb.append(algorithm.printResults());
             //if a solution was found...
             if (result != null) {
+                sb.append("\n\nResult:");
                 sb.append(problem.toString(result));
             }
         }

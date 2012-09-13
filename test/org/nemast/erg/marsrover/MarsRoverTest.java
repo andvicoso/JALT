@@ -1,6 +1,6 @@
 package org.nemast.erg.marsrover;
 
-import org.emast.model.algorithm.reinforcement.ValueIterationAlgorithm;
+import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.test.Test;
 
@@ -13,7 +13,7 @@ public class MarsRoverTest extends Test {
     private static final MarsRoverProblemFactory factory = new MarsRoverProblemFactory();
 
     public MarsRoverTest() {
-        super(createProblem(), new ValueIterationAlgorithm());
+        super(createProblem(), new PPFERG());
     }
 
     private static Problem createProblem() {

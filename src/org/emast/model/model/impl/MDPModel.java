@@ -137,7 +137,7 @@ public abstract class MDPModel implements MDP, Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("\nModel:");
+        StringBuilder sb = new StringBuilder();
         sb.append("\nStates: ").append(states);
         sb.append("\nActions: ").append(actions);
         sb.append("\nAgents: ").append(agents);

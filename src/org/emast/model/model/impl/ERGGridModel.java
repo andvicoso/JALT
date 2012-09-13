@@ -97,10 +97,9 @@ public abstract class ERGGridModel extends GridModel implements ERG, BadRewarder
     public String toString() {
         StringBuilder sb = new StringBuilder(super.toString());
         sb.append("\nPropositions: ").append(getPropositions());
-        sb.append("\nProposition Function: ").append(getPropositionFunction());
-        sb.append("\nFinal Goal: ").append(getGoal());
-        sb.append("\nPreservation Goal: ").append(getPreservationGoal());
-        sb.append("\nBad Reward Propositions: ").append(getBadRewards());
+        sb.append("\nProposition function: ").append(getPropositionFunction());
+        sb.append("\nFinal goal: ").append(getGoal());
+        sb.append("\nPreservation goal: ").append(getPreservationGoal());
 
         return sb.toString();
     }

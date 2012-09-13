@@ -18,17 +18,13 @@ public class Policy extends HashMap<State, Action> {
         final StringBuilder sb = new StringBuilder();
         for (final State state : list) {
             final Action action = get(state);
-            sb.append("(").append(state.getName());
-            sb.append(", ").append(action.getName()).append(")");
-            //if (list.indexOf(state) > 0 && list.indexOf(state) % 10 == 0)
-            //result += "\n";
+            sb.append("(");
+            sb.append(state.getName());
+            sb.append(", ");
+            sb.append(action.getName());
+            sb.append(")");
         }
 
-        String result = sb.toString();
-        if (result.length() > 1 && result.lastIndexOf(',') > -1) {
-            result = result.substring(0, result.lastIndexOf(','));
-        }
-
-        return result;
+        return sb.toString();
     }
 }

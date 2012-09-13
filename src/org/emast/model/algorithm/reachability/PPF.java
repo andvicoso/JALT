@@ -21,9 +21,9 @@ import org.emast.util.ModelUtils;
  */
 public class PPF<M extends MDP & SRG> implements Algorithm<M, Policy> {
 
-    private M model;
+    protected M model;
     private double gama = 0.9;
-    private int iterations = 0;
+    protected int iterations = 0;
 
     @Override
     public Policy run(Problem<M> pProblem) {
@@ -94,7 +94,8 @@ public class PPF<M extends MDP & SRG> implements Algorithm<M, Policy> {
 
     protected Collection<State> intension(final Expression pExpression) {
         try {
-            return model.getPropositionFunction().intension(model.getStates(), model.getPropositions(), pExpression);
+            return model.getPropositionFunction().intension(model.getStates(),
+                    model.getPropositions(), pExpression);
         } catch (EvaluationException ex) {
         }
         return null;
@@ -175,6 +176,7 @@ public class PPF<M extends MDP & SRG> implements Algorithm<M, Policy> {
     public String printResults() {
         final StringBuilder sb = new StringBuilder();
         sb.append("\nIterations: ").append(iterations);
+        sb.append("\nGama: ").append(gama);
 
         return sb.toString();
     }

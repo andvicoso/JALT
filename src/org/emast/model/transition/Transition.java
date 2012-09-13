@@ -25,4 +25,28 @@ public class Transition {
     public String toString() {
         return "(" + state.getName() + ", " + action.getName() + ")";
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Transition other = (Transition) obj;
+        if (this.state != other.state && (this.state == null || !this.state.equals(other.state))) {
+            return false;
+        }
+        if (this.action != other.action && (this.action == null || !this.action.equals(other.action))) {
+            return false;
+        }
+        return true;
+    }
 }
