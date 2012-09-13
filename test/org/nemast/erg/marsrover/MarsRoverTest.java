@@ -17,10 +17,10 @@ public class MarsRoverTest extends Test {
     }
 
     private static Problem createProblem() {
-        final int rows = 9;
-        final int cols = 9;
-        final int agents = 5;
-        final int obstacles = 35;
+        final int rows = 5;
+        final int cols = 5;
+        final int agents = (int) (0.15 * rows * cols);
+        final int obstacles = (int) (0.3 * rows * cols);
 
         return factory.createProblem(rows, cols, agents, obstacles);
     }

@@ -13,12 +13,12 @@ public class Test implements Runnable {
 
     private static PrintStream out = System.out;
     private Problem problem;
-    private Algorithm algorithm;
+    private Algorithm[] algorithms;
     private long msecs;
 
-    public Test(Problem pProblem, Algorithm pAlgorithm) {
+    public Test(Problem pProblem, Algorithm... pAlgorithms) {
         problem = pProblem;
-        algorithm = pAlgorithm;
+        algorithms = pAlgorithms;
     }
 
     protected void init() {
@@ -31,16 +31,18 @@ public class Test implements Runnable {
     public void run() {
         init();
 
-        long initMsecs = System.currentTimeMillis();
-        Object result = algorithm.run(problem);
-        msecs = System.currentTimeMillis() - initMsecs;
+        for (Algorithm algorithm : algorithms) {
+            long initMsecs = System.currentTimeMillis();
+            Object result = algorithm.run(problem);
+            msecs = System.currentTimeMillis() - initMsecs;
 
-        out.println("\nTime: ");
-        out.println(toTimeString(msecs));
+            out.println("\nTime: ");
+            out.println(toTimeString(msecs));
 
-        //if a solution was found...
-        if (result != null) {
-            out.println(result.toString() + "\n");
+            //if a solution was found...
+            if (result != null) {
+                out.println(result.toString() + "\n");
+            }
         }
     }
 

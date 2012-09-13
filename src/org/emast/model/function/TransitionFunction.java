@@ -61,7 +61,12 @@ public abstract class TransitionFunction {
     public Collection<Action> getActionsFrom(final Collection<Action> pModelActions, final State pState) {
         final Collection<Action> list = new HashSet<Action>();
 
-        //TODO
+        for (Action action : pModelActions) {
+            double value = getValue(pState, State.ANY, action);
+            if (value > 0) {
+                list.add(action);
+            }
+        }
 
         return list;
     }

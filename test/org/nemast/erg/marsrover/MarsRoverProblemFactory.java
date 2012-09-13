@@ -35,6 +35,7 @@ public class MarsRoverProblemFactory extends ProblemFactory {
         }
         //put final goal over the grid
         pf.add(getRandomEmptyState(model), exit);
+        model.setPropositionFunction(pf);
         //create initial states
         final List<State> initStates = getRandomEmptyStates(model, pAgents);
         final Map<Integer, State> map = CollectionsUtils.asMap(initStates);

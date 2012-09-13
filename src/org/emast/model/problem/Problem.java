@@ -41,4 +41,15 @@ public class Problem<M extends MDP> {
                 + Utils.toFileTimeString(System.currentTimeMillis()) + ".emastp";
         Utils.toFile(this, filename);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Initial States: ");
+        sb.append(initialStates);
+        sb.append("\n");
+        sb.append(model.toString());
+
+        return sb.toString();
+    }
 }

@@ -11,6 +11,7 @@ import org.emast.model.function.TransitionFunction;
 import org.emast.model.model.Grid;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
+import org.emast.util.GridPrinter;
 
 /**
  *
@@ -98,7 +99,11 @@ public abstract class GridModel extends MDPModel implements Grid {
             @Override
             public double getValue(State pState, State pFinalState, Action pAction) {
                 final Map<State, Action> targets = getTransitions(pState);
-                final double value = 1d / targets.size();
+                double value = 0;
+
+                if (targets.values().contains(pAction)) {
+                    value = 1d / targets.size();
+                }
 
                 return value;
             }
@@ -107,6 +112,12 @@ public abstract class GridModel extends MDPModel implements Grid {
 
     private State getState(final int pRow, final int pCol) {
         return getState(getGridStateName(pRow, pCol));
+    }
+
+    @Override
+    public String toString() {
+        final GridPrinter gridPrinter = new GridPrinter();
+        return gridPrinter.print(this, true);
     }
 
     public static List<State> createStates(final int pRows, final int pCols) {
