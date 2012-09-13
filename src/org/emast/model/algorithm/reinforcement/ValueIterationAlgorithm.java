@@ -3,16 +3,19 @@ package org.emast.model.algorithm.reinforcement;
 import java.util.*;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.Algorithm;
+import org.emast.model.model.Grid;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
+import org.emast.util.GridPrinter;
 
 public class ValueIterationAlgorithm<M extends MDP> implements Algorithm<M, Policy> {
 
     private List<Map<State, Double>> values;
     private int iterations;
     private double gama = 0.9d;
+    private M model;
 
     public ValueIterationAlgorithm() {
         values = new ArrayList<Map<State, Double>>();
@@ -22,7 +25,7 @@ public class ValueIterationAlgorithm<M extends MDP> implements Algorithm<M, Poli
     @Override
     public Policy run(final Problem<M> pProblem) {
         Policy pi;
-        M model = pProblem.getModel();
+        model = pProblem.getModel();
         // Start the main loop
         // When the maximmum error is greater than the defined error,
         // the best policy is found
@@ -132,10 +135,22 @@ public class ValueIterationAlgorithm<M extends MDP> implements Algorithm<M, Poli
 
     @Override
     public String printResults() {
+        String lvs;
+        Map<State, Double> lastValues = values.get(iterations);
+        if (model instanceof Grid) {
+            int rows = ((Grid) model).getRows();
+            int cols = ((Grid) model).getCols();
+            lvs = new GridPrinter().toTable(lastValues, rows, cols);
+        } else {
+            lvs = lastValues.toString();
+        }
+
         final StringBuilder sb = new StringBuilder();
         sb.append("\nIterations: ").append(iterations);
         sb.append("\nGama: ").append(gama);
-        
+        sb.append("\nLast values:\n").append(lvs);
+
+
         return sb.toString();
     }
 }
