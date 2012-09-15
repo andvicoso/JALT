@@ -4,6 +4,7 @@ import java.util.*;
 import net.sourceforge.jeval.EvaluationException;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.Algorithm;
+import org.emast.model.function.TransitionFunction;
 import org.emast.model.model.MDP;
 import org.emast.model.model.SRG;
 import org.emast.model.problem.Problem;
@@ -60,24 +61,21 @@ public class PPF<M extends MDP & SRG> implements Algorithm<M, Policy> {
     protected Policy choose(final Map<State, Double> pValues,
             final Collection<Transition> pPrune) {
         final Policy pi = new Policy();
+        final TransitionFunction tf = model.getTransitionFunction();
 
         for (final State state : ModelUtils.getStates(pPrune)) {
             final Set<Action> pruneActions = ModelUtils.getActions(pPrune);
             final Map<Double, Action> q = new HashMap<Double, Action>();
             // search for the Qs values for state
-            for (final Action actions : pruneActions) {
+            for (final Action action : pruneActions) {
                 double sum = 0;
-                for (final State stateLine : model.getTransitionFunction().getReachableStates(model.getStates(),
-                        state, actions)) {
-                    final Double trans = model.getTransitionFunction().getValue(
-                            state, stateLine, actions);
+                for (final State stateLine : tf.getReachableStates(model.getStates(), state, action)) {
+                    final Double trans = tf.getValue(state, stateLine, action);
                     if (trans != null && pValues.get(stateLine) != null) {
                         sum += trans * pValues.get(stateLine);
                     }
                 }
-
-                double x = gama * sum;
-                q.put(x, actions);
+                q.put(gama * sum, action);
             }
             //if found something
             if (q.size() > 0) {
@@ -98,7 +96,7 @@ public class PPF<M extends MDP & SRG> implements Algorithm<M, Policy> {
                     model.getPropositions(), pExpression);
         } catch (EvaluationException ex) {
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**

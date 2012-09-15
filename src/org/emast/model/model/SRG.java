@@ -9,7 +9,7 @@ import org.emast.model.propositional.Proposition;
  *
  * @author Anderson
  */
-public interface SRG {
+public interface SRG extends MDP{
 
     void setPropositionFunction(PropositionFunction pf);
 

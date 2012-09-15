@@ -13,7 +13,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class BadRewardFunction<M extends MDP & ERG & BadRewarder> implements RewardFunction {
+public class BadRewardFunction<M extends ERG & BadRewarder> implements RewardFunction {
 
     private final M model;
 

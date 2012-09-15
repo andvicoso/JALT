@@ -72,55 +72,33 @@ public final class Expression implements Serializable {
         return new Expression(NOT + exp);
     }
 
-    public boolean evaluate(final Map<String, String> pMap) throws EvaluationException {
-        if (pMap == null || pMap.isEmpty()) {
-            return false;
-        }
-        //code vars
-        final StringBuilder sb = new StringBuilder();
-        final StringTokenizer st = new StringTokenizer(expression, EVALUATE_DELIMS, true);
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            if (pMap.containsKey(token)) {
-                sb.append("#{").append(token).append("}");
-            } else {
-                sb.append(token);
-            }
-        }
-        //replace operators tokens
-        String codedVariablesExpression = sb.toString();
-        codedVariablesExpression = codedVariablesExpression.replace(AND.getToken(), JEVAL_AND_TOKEN);
-        codedVariablesExpression = codedVariablesExpression.replace(OR.getToken(), JEVAL_OR_TOKEN);
-        //evaluate
-        final Evaluator eval = createEvaluator(pMap);
-        return eval.getBooleanResult(codedVariablesExpression);
+    public boolean isEmpty() {
+        return expression.isEmpty();
     }
 
-    public boolean evaluate(final Set<Proposition> pPropositions, final boolean pValueForAllProps)
+    public boolean evaluate(final Set<Proposition> pTrueProps)
             throws EvaluationException {
-        if (pPropositions == null || pPropositions.isEmpty()) {
+        if (pTrueProps == null) {
             return false;
         }
         //create propositions values for expression
-        final Map<String, String> map = new HashMap<String, String>(pPropositions.size());
-        for (final Proposition proposition : pPropositions) {
-            map.put(proposition.getName(), getValue(pValueForAllProps));
-        }
-        return evaluate(map);
-    }
-
-    public boolean evaluate(final Interpretation pInter, final Set<Proposition> pModelPropos)
-            throws EvaluationException {
-        if (pModelPropos == null || pModelPropos.isEmpty()) {
-            return false;
-        }
-        //create propositions values for expression
-        final Map<String, String> map = new HashMap<String, String>(pModelPropos.size());
-        for (final Proposition proposition : pModelPropos) {
-            boolean value = pInter.containsKey(proposition) && pInter.get(proposition);
+        final Set<Proposition> expProps = getPropositions();
+        final Map<String, String> map = new HashMap<String, String>(expProps.size());
+        for (final Proposition proposition : expProps) {
+            boolean value = pTrueProps.contains(proposition);
             map.put(proposition.getName(), getValue(value));
         }
         return evaluate(map);
+    }
+
+    private boolean evaluate(final Map<String, String> pMap) throws EvaluationException {
+        //code vars
+        String jEvalExp = codeJEvalVariables(pMap);
+        //replace operators tokens
+        String codedJEvalExp = replaceJEvalOperators(jEvalExp);
+        //evaluate
+        final Evaluator eval = createEvaluator(pMap);
+        return eval.getBooleanResult(codedJEvalExp);
     }
 
     @Override
@@ -253,5 +231,27 @@ public final class Expression implements Serializable {
         }
 
         return false;
+    }
+
+    private String codeJEvalVariables(Map<String, String> pMap) {
+        final StringBuilder sb = new StringBuilder();
+        final StringTokenizer st = new StringTokenizer(expression, EVALUATE_DELIMS, true);
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            if (pMap.containsKey(token)) {
+                sb.append("#{").append(token).append("}");
+            } else {
+                sb.append(token);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private String replaceJEvalOperators(String pJEvalExp) {
+        String codedJEvalExp = pJEvalExp.replace(AND.getToken(), JEVAL_AND_TOKEN);
+        codedJEvalExp = codedJEvalExp.replace(OR.getToken(), JEVAL_OR_TOKEN);
+
+        return codedJEvalExp;
     }
 }

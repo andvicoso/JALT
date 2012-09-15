@@ -1,8 +1,7 @@
-package org.emast.model.algorithm.planning.agent;
+package org.emast.model.algorithm.planning.agent.iterator;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.emast.model.agent.Agent;
 import org.emast.model.comm.Message;
@@ -10,7 +9,6 @@ import org.emast.model.comm.MessageHistory;
 import org.emast.model.comm.StateRewardMessage;
 import org.emast.model.model.ERG;
 import org.emast.model.model.MDP;
-import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
@@ -19,7 +17,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class CommAgentIterator<M extends MDP & ERG> extends PropReputationAgentIterator<M> {
+public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterator<M> {
 
     private final double badMessageThreshold;
     private final MessageHistory history;
@@ -101,30 +99,6 @@ public class CommAgentIterator<M extends MDP & ERG> extends PropReputationAgentI
             final Message msg = new StateRewardMessage(nextState, reward, ag);
             //broadcast it!
             sendMessage(msg);
-        }
-    }
-
-    public static class CommAgentIteratorFactory<M extends MDP & ERG> extends PropReputationAgentIteratorFactory<M> {
-
-        protected double badMessageThreshold;
-        private final double messageCost;
-
-        public CommAgentIteratorFactory(double pMessageCost, double pBadRewardThreshold, double pBadMessageThreshold) {
-            super(pBadRewardThreshold);
-            badMessageThreshold = pBadMessageThreshold;
-            messageCost = pMessageCost;
-        }
-
-        @Override
-        public List<AgentIterator> createAgentIterators(Problem<M> pProblem, Policy pInitialPolicy) {
-            return super.createAgentIterators(pProblem, pInitialPolicy);
-        }
-
-        @Override
-        public CommAgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState) {
-            final M newModel = (M) pModel.copy();
-            return new CommAgentIterator(newModel, pPolicy, pAgent, pInitialState,
-                    messageCost, badRewardThreshold, badMessageThreshold);
         }
     }
 }

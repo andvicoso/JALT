@@ -3,7 +3,6 @@ package org.emast.model.function;
 import java.util.*;
 import net.sourceforge.jeval.EvaluationException;
 import org.emast.model.propositional.Expression;
-import org.emast.model.propositional.Interpretation;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.state.State;
@@ -33,7 +32,7 @@ public class PropositionFunction {
     }
 
     /**
-     * return states that satisfies expressions
+     * return states that satisfies the expression
      *
      * @param pExpression
      * @param pPropositions
@@ -46,7 +45,7 @@ public class PropositionFunction {
         final Collection<State> result = new HashSet<State>();
 
         for (final State state : pModelStates) {
-            if (satisfies(pModelProps, state, pExpression)) {
+            if (satisfies(state, pExpression)) {
                 result.add(state);
             }
         }
@@ -54,28 +53,19 @@ public class PropositionFunction {
         return result;
     }
 
-    public boolean satisfies(final Set<Proposition> pModelProps,
-            final State pState, final Expression pExpression)
+    public boolean satisfies(final State pState, final Expression pExpression)
             throws EvaluationException {
-        boolean containsState = false;
-
         for (State state : table.keySet()) {
             if (isStateValid(pState, state)) {
-                containsState = true;
-
                 Set<Proposition> props = table.get(state);
-                Interpretation inter = new Interpretation(props);
 
-                if (pExpression.evaluate(inter, pModelProps)) {
+                if (pExpression.evaluate(props)) {
                     return true;
                 }
             }
         }
 
-        if (!containsState) {
-            return pExpression.evaluate(new Interpretation(), pModelProps);
-        }
-        return false;
+        return pExpression.isEmpty();
     }
 
     public Set<Proposition> getPropositionsForState(final State pState) {

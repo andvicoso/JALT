@@ -1,10 +1,9 @@
-package org.emast.model.algorithm.planning.agent;
+package org.emast.model.algorithm.planning.agent.iterator;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.emast.model.algorithm.planning.agent.ERGAgentIterator.ERGAgentIteratorFactory;
 import org.emast.model.model.ERG;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -19,7 +18,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class PropReputationAgentIterator<M extends MDP & ERG> extends ERGAgentIterator<M> {
+public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator<M> {
 
     private final double badRewardThreshold;
     private final Map<Proposition, Double> localPropositionsReputation;
@@ -80,7 +79,7 @@ public class PropReputationAgentIterator<M extends MDP & ERG> extends ERGAgentIt
     }
 
     protected Problem<M> cloneProblem(final Expression pNewPreservGoal) {
-        final M cloneModel = (M)getModel().copy();
+        final M cloneModel = (M) getModel().copy();
         //set new preservation goal
         cloneModel.setPreservationGoal(pNewPreservGoal);
         //set the initial state only for the current agent
@@ -109,7 +108,7 @@ public class PropReputationAgentIterator<M extends MDP & ERG> extends ERGAgentIt
             if (!newPreservGoal.equals(originalPreservGoal)
                     && !originalPreservGoal.contains(newPropsExp)
                     && !originalPreservGoal.contains(newPropsExp.negate())
-                    && !getModel().getPropositionFunction().satisfies(getModel().getPropositions(), pState, finalGoal)) {
+                    && !getModel().getPropositionFunction().satisfies(pState, finalGoal)) {
                 //TODO: Decide which propositions are giving a bad reward
                 //create a new cloned problem
                 final Problem<M> newProblem = cloneProblem(newPreservGoal);
@@ -170,20 +169,5 @@ public class PropReputationAgentIterator<M extends MDP & ERG> extends ERGAgentIt
         }
 
         return changedProp != null;
-    }
-
-    public static class PropReputationAgentIteratorFactory<M extends MDP & ERG> extends ERGAgentIteratorFactory<M> {
-
-        protected double badRewardThreshold;
-
-        public PropReputationAgentIteratorFactory(double pBadRewardThreshold) {
-            badRewardThreshold = pBadRewardThreshold;
-        }
-
-        @Override
-        public PropReputationAgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState) {
-            final M newModel = (M)pModel.copy();
-            return new PropReputationAgentIterator(newModel, pPolicy, pAgent, pInitialState, badRewardThreshold);
-        }
     }
 }

@@ -27,8 +27,8 @@ public class ValueIterationSRGAlgorithm<M extends MDP & SRG>
         // Initilize the policies with random values
         for (final State state : model.getStates()) {
             try {
-                values.get(0).put(state, model.getPropositionFunction().satisfies(model.getPropositions(), state,
-                        model.getGoal()) ? 1d : 0d);
+                double value = model.getPropositionFunction().satisfies(state, model.getGoal()) ? 1d : 0d;
+                values.get(0).put(state, value);
             } catch (EvaluationException ex) {
             }
         }
@@ -37,7 +37,7 @@ public class ValueIterationSRGAlgorithm<M extends MDP & SRG>
         // the best policy is found
         do {
             pis.add(new Policy());
-            
+
             for (final State state : model.getStates()) {
                 final Map<Double, Action> q = getQ(model, iterations == 0
                         ? null : values.get(iterations - 1), state);

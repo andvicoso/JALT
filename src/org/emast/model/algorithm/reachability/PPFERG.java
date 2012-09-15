@@ -9,7 +9,7 @@ import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.model.transition.Transition;
 
-public class PPFERG<M extends MDP & ERG> extends PPF<M> {
+public class PPFERG<M extends ERG> extends PPF<M> {
 
     /**
      * if is true, then the algorithm will stop when it finds a valid path to some agent's initial position.

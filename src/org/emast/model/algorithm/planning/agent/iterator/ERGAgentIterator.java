@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.planning.agent;
+package org.emast.model.algorithm.planning.agent.iterator;
 
 import java.util.Collection;
 import org.emast.model.algorithm.reachability.PPFERG;
@@ -12,7 +12,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class ERGAgentIterator<M extends MDP & ERG> extends AgentIterator<M> {
+public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
 
     public ERGAgentIterator(M pModel, Policy pInitialPolicy, int pAgent, State pInitialState) {
         super(pModel, pInitialPolicy, pAgent, pInitialState);
@@ -26,12 +26,12 @@ public class ERGAgentIterator<M extends MDP & ERG> extends AgentIterator<M> {
         return new PPFERG<M>();
     }
 
-    public static class ERGAgentIteratorFactory<M extends MDP & ERG> extends DefaultAgentIteratorFactory<M> {
+    @Override
+    public String printResults() {
+        final StringBuilder sb = new StringBuilder(super.printResults());
+        sb.append("\nFinal goal: ").append(getModel().getGoal());
+        sb.append("\nPreservation goal: ").append(getModel().getPreservationGoal());
 
-        @Override
-        public ERGAgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState) {
-            final M newModel = (M)pModel.copy();
-            return new ERGAgentIterator(newModel, pPolicy, pAgent, pInitialState);
-        }
+        return sb.toString();
     }
 }
