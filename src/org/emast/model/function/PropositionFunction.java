@@ -2,6 +2,7 @@ package org.emast.model.function;
 
 import java.util.*;
 import net.sourceforge.jeval.EvaluationException;
+import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
@@ -41,7 +42,7 @@ public class PropositionFunction {
      */
     public Collection<State> intension(final Collection<State> pModelStates,
             final Set<Proposition> pModelProps, final Expression pExpression)
-            throws EvaluationException {
+            throws InvalidExpressionException {
         final Collection<State> result = new HashSet<State>();
 
         for (final State state : pModelStates) {
@@ -54,7 +55,7 @@ public class PropositionFunction {
     }
 
     public boolean satisfies(final State pState, final Expression pExpression)
-            throws EvaluationException {
+            throws InvalidExpressionException {
         for (State state : table.keySet()) {
             if (isStateValid(pState, state)) {
                 Set<Proposition> props = table.get(state);

@@ -2,7 +2,7 @@ package org.emast.model.algorithm.reinforcement;
 
 import java.util.*;
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.Algorithm;
+import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.model.Grid;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -10,7 +10,7 @@ import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.util.GridPrinter;
 
-public class ValueIterationAlgorithm<M extends MDP> implements Algorithm<M, Policy> {
+public class ValueIterationAlgorithm<M extends MDP> implements PolicyGenerator<M> {
 
     private List<Map<State, Double>> values;
     private int iterations;

@@ -4,14 +4,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.Algorithm;
+import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.util.PolicyUtils;
 
-public class PolicyIterationAlgorithm implements Algorithm<MDP, Policy> {
+public class PolicyIterationAlgorithm implements PolicyGenerator<MDP> {
 
     private double gama = 0.9d;
     private int iterations = 0;

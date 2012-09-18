@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import net.sourceforge.jeval.EvaluationException;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.reinforcement.ValueIterationAlgorithm;
-import org.emast.model.model.MDP;
+import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.SRG;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 
-public class ValueIterationSRGAlgorithm<M extends MDP & SRG>
+public class ValueIterationSRGAlgorithm<M extends SRG>
         extends ValueIterationAlgorithm<M> {
 
     private int iterations = 0;
@@ -29,7 +28,7 @@ public class ValueIterationSRGAlgorithm<M extends MDP & SRG>
             try {
                 double value = model.getPropositionFunction().satisfies(state, model.getGoal()) ? 1d : 0d;
                 values.get(0).put(state, value);
-            } catch (EvaluationException ex) {
+            } catch (InvalidExpressionException ex) {
             }
         }
         // Start the main loop

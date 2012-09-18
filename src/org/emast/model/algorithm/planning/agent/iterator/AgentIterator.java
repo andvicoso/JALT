@@ -23,12 +23,12 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
     private static final boolean DEBUG = true;
     protected double totalReward;
     protected State currentState;
-    protected Policy policy;
     protected Plan plan;
     protected final int agent;
     private long msecs;
     private AgentIteratorState itState = AgentIteratorState.INITIAL;
     protected M model;
+    private Policy policy;
 
     public AgentIterator(final int pAgent) {
         agent = pAgent;
@@ -37,6 +37,7 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
     @Override
     public Plan run(Problem<M> pProblem) {
         model = pProblem.getModel();
+
         long initMsecs = System.currentTimeMillis();
 
         itState = doRun(pProblem);
@@ -68,7 +69,7 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
 
     protected AgentIteratorState doRun(Problem<M> pProblem) {
         Action action;
-        int count = 0;
+        int iterations = 0;
         //get the agent's initial state
         currentState = pProblem.getInitialStates().get(getAgent());
         //create a plan for agent
@@ -93,12 +94,15 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
                 } else {
                     currentState = null;
                 }
-                count++;
+                //count iterations
+                iterations++;
+                //save action in plan
+                plan.add(action);
             }
             //while there is a valid state to go to and did not reach the max iteration
-        } while (action != null && currentState != null && count < MAX_ITERATIONS);
+        } while (action != null && currentState != null && iterations < MAX_ITERATIONS);
 
-        return count < MAX_ITERATIONS ? FINISHED : FINISHED_MAX_ITERATIONS;
+        return iterations < MAX_ITERATIONS ? FINISHED : FINISHED_MAX_ITERATIONS;
     }
 
     @Override

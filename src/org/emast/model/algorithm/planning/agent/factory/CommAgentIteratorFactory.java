@@ -1,10 +1,8 @@
 package org.emast.model.algorithm.planning.agent.factory;
 
-import org.emast.model.algorithm.executor.rewardcombinator.MeanRewardCombinator;
+import org.emast.model.algorithm.planning.rewardcombinator.impl.MeanRewardCombinator;
 import org.emast.model.algorithm.planning.agent.iterator.CommAgentIterator;
 import org.emast.model.model.ERG;
-import org.emast.model.solution.Policy;
-import org.emast.model.state.State;
 
 /**
  *

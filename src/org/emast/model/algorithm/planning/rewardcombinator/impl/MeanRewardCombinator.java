@@ -1,9 +1,10 @@
-package org.emast.model.algorithm.executor.rewardcombinator;
+package org.emast.model.algorithm.planning.rewardcombinator.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.propositional.Proposition;
 import org.emast.util.comparator.ValueComparator;
 

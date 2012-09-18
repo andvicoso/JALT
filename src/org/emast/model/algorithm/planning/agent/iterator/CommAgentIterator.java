@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.emast.model.algorithm.executor.rewardcombinator.RewardCombinator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.comm.Message;
 import org.emast.model.comm.MessageHistory;
 import org.emast.model.comm.StateRewardMessage;
+import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.solution.Policy;
@@ -42,13 +45,17 @@ public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterato
         savePropositionReputation(pMsg.getState(), pMsg.getValue(), messagePropositionsReputation);
         //verify the need to change the preservation goal
         if (mustChangePreservationGoal(pMsg.getState())) {
-            //verify the need to change the preservation goal
-            final Policy p = changePreservationGoal(pMsg.getState());
-            //if found a policy
-            if (p != null) {
-                //changed preservation goal, continue iteration 
-                //with the new preservation goal and policy
-                setPolicy(p);
+            try {
+                //verify the need to change the preservation goal
+                final Policy p = changePreservationGoal(pMsg.getState());
+                //if found a policy
+                if (p != null) {
+                    //changed preservation goal, continue iteration 
+                    //with the new preservation goal and policy
+                    setPolicy(p);
+                }
+            } catch (InvalidExpressionException ex) {
+                Logger.getLogger(CommAgentIterator.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

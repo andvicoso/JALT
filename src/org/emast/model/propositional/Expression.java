@@ -1,5 +1,6 @@
 package org.emast.model.propositional;
 
+import org.emast.model.exception.InvalidExpressionException;
 import java.io.Serializable;
 import java.util.*;
 import net.sourceforge.jeval.EvaluationException;
@@ -77,18 +78,24 @@ public final class Expression implements Serializable {
     }
 
     public boolean evaluate(final Set<Proposition> pTrueProps)
-            throws EvaluationException {
+            throws InvalidExpressionException {
         if (pTrueProps == null) {
             return false;
         }
         //create propositions values for expression
-        final Set<Proposition> expProps = getPropositions();
-        final Map<String, String> map = new HashMap<String, String>(expProps.size());
+        Set<Proposition> expProps = getPropositions();
+        Map<String, String> map = new HashMap<String, String>(expProps.size());
+
         for (final Proposition proposition : expProps) {
             boolean value = pTrueProps.contains(proposition);
             map.put(proposition.getName(), getValue(value));
         }
-        return evaluate(map);
+
+        try {
+            return evaluate(map);
+        } catch (EvaluationException ex) {
+            throw new InvalidExpressionException(expression);
+        }
     }
 
     private boolean evaluate(final Map<String, String> pMap) throws EvaluationException {
@@ -96,8 +103,9 @@ public final class Expression implements Serializable {
         String jEvalExp = codeJEvalVariables(pMap);
         //replace operators tokens
         String codedJEvalExp = replaceJEvalOperators(jEvalExp);
+        //create evaluator
+        Evaluator eval = createEvaluator(pMap);
         //evaluate
-        final Evaluator eval = createEvaluator(pMap);
         return eval.getBooleanResult(codedJEvalExp);
     }
 

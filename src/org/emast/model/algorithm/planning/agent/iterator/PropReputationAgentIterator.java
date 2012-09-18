@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import net.sourceforge.jeval.EvaluationException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
@@ -43,13 +45,17 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
         savePropositionReputation(pNextState, pReward, localPropositionsReputation);
         //verify the need to change the preservation goal
         if (mustChangePreservationGoal(pNextState)) {
-            //get the new policy for the new preservation goal (if one exists)
-            Policy p = changePreservationGoal(pNextState);
-            //if found a policy
-            if (p != null) {
-                //changed preservation goal, continue iteration 
-                //with the new preservation goal and policy
-                setPolicy(p);
+            try {
+                //get the new policy for the new preservation goal (if one exists)
+                Policy p = changePreservationGoal(pNextState);
+                //if found a policy
+                if (p != null) {
+                    //changed preservation goal, continue iteration 
+                    //with the new preservation goal and policy
+                    setPolicy(p);
+                }
+            } catch (InvalidExpressionException ex) {
+                Logger.getLogger(PropReputationAgentIterator.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -90,7 +96,7 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
         return localPropositionsReputation;
     }
 
-    protected Policy changePreservationGoal(State pState) {
+    protected Policy changePreservationGoal(State pState) throws InvalidExpressionException {
         //save the goal
         Expression finalGoal = model.getGoal();
         //save the original preservation goal
@@ -102,41 +108,39 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
         //and join them with an AND operator
         newPreservGoal.add(newPropsExp, BinaryOperator.AND);
 
-        try {
-            //compare previous goal with the newly created
-            if (!newPreservGoal.equals(originalPreservGoal)
-                    && !originalPreservGoal.contains(newPropsExp)
-                    && !originalPreservGoal.contains(newPropsExp.negate())
-                    && !model.getPropositionFunction().satisfies(pState, finalGoal)) {
-                //TODO: Decide which propositions are giving a bad reward
-                //create a new cloned problem
-                Problem<M> newProblem = cloneProblem(model, newPreservGoal);
-                //Execute the base algorithm (PPFERG) over the new problem (with the new preservation goal)
-                Policy p = getAlgorithm().run(newProblem);
-                //if there isn`t a path to reach the goal,
-                if (canReachFinalGoal(newProblem)) {
-                    //set the new preservation goal to the current problem
-                    newProblem.getModel().setPreservationGoal(newPreservGoal);
-                    //confirm the goal modification
-                    print("changed preservation goal from {"
-                            + originalPreservGoal + "} to {" + newPreservGoal + "}");
-                    return p;
-                }
+        //compare previous goal with the newly created
+        if (!newPreservGoal.equals(originalPreservGoal)
+                && !originalPreservGoal.contains(newPropsExp)
+                && !originalPreservGoal.contains(newPropsExp.negate())
+                && !model.getPropositionFunction().satisfies(pState, finalGoal)) {
+            //TODO: Decide which propositions are giving a bad reward
+            //create a new cloned problem
+            Problem<M> newProblem = cloneProblem(model, newPreservGoal);
+            //Execute the base algorithm (PPFERG) over the new problem (with the new preservation goal)
+            Policy p = getAlgorithm().run(newProblem);
+            //if there isn`t a path to reach the goal,
+            if (canReachFinalGoal(newProblem)) {
+                //set the new preservation goal to the current problem
+                newProblem.getModel().setPreservationGoal(newPreservGoal);
+                //confirm the goal modification
+                print("changed preservation goal from {"
+                        + originalPreservGoal + "} to {" + newPreservGoal + "}");
+                return p;
             }
-        } catch (EvaluationException ex) {
-            ex.printStackTrace();
         }
         return null;
     }
 
     private boolean canReachFinalGoal(Problem pProblem) {
         //create a new simple agent iterator
-        AgentIterator iterator = new AgentIterator(getAgent());
+        AgentIterator agentIt = new AgentIterator(getAgent());
+        agentIt.setPolicy(getPolicy());
         //find the plan for the newly created problem
         //with the preservation goal changed
-        iterator.run(pProblem);
+        agentIt.run(pProblem);
         //get the resulting plan
-        Plan agPlan = iterator.getPlan();
+        Plan agPlan = agentIt.getPlan();
+
         return agPlan != null && !agPlan.isEmpty();
     }
 

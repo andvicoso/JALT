@@ -1,8 +1,6 @@
 package org.emast.model.algorithm.planning;
 
 import java.util.List;
-import org.emast.model.algorithm.Algorithm;
-import org.emast.model.algorithm.AlgorithmThread;
 import org.emast.model.algorithm.planning.agent.iterator.AgentIterator;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -12,22 +10,41 @@ import org.emast.model.solution.Policy;
  *
  * @author anderson
  */
-public class Planner<M extends MDP, A extends AgentIterator> implements Algorithm<M, Policy> {
+public class Planner<M extends MDP, A extends AgentIterator> {
 
     private final List<A> agents;
+    private final PolicyGenerator<M> policyGenerator;
 
-    public Planner(List<A> pAgents) {
+    public Planner(PolicyGenerator<M> pPolicyGen, List<A> pAgents) {
         agents = pAgents;
+        policyGenerator = pPolicyGen;
     }
 
-    @Override
-    public Policy run(Problem<M> pProblem) {
+    public void run(final Problem<M> pProblem) {
+        final Policy policy = policyGenerator.run(pProblem);
         //execute them all
-        for (final A agentPlanner : agents) {
-            new AlgorithmThread(agentPlanner, pProblem).start();
-        }
+        for (final A agent : agents) {
+            //set the initial policy
+            agent.setPolicy(policy);
+            //get new thread name
+            String threadName = agent.getClass().getSimpleName()
+                    + " - " + pProblem.getClass().getSimpleName();
+            //create and run an thread for the agent iterator 
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    agent.run(pProblem);
 
-        return null; //TODO: combine?
+                    finished(agent);
+                }
+            }, threadName).start();
+        }
+    }
+
+    protected void finished(A agent) {
+        if (isFinished()) {
+            finished();
+        }
     }
 
     public List<A> getIterators() {
@@ -43,8 +60,6 @@ public class Planner<M extends MDP, A extends AgentIterator> implements Algorith
         return ret;
     }
 
-    @Override
-    public String printResults() {
-        return "";
+    protected void finished() {
     }
 }

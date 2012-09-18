@@ -1,10 +1,10 @@
-package org.emast.model.algorithm.executor;
+package org.emast.model.algorithm.planning;
 
 import java.util.*;
 import org.emast.model.BadRewarder;
-import org.emast.model.algorithm.executor.rewardcombinator.RewardCombinator;
 import org.emast.model.algorithm.planning.agent.iterator.AgentIterator;
 import org.emast.model.algorithm.planning.agent.iterator.PropReputationAgentIterator;
+import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
@@ -17,12 +17,17 @@ import org.emast.model.solution.Policy;
  *
  * @author Anderson
  */
-public class ERGExecutor<R> extends Executor<ERG, PropReputationAgentIterator, R> {
+public class ERGExecutor implements PolicyGenerator<ERG> {
 
-    private static final int MAX_ITERATIONS = 10;
+    protected final RewardCombinator rewardCombinator;
+    protected final int maxIterations;
+    private final Planner<ERG, PropReputationAgentIterator> planner;
 
-    public ERGExecutor(List<PropReputationAgentIterator> pAgents, RewardCombinator pRewardCombinator) {
-        super(pAgents, pRewardCombinator);
+    public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator, List<PropReputationAgentIterator> pAgents,
+            RewardCombinator pRewardCombinator, int pMaxIterations) {
+        rewardCombinator = pRewardCombinator;
+        maxIterations = pMaxIterations;
+        planner = new Planner<ERG, PropReputationAgentIterator>(pPolicyGenerator, pAgents);
     }
 
     @Override
@@ -31,33 +36,35 @@ public class ERGExecutor<R> extends Executor<ERG, PropReputationAgentIterator, R
     }
 
     @Override
-    public R run(Problem<ERG> pProblem) {
+    public Policy run(Problem<ERG> pProblem) {
         ERG model = pProblem.getModel();
-        int count = 0;
+        int iterations = 0;
+
         do {
+            //Policy policy = 
             final Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
             //run problem
-            getPlanner().run(pProblem);
+            planner.run(pProblem);
             //iterators
-            List<PropReputationAgentIterator> as = getPlanner().getIterators();
+            List<PropReputationAgentIterator> as = planner.getIterators();
             //get results for each agent iterator
             for (final PropReputationAgentIterator agentIt : as) {
                 Map<Proposition, Double> propsRep = agentIt.getPropositionsReputation();
                 reps.add(propsRep);
             }
             //combine reputations for propositions from agents
-            Map<Proposition, Double> combined = getRewardCombinator().combine(reps);
+            Map<Proposition, Double> combined = rewardCombinator.combine(reps);
             //get "bad" propositions
             Collection<Proposition> props = getBadPropositions(model, combined);
             //verify the need to change the preservation goal
             if (!props.isEmpty()) {
                 changePreservationGoal(pProblem, props);
             }
-        } while (count++ < MAX_ITERATIONS);
+        } while (iterations++ < maxIterations);
         //run problem again with the final combined preserv. goals
-        getPlanner().run(pProblem);
+        run(pProblem);
 
-        return null;
+        return null;// TODO: 
     }
 
     protected boolean changePreservationGoal(final Problem<ERG> pProblem,
@@ -79,9 +86,9 @@ public class ERGExecutor<R> extends Executor<ERG, PropReputationAgentIterator, R
             final ERG newModel = cloneModel(model, newPreservGoal);
             final Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
             //Execute the base algorithm (PPFERG) over the new problem (with the new preservation goal)
-            final Policy p = getPlanner().run(newProblem);
+            run(newProblem);
             //if there isn`t a path to reach the final goal,
-            if (canReachFinalGoal(p, newProblem)) {
+            if (canReachFinalGoal(newProblem)) {
                 //set the preservation goal to the current problem
                 pProblem.getModel().setPreservationGoal(newPreservGoal);
                 //confirm the goal modification
@@ -93,7 +100,7 @@ public class ERGExecutor<R> extends Executor<ERG, PropReputationAgentIterator, R
         return false;
     }
 
-    private boolean canReachFinalGoal(final Policy pPolicy, final Problem<ERG> pProblem) {
+    private boolean canReachFinalGoal(final Problem<ERG> pProblem) {
         boolean ret = true;
         final ERG model = pProblem.getModel();
         for (int i = 0; i < model.getAgents(); i++) {

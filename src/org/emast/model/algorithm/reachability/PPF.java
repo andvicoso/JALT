@@ -1,9 +1,12 @@
 package org.emast.model.algorithm.reachability;
 
 import java.util.*;
-import net.sourceforge.jeval.EvaluationException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.Algorithm;
+import org.emast.model.algorithm.planning.PolicyGenerator;
+import org.emast.model.algorithm.planning.agent.iterator.PropReputationAgentIterator;
+import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.function.TransitionFunction;
 import org.emast.model.model.MDP;
 import org.emast.model.model.SRG;
@@ -20,7 +23,7 @@ import org.emast.util.ModelUtils;
  * @author Anderson
  * @param <P> Simple reachability problem to be resolved
  */
-public class PPF<M extends MDP & SRG> implements Algorithm<M, Policy> {
+public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 
     protected M model;
     private double gama = 0.9;
@@ -94,7 +97,8 @@ public class PPF<M extends MDP & SRG> implements Algorithm<M, Policy> {
         try {
             return model.getPropositionFunction().intension(model.getStates(),
                     model.getPropositions(), pExpression);
-        } catch (EvaluationException ex) {
+        } catch (InvalidExpressionException ex) {
+            Logger.getLogger(PropReputationAgentIterator.class.getName()).log(Level.SEVERE, null, ex);
         }
         return Collections.emptyList();
     }
