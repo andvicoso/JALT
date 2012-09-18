@@ -61,10 +61,8 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
 
     protected void addReward(State pNextState, double pReward) {
         //add current reward to total reward
-        if (pReward != 0) {
-            totalReward += pReward;
-            print("received reward of: " + pReward + ". Total: " + totalReward);
-        }
+        totalReward += pReward;
+        print("received reward of: " + pReward + ". Total: " + totalReward);
     }
 
     protected AgentIteratorState doRun(Problem<M> pProblem) {
@@ -86,7 +84,7 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
                 //is there a state pointed by the action?
                 if (nextStates != null && !nextStates.isEmpty()) {
                     final double reward = model.getRewardFunction().getValue(currentState, action);
-                    State nextState = nextStates.iterator().next();
+                    State nextState = nextStates.iterator().next();//TODO:
                     //add reward to total reward
                     addReward(nextState, reward);
                     //change to next state

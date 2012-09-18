@@ -1,10 +1,10 @@
 package org.emast.model.propositional;
 
-import org.emast.model.exception.InvalidExpressionException;
 import java.io.Serializable;
 import java.util.*;
 import net.sourceforge.jeval.EvaluationException;
 import net.sourceforge.jeval.Evaluator;
+import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.propositional.operator.BinaryOperator;
 import static org.emast.model.propositional.operator.BinaryOperator.AND;
 import static org.emast.model.propositional.operator.BinaryOperator.OR;
@@ -26,6 +26,26 @@ public final class Expression implements Serializable {
     private static final String EVALUATE_DELIMS = " !()";
     private String expression;
 
+    public Expression(final Proposition pProposition) {
+        this(pProposition.getName());
+    }
+
+    public Expression(final Collection<Proposition> pPropositions, final BinaryOperator pGlueOperator) {
+        for (final Proposition proposition : pPropositions) {
+            add(new Expression(proposition), pGlueOperator);
+        }
+        optimize();
+    }
+
+    public Expression(final String pExpressionText) {
+        expression = pExpressionText;
+        optimize();
+    }
+
+    public Expression(Expression pExpression) {
+        this(pExpression.expression);
+    }
+
     public static boolean isNegated(final String exp) {
         return exp.startsWith(NOT.toString() + "(")
                 || (exp.startsWith(NOT.toString()) && isPrimitive(exp));
@@ -44,22 +64,6 @@ public final class Expression implements Serializable {
 
     public boolean isNegated() {
         return isNegated(expression);
-    }
-
-    public Expression(final Proposition pProposition) {
-        this(pProposition.getName());
-    }
-
-    public Expression(final Collection<Proposition> pPropositions, final BinaryOperator pGlueOperator) {
-        for (final Proposition proposition : pPropositions) {
-            add(new Expression(proposition), pGlueOperator);
-        }
-        optimize();
-    }
-
-    public Expression(final String pExpressionText) {
-        expression = pExpressionText;
-        optimize();
     }
 
     public Expression negate() {

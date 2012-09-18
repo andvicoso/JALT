@@ -2,6 +2,7 @@ package org.emast.model.model.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import org.emast.model.BadReward;
 import org.emast.model.BadRewarder;
@@ -16,7 +17,7 @@ import org.emast.model.propositional.Proposition;
  *
  * @author Anderson
  */
-public abstract class ERGGridModel extends GridModel implements ERG, BadRewarder {
+public class ERGGridModel extends GridModel implements ERG, BadRewarder {
 
     private Expression goal;
     private Expression preservationGoal;
@@ -27,6 +28,21 @@ public abstract class ERGGridModel extends GridModel implements ERG, BadRewarder
 
     public ERGGridModel(final int pRows, final int pCols, final int pAgents) {
         super(pRows, pCols, pAgents);
+    }
+
+    public ERGGridModel(ERGGridModel pModel) {
+        super(pModel);
+        goal = new Expression(pModel.getGoal());
+        preservationGoal = new Expression(pModel.getPreservationGoal());
+        pf = pModel.getPropositionFunction();
+        propositions = new HashSet<Proposition>(pModel.getPropositions());
+        badRewards = new ArrayList<BadReward>(pModel.getBadRewards());
+        otherwiseValue = pModel.getOtherwiseValue();
+    }
+
+    @Override
+    public ERGGridModel copy() {
+        return new ERGGridModel(this);
     }
 
     @Override
@@ -100,7 +116,7 @@ public abstract class ERGGridModel extends GridModel implements ERG, BadRewarder
         for (BadReward br : badRewards) {
             badProps.add(br.getBadRewardProp());
         }
-        
+
         return badProps;
     }
 

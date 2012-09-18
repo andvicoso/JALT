@@ -10,12 +10,12 @@ import org.emast.model.solution.Policy;
  *
  * @author anderson
  */
-public class Planner<M extends MDP, A extends AgentIterator> {
+public class PlannerThread<M extends MDP, A extends AgentIterator> {
 
     private final List<A> agents;
     private final PolicyGenerator<M> policyGenerator;
 
-    public Planner(PolicyGenerator<M> pPolicyGen, List<A> pAgents) {
+    public PlannerThread(PolicyGenerator<M> pPolicyGen, List<A> pAgents) {
         agents = pAgents;
         policyGenerator = pPolicyGen;
     }
@@ -26,7 +26,24 @@ public class Planner<M extends MDP, A extends AgentIterator> {
         for (final A agent : agents) {
             //set the initial policy
             agent.setPolicy(policy);
-            agent.run(pProblem);
+            //get new thread name
+            String threadName = agent.getClass().getSimpleName()
+                    + " - " + pProblem.getClass().getSimpleName();
+            //create and run an thread for the agent iterator 
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    agent.run(pProblem);
+
+                    finished(agent);
+                }
+            }, threadName).start();
+        }
+    }
+
+    protected void finished(A agent) {
+        if (isFinished()) {
+            finished();
         }
     }
 
@@ -41,5 +58,8 @@ public class Planner<M extends MDP, A extends AgentIterator> {
         }
 
         return ret;
+    }
+
+    protected void finished() {
     }
 }

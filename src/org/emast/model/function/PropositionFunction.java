@@ -56,17 +56,11 @@ public class PropositionFunction {
 
     public boolean satisfies(final State pState, final Expression pExpression)
             throws InvalidExpressionException {
-        for (State state : table.keySet()) {
-            if (isStateValid(pState, state)) {
-                Set<Proposition> props = table.get(state);
-
-                if (pExpression.evaluate(props)) {
-                    return true;
-                }
-            }
+        Set<Proposition> props = table.get(pState);
+        if (props == null) {
+            props = Collections.EMPTY_SET;
         }
-
-        return pExpression.isEmpty();
+        return pExpression.isEmpty() || pExpression.evaluate(props);
     }
 
     public Set<Proposition> getPropositionsForState(final State pState) {

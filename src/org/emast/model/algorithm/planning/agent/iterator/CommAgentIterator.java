@@ -20,7 +20,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterator<M> {
+public class CommAgentIterator<M extends ERG> extends ChangePreservGoalPropRepAgentIterator<M> {
 
     private final double badMessageThreshold;
     private final MessageHistory history;

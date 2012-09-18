@@ -3,7 +3,6 @@ package org.emast.model.algorithm.reachability;
 import java.util.*;
 import org.emast.model.action.Action;
 import org.emast.model.model.ERG;
-import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
