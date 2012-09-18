@@ -5,7 +5,6 @@ import org.emast.model.algorithm.planning.agent.iterator.AgentIterator;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
-import org.emast.model.state.State;
 
 /**
  *
@@ -13,7 +12,7 @@ import org.emast.model.state.State;
  */
 public interface AgentIteratorFactory<M extends MDP> {
 
-    AgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState);
+    AgentIterator createAgentIterator(int pAgent);
 
     List<AgentIterator> createAgentIterators(Problem<M> problem, Policy pPolicy);
 }

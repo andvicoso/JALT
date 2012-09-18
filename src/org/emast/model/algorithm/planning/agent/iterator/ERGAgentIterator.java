@@ -4,7 +4,6 @@ import java.util.Collection;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.model.ERG;
 import org.emast.model.propositional.Proposition;
-import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 
 /**
@@ -13,12 +12,12 @@ import org.emast.model.state.State;
  */
 public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
 
-    public ERGAgentIterator(M pModel, Policy pInitialPolicy, int pAgent, State pInitialState) {
-        super(pModel, pInitialPolicy, pAgent, pInitialState);
+    public ERGAgentIterator(int pAgent) {
+        super(pAgent);
     }
 
     protected Collection<Proposition> getPropositionsForState(final State pState) {
-        return getModel().getPropositionFunction().getPropositionsForState(pState);
+        return model.getPropositionFunction().getPropositionsForState(pState);
     }
 
     protected PPFERG<M> getAlgorithm() {
@@ -28,8 +27,8 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
     @Override
     public String printResults() {
         final StringBuilder sb = new StringBuilder(super.printResults());
-        sb.append("\nFinal goal: ").append(getModel().getGoal());
-        sb.append("\nPreservation goal: ").append(getModel().getPreservationGoal());
+        sb.append("\nFinal goal: ").append(model.getGoal());
+        sb.append("\nPreservation goal: ").append(model.getPreservationGoal());
 
         return sb.toString();
     }

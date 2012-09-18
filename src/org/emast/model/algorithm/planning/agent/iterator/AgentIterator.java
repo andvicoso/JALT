@@ -28,22 +28,18 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
     protected final int agent;
     private long msecs;
     private AgentIteratorState itState = AgentIteratorState.INITIAL;
-    private final M model;
-    private final State initialState;
+    protected M model;
 
-    public AgentIterator(final M pModel, final Policy pInitialPolicy,
-            final int pAgent, final State pInitialState) {
+    public AgentIterator(final int pAgent) {
         agent = pAgent;
-        model = pModel;
-        policy = pInitialPolicy;
-        initialState = pInitialState;
     }
 
     @Override
     public Plan run(Problem<M> pProblem) {
+        model = pProblem.getModel();
         long initMsecs = System.currentTimeMillis();
 
-        itState = doRun();
+        itState = doRun(pProblem);
 
         msecs = System.currentTimeMillis() - initMsecs;
 
@@ -70,11 +66,11 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
         }
     }
 
-    protected AgentIteratorState doRun() {
+    protected AgentIteratorState doRun(Problem<M> pProblem) {
         Action action;
         int count = 0;
         //get the agent's initial state
-        currentState = getInitialState();
+        currentState = pProblem.getInitialStates().get(getAgent());
         //create a plan for agent
         plan = new Plan();
         //main loop
@@ -88,7 +84,7 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
                         model.getStates(), currentState, action);
                 //is there a state pointed by the action?
                 if (nextStates != null && !nextStates.isEmpty()) {
-                    final double reward = getModel().getRewardFunction().getValue(currentState, action);
+                    final double reward = model.getRewardFunction().getValue(currentState, action);
                     State nextState = nextStates.iterator().next();
                     //add reward to total reward
                     addReward(nextState, reward);
@@ -132,10 +128,6 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
         return itState.equals(FINISHED) || itState.equals(FINISHED_MAX_ITERATIONS);
     }
 
-    public M getModel() {
-        return model;
-    }
-
     public Plan getPlan() {
         return plan;
     }
@@ -168,10 +160,6 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
 
     public double getTotalReward() {
         return totalReward;
-    }
-
-    public State getInitialState() {
-        return initialState;
     }
 
     public State getCurrentState() {

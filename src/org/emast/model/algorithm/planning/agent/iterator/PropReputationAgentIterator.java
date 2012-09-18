@@ -20,12 +20,11 @@ import org.emast.model.state.State;
  */
 public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator<M> {
 
-    private final double badRewardThreshold;
-    private final Map<Proposition, Double> localPropositionsReputation;
+    private double badRewardThreshold;
+    private Map<Proposition, Double> localPropositionsReputation;
 
-    public PropReputationAgentIterator(M pModel, Policy pInitialPolicy, int pAgent, State pInitialState,
-            double pBadRewardThreshold) {
-        super(pModel, pInitialPolicy, pAgent, pInitialState);
+    public PropReputationAgentIterator(int pAgent, double pBadRewardThreshold) {
+        super(pAgent);
         badRewardThreshold = pBadRewardThreshold;
         localPropositionsReputation = new HashMap<Proposition, Double>();
     }
@@ -39,13 +38,13 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
         }
     }
 
-    protected void manageBadReward(final State pNextState, final double pReward) {
+    protected void manageBadReward(State pNextState, double pReward) {
         //save proposition reputation based on the state and reward received
         savePropositionReputation(pNextState, pReward, localPropositionsReputation);
         //verify the need to change the preservation goal
         if (mustChangePreservationGoal(pNextState)) {
             //get the new policy for the new preservation goal (if one exists)
-            final Policy p = changePreservationGoal(pNextState);
+            Policy p = changePreservationGoal(pNextState);
             //if found a policy
             if (p != null) {
                 //changed preservation goal, continue iteration 
@@ -56,17 +55,17 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
     }
 
     //TODO: define better what is a bad reward state (using state)
-    private boolean isBadRewardState(final State pState, final double pReward) {
+    private boolean isBadRewardState(State pState, double pReward) {
         return pReward < badRewardThreshold;
     }
 
-    protected void savePropositionReputation(final State pNextState,
-            final double pReward, final Map<Proposition, Double> pPropositionsReputation) {
+    protected void savePropositionReputation(State pNextState,
+            double pReward, Map<Proposition, Double> pPropositionsReputation) {
         if (pPropositionsReputation != null) {
             //bad reward value is distributed equally over the state`s propostions
-            final Collection<Proposition> props = getPropositionsForState(pNextState);
-            final double propReward = pReward / props.size();
-            for (final Proposition proposition : props) {
+            Collection<Proposition> props = getPropositionsForState(pNextState);
+            double propReward = pReward / props.size();
+            for (Proposition proposition : props) {
                 Double currPropReward = pPropositionsReputation.get(proposition);
                 currPropReward = currPropReward == null ? 0d : currPropReward;
                 pPropositionsReputation.put(proposition, propReward + currPropReward);
@@ -74,12 +73,12 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
         }
     }
 
-    protected Double getPropositionReputation(final Proposition pProposition) {
+    protected Double getPropositionReputation(Proposition pProposition) {
         return localPropositionsReputation.get(pProposition);
     }
 
-    protected Problem<M> cloneProblem(final Expression pNewPreservGoal) {
-        final M cloneModel = (M) getModel().copy();
+    protected Problem<M> cloneProblem(M model, Expression pNewPreservGoal) {
+        M cloneModel = (M) model.copy();
         //set new preservation goal
         cloneModel.setPreservationGoal(pNewPreservGoal);
         //set the initial state only for the current agent
@@ -91,15 +90,15 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
         return localPropositionsReputation;
     }
 
-    protected Policy changePreservationGoal(final State pState) {
-        //save the final goal
-        final Expression finalGoal = getModel().getGoal();
+    protected Policy changePreservationGoal(State pState) {
+        //save the goal
+        Expression finalGoal = model.getGoal();
         //save the original preservation goal
-        final Expression originalPreservGoal = getModel().getPreservationGoal();
+        Expression originalPreservGoal = model.getPreservationGoal();
         //get the new preservation goal, based on the original and the state
-        final Expression newPropsExp = getNewPreservationGoal(originalPreservGoal, pState);
+        Expression newPropsExp = getNewPreservationGoal(originalPreservGoal, pState);
         //copy the original preservation goal
-        final Expression newPreservGoal = new Expression(originalPreservGoal.toString());
+        Expression newPreservGoal = new Expression(originalPreservGoal.toString());
         //and join them with an AND operator
         newPreservGoal.add(newPropsExp, BinaryOperator.AND);
 
@@ -108,14 +107,14 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
             if (!newPreservGoal.equals(originalPreservGoal)
                     && !originalPreservGoal.contains(newPropsExp)
                     && !originalPreservGoal.contains(newPropsExp.negate())
-                    && !getModel().getPropositionFunction().satisfies(pState, finalGoal)) {
+                    && !model.getPropositionFunction().satisfies(pState, finalGoal)) {
                 //TODO: Decide which propositions are giving a bad reward
                 //create a new cloned problem
-                final Problem<M> newProblem = cloneProblem(newPreservGoal);
+                Problem<M> newProblem = cloneProblem(model, newPreservGoal);
                 //Execute the base algorithm (PPFERG) over the new problem (with the new preservation goal)
-                final Policy p = getAlgorithm().run(newProblem);
-                //if there isn`t a path to reach the final goal,
-                if (canReachFinalGoal(p, newProblem.getModel())) {
+                Policy p = getAlgorithm().run(newProblem);
+                //if there isn`t a path to reach the goal,
+                if (canReachFinalGoal(newProblem)) {
                     //set the new preservation goal to the current problem
                     newProblem.getModel().setPreservationGoal(newPreservGoal);
                     //confirm the goal modification
@@ -130,37 +129,35 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
         return null;
     }
 
-    private boolean canReachFinalGoal(final Policy pPolicy, final M pModel) {
+    private boolean canReachFinalGoal(Problem pProblem) {
         //create a new simple agent iterator
-        final AgentIterator iterator = new AgentIterator(pModel,
-                pPolicy, getAgent(), getInitialState());
+        AgentIterator iterator = new AgentIterator(getAgent());
         //find the plan for the newly created problem
         //with the preservation goal changed
-        iterator.run(null);
+        iterator.run(pProblem);
         //get the resulting plan
-        final Plan agPlan = iterator.getPlan();
+        Plan agPlan = iterator.getPlan();
         return agPlan != null && !agPlan.isEmpty();
     }
 
-    private Expression getNewPreservationGoal(final Expression pOriginalPreservGoal,
-            final State pState) {
+    private Expression getNewPreservationGoal(Expression pOriginalPreservGoal, State pState) {
         //get the "problematic" expression
         //i.e. the one that is giving the bad reward
         Expression newPropsExp =
-                getModel().getPropositionFunction().getExpressionForState(pState);
+                model.getPropositionFunction().getExpressionForState(pState);
         //negate it
         newPropsExp = newPropsExp.negate();
 
         return newPropsExp;
     }
 
-    protected boolean mustChangePreservationGoal(final State pState) {
+    protected boolean mustChangePreservationGoal(State pState) {
         Proposition changedProp = null;
-        final Collection<Proposition> props = getPropositionsForState(pState);
+        Collection<Proposition> props = getPropositionsForState(pState);
 
         if (props != null) {
-            for (final Proposition proposition : props) {
-                final Double rep = getPropositionReputation(proposition);
+            for (Proposition proposition : props) {
+                Double rep = getPropositionReputation(proposition);
                 if (rep < badRewardThreshold) {
                     changedProp = proposition;
                     break;

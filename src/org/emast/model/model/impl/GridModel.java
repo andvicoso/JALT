@@ -5,12 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.emast.model.action.Action;
-import org.emast.model.agent.Agent;
 import org.emast.model.function.RewardFunction;
 import org.emast.model.function.TransitionFunction;
 import org.emast.model.model.Grid;
 import org.emast.model.state.State;
-import org.emast.util.CollectionsUtils;
 import org.emast.util.GridUtils;
 
 /**
@@ -23,8 +21,7 @@ public abstract class GridModel extends MDPModel implements Grid {
     private int cols;
 
     public GridModel(int pRows, int pCols, int pAgents) {
-        super(GridUtils.createStates(pRows, pCols), createGridMovementActions(),
-                CollectionsUtils.createList(Agent.class, pAgents));
+        super(GridUtils.createStates(pRows, pCols), createGridMovementActions(), pAgents);
         this.rows = pRows;
         this.cols = pCols;
     }

@@ -1,6 +1,5 @@
 package org.emast.model.comm;
 
-import org.emast.model.agent.Agent;
 import org.emast.model.state.State;
 
 /**
@@ -12,8 +11,8 @@ public class StateRewardMessage extends Message<Double> {
     private State state;
 
     public StateRewardMessage(final State pState, final double pReward,
-            final Agent sender) {
-        super(pReward, sender);
+            final int pAgentSender) {
+        super(pReward, pAgentSender);
         state = pState;
     }
 

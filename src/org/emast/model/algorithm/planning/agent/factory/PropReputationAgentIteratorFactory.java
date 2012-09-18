@@ -2,9 +2,6 @@ package org.emast.model.algorithm.planning.agent.factory;
 
 import org.emast.model.algorithm.planning.agent.iterator.PropReputationAgentIterator;
 import org.emast.model.model.ERG;
-import org.emast.model.model.MDP;
-import org.emast.model.solution.Policy;
-import org.emast.model.state.State;
 
 /**
  *
@@ -19,8 +16,7 @@ public class PropReputationAgentIteratorFactory<M extends ERG> extends ERGAgentI
     }
 
     @Override
-    public PropReputationAgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState) {
-        final M newModel = (M) pModel.copy();
-        return new PropReputationAgentIterator(newModel, pPolicy, pAgent, pInitialState, badRewardThreshold);
+    public PropReputationAgentIterator createAgentIterator(int pAgent) {
+        return new PropReputationAgentIterator( pAgent, badRewardThreshold);
     }
 }

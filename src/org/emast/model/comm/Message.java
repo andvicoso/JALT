@@ -1,11 +1,9 @@
 package org.emast.model.comm;
 
-import org.emast.model.agent.Agent;
-
 public class Message<V> {
 
     private V value;
-    private Agent sender;
+    private int agentSender;
 
     public Message() {
     }
@@ -14,9 +12,9 @@ public class Message<V> {
         this.value = value;
     }
 
-    public Message(final V value, final Agent sender) {
+    public Message(final V value, final int pAgentSender) {
         this.value = value;
-        this.sender = sender;
+        this.agentSender = pAgentSender;
     }
 
     public V getValue() {
@@ -32,11 +30,11 @@ public class Message<V> {
         return getValue() != null ? getValue().toString() : "";
     }
 
-    public Agent getSender() {
-        return sender;
+    public int getSender() {
+        return agentSender;
     }
 
-    public void setSender(final Agent sender) {
-        this.sender = sender;
+    public void setSender(final int pAgentSender) {
+        agentSender = pAgentSender;
     }
 }

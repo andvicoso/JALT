@@ -22,9 +22,8 @@ public class CommAgentIteratorFactory<M extends ERG> extends PropReputationAgent
     }
 
     @Override
-    public CommAgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState) {
-        final M newModel = (M) pModel.copy();
-        return new CommAgentIterator(newModel, pPolicy, pAgent, pInitialState,
-                messageCost, badRewardThreshold, badMsgThreshold, new MeanRewardCombinator());
+    public CommAgentIterator createAgentIterator(int pAgent) {
+        return new CommAgentIterator(pAgent, messageCost, badRewardThreshold,
+                badMsgThreshold, new MeanRewardCombinator());
     }
 }

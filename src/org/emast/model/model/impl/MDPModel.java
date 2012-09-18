@@ -3,9 +3,7 @@ package org.emast.model.model.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import org.emast.model.action.Action;
-import org.emast.model.agent.Agent;
 import org.emast.model.function.RewardFunction;
 import org.emast.model.function.TransitionFunction;
 import org.emast.model.model.MDP;
@@ -15,11 +13,11 @@ public abstract class MDPModel implements MDP, Serializable {
 
     private Collection<State> states;
     private Collection<Action> actions;
-    private List<Agent> agents;
+    private int agents;
 
     public MDPModel(final Collection<State> pStates,
             final Collection<Action> pActions,
-            final List<Agent> pAgents) {
+            final int pAgents) {
         states = pStates;
         actions = pActions;
         agents = pAgents;
@@ -57,15 +55,6 @@ public abstract class MDPModel implements MDP, Serializable {
         return null;
     }
 
-    public Agent getAgent(final String pName) {
-        for (final Agent agent : getAgents()) {
-            if (agent.getName().equals(pName)) {
-                return agent;
-            }
-        }
-        return null;
-    }
-
     public State getState(final String pName) {
         if (pName.equals(State.ANY.getName())) {
             return State.ANY;
@@ -89,7 +78,7 @@ public abstract class MDPModel implements MDP, Serializable {
     }
 
     @Override
-    public List<Agent> getAgents() {
+    public int getAgents() {
         return agents;
     }
 

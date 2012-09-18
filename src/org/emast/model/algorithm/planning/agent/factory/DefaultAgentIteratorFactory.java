@@ -6,7 +6,6 @@ import org.emast.model.algorithm.planning.agent.iterator.AgentIterator;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
-import org.emast.model.state.State;
 
 /**
  *
@@ -19,10 +18,9 @@ public class DefaultAgentIteratorFactory<M extends MDP> implements AgentIterator
         final List<AgentIterator> iterators = new ArrayList<AgentIterator>();
         final M model = pProblem.getModel();
         //for each agent, create an agent planner
-        for (int i = 0; i < model.getAgents().size(); i++) {
-            final State initialState = pProblem.getInitialStates().get(i);
+        for (int i = 0; i < model.getAgents(); i++) {
             //create an agent iterator for each agent
-            final AgentIterator ap = createAgentIterator(model, pInitialPolicy, i, initialState);
+            final AgentIterator ap = createAgentIterator(i);
             //save them
             iterators.add(ap);
         }
@@ -31,7 +29,7 @@ public class DefaultAgentIteratorFactory<M extends MDP> implements AgentIterator
     }
 
     @Override
-    public AgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState) {
-        return new AgentIterator(pModel, pPolicy, pAgent, pInitialState);
+    public AgentIterator createAgentIterator(int pAgent) {
+        return new AgentIterator(pAgent);
     }
 }

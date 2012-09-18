@@ -12,7 +12,6 @@ import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.solution.Plan;
 import org.emast.model.solution.Policy;
-import org.emast.model.state.State;
 
 /**
  *
@@ -97,11 +96,9 @@ public class ERGExecutor<R> extends Executor<ERG, PropReputationAgentIterator, R
     private boolean canReachFinalGoal(final Policy pPolicy, final Problem<ERG> pProblem) {
         boolean ret = true;
         final ERG model = pProblem.getModel();
-        for (int i = 0; i < model.getAgents().size(); i++) {
-            //TODO: for (Agent agent : pProblem.getModel().getAgents()) {
-            final State initialState = pProblem.getInitialStates().get(i);
+        for (int i = 0; i < model.getAgents(); i++) {
             //create a new simple agent iterator
-            final AgentIterator iterator = new AgentIterator(model, pPolicy, i, initialState);
+            final AgentIterator iterator = new AgentIterator(i);
             //find the plan for the newly created problem
             //with the preservation goal changed
             iterator.run(pProblem);
