@@ -1,5 +1,6 @@
 package org.emast.model.model.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import org.emast.model.BadReward;
@@ -91,6 +92,16 @@ public abstract class ERGGridModel extends GridModel implements ERG, BadRewarder
     @Override
     public double getOtherwiseValue() {
         return otherwiseValue;
+    }
+
+    @Override
+    public Collection<Proposition> getBadRewardProps() {
+        Collection<Proposition> badProps = new ArrayList<Proposition>();
+        for (BadReward br : badRewards) {
+            badProps.add(br.getBadRewardProp());
+        }
+        
+        return badProps;
     }
 
     @Override

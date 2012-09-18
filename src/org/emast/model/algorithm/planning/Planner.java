@@ -4,7 +4,6 @@ import java.util.List;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.AlgorithmThread;
 import org.emast.model.algorithm.planning.agent.iterator.AgentIterator;
-import org.emast.model.algorithm.planning.agent.factory.AgentIteratorFactory;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
@@ -13,38 +12,35 @@ import org.emast.model.solution.Policy;
  *
  * @author anderson
  */
-public class Planner<M extends MDP, R> implements Algorithm<M, R> {
+public class Planner<M extends MDP, A extends AgentIterator> implements Algorithm<M, Policy> {
 
-    private Policy initialPolicy;
-    private List<AgentIterator> iterators;
-    private final AgentIteratorFactory factory;
+    private final List<A> agents;
 
-    public Planner(Policy pInitialPolicy, AgentIteratorFactory pFactory) {
-        initialPolicy = pInitialPolicy;
-        factory = pFactory;
-    }
-
-    public Policy getInitialPolicy() {
-        return initialPolicy;
+    public Planner(List<A> pAgents) {
+        agents = pAgents;
     }
 
     @Override
-    public R run(Problem<M> pProblem) {
-        createIterators(pProblem, initialPolicy);
+    public Policy run(Problem<M> pProblem) {
         //execute them all
-        for (final AgentIterator agentPlanner : iterators) {
+        for (final A agentPlanner : agents) {
             new AlgorithmThread(agentPlanner, pProblem).start();
         }
 
-        return null; //TODO:
+        return null; //TODO: combine?
     }
 
-    protected void createIterators(Problem<M> problem, Policy pPolicy) {
-        iterators = factory.createAgentIterators(problem, pPolicy);
+    public List<A> getIterators() {
+        return agents;
     }
 
-    public List<AgentIterator> getIterators() {
-        return iterators;
+    public boolean isFinished() {
+        boolean ret = true;
+        for (A agent : agents) {
+            ret &= agent.isFinished();
+        }
+
+        return ret;
     }
 
     @Override

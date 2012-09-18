@@ -3,7 +3,6 @@ package org.emast.model.algorithm.planning.agent.iterator;
 import java.util.Collection;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.model.ERG;
-import org.emast.model.model.MDP;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;

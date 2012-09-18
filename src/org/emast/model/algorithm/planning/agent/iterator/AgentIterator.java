@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.Algorithm;
+import static org.emast.model.algorithm.planning.agent.iterator.AgentIteratorState.*;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Plan;
@@ -15,7 +16,7 @@ import org.emast.util.Utils;
  *
  * @author Anderson
  */
-public class AgentIterator<M extends MDP> implements Runnable, Algorithm<M, Plan> {
+public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
 
     private static final PrintStream DEBUG_WRITER = System.out;
     protected static final int MAX_ITERATIONS = 1000;
@@ -38,19 +39,6 @@ public class AgentIterator<M extends MDP> implements Runnable, Algorithm<M, Plan
         initialState = pInitialState;
     }
 
-    public AgentIteratorState getAgentIteratorState() {
-        return itState;
-    }
-
-    public long getMsecs() {
-        return msecs;
-    }
-
-    @Override
-    public void run() {
-        run(null);
-    }
-
     @Override
     public Plan run(Problem<M> pProblem) {
         long initMsecs = System.currentTimeMillis();
@@ -60,52 +48,6 @@ public class AgentIterator<M extends MDP> implements Runnable, Algorithm<M, Plan
         msecs = System.currentTimeMillis() - initMsecs;
 
         return plan;
-    }
-
-    public M getModel() {
-        return model;
-    }
-
-    public Plan getPlan() {
-        return plan;
-    }
-
-    protected void setPlan(final Plan plan) {
-        this.plan = plan;
-    }
-
-    public int getAgent() {
-        return agent;
-    }
-
-    public Policy getPolicy() {
-        return policy;
-    }
-
-    public void setPolicy(Policy pPolicy) {
-        policy = pPolicy;
-    }
-
-    protected void print(final String pMsg) {
-        if (DEBUG) {
-            DEBUG_WRITER.println("Agent " + getAgent() + " " + pMsg);
-        }
-    }
-
-    protected static boolean isDebug() {
-        return DEBUG;
-    }
-
-    public double getTotalReward() {
-        return totalReward;
-    }
-
-    public State getInitialState() {
-        return initialState;
-    }
-
-    public State getCurrentState() {
-        return currentState;
     }
 
     /**
@@ -142,8 +84,8 @@ public class AgentIterator<M extends MDP> implements Runnable, Algorithm<M, Plan
             //if has somewhere to go to
             if (action != null) {
                 //get the states that the action points to
-                final Collection<State> nextStates =
-                        model.getTransitionFunction().getFinalStates(model.getStates(), currentState, action);
+                final Collection<State> nextStates = model.getTransitionFunction().getFinalStates(
+                        model.getStates(), currentState, action);
                 //is there a state pointed by the action?
                 if (nextStates != null && !nextStates.isEmpty()) {
                     final double reward = getModel().getRewardFunction().getValue(currentState, action);
@@ -160,9 +102,7 @@ public class AgentIterator<M extends MDP> implements Runnable, Algorithm<M, Plan
             //while there is a valid state to go to and did not reach the max iteration
         } while (action != null && currentState != null && count < MAX_ITERATIONS);
 
-        return count < MAX_ITERATIONS
-                ? AgentIteratorState.FINISHED
-                : AgentIteratorState.FINISHED_MAX_ITERATIONS;
+        return count < MAX_ITERATIONS ? FINISHED : FINISHED_MAX_ITERATIONS;
     }
 
     @Override
@@ -176,12 +116,65 @@ public class AgentIterator<M extends MDP> implements Runnable, Algorithm<M, Plan
         return sb.toString();
     }
 
+    public AgentIteratorState getAgentIteratorState() {
+        return itState;
+    }
+
+    public long getMsecs() {
+        return msecs;
+    }
+
     protected Action getAction() {
         return policy.get(currentState);
     }
 
     public boolean isFinished() {
-        return itState.equals(AgentIteratorState.FINISHED)
-                || itState.equals(AgentIteratorState.FINISHED_MAX_ITERATIONS);
+        return itState.equals(FINISHED) || itState.equals(FINISHED_MAX_ITERATIONS);
+    }
+
+    public M getModel() {
+        return model;
+    }
+
+    public Plan getPlan() {
+        return plan;
+    }
+
+    protected void setPlan(final Plan pPlan) {
+        this.plan = pPlan;
+    }
+
+    public int getAgent() {
+        return agent;
+    }
+
+    public Policy getPolicy() {
+        return policy;
+    }
+
+    public void setPolicy(final Policy pPolicy) {
+        policy = pPolicy;
+    }
+
+    protected void print(final String pMsg) {
+        if (DEBUG) {
+            DEBUG_WRITER.println("Agent " + getAgent() + " " + pMsg);
+        }
+    }
+
+    protected static boolean isDebug() {
+        return DEBUG;
+    }
+
+    public double getTotalReward() {
+        return totalReward;
+    }
+
+    public State getInitialState() {
+        return initialState;
+    }
+
+    public State getCurrentState() {
+        return currentState;
     }
 }

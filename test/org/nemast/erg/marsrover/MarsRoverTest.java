@@ -10,13 +10,12 @@ import org.emast.model.test.Test;
  */
 public class MarsRoverTest extends Test {
 
-    private static final MarsRoverProblemFactory factory = new MarsRoverProblemFactory();
-
     public MarsRoverTest() {
         super(createProblem(), new PPFERG());
     }
 
     private static Problem createProblem() {
+        final MarsRoverProblemFactory factory = new MarsRoverProblemFactory();
         final int rows = 9;
         final int cols = 9;
         final int size = rows * cols;

@@ -1,5 +1,6 @@
 package org.emast.model.algorithm.planning.agent.factory;
 
+import org.emast.model.algorithm.executor.rewardcombinator.MeanRewardCombinator;
 import org.emast.model.algorithm.planning.agent.iterator.CommAgentIterator;
 import org.emast.model.model.ERG;
 import org.emast.model.solution.Policy;
@@ -24,6 +25,6 @@ public class CommAgentIteratorFactory<M extends ERG> extends PropReputationAgent
     public CommAgentIterator createAgentIterator(M pModel, Policy pPolicy, int pAgent, State pInitialState) {
         final M newModel = (M) pModel.copy();
         return new CommAgentIterator(newModel, pPolicy, pAgent, pInitialState,
-                messageCost, badRewardThreshold, badMsgThreshold);
+                messageCost, badRewardThreshold, badMsgThreshold, new MeanRewardCombinator());
     }
 }

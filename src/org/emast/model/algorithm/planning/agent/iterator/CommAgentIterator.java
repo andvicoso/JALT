@@ -1,14 +1,15 @@
 package org.emast.model.algorithm.planning.agent.iterator;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.emast.model.agent.Agent;
+import org.emast.model.algorithm.executor.rewardcombinator.RewardCombinator;
 import org.emast.model.comm.Message;
 import org.emast.model.comm.MessageHistory;
 import org.emast.model.comm.StateRewardMessage;
 import org.emast.model.model.ERG;
-import org.emast.model.model.MDP;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
@@ -18,21 +19,24 @@ import org.emast.model.state.State;
  * @author Anderson
  */
 public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterator<M> {
-
+    
     private final double badMessageThreshold;
     private final MessageHistory history;
     private final Map<Proposition, Double> messagePropositionsReputation;
     private final double messageCost;
-
+    private final RewardCombinator rewardCombinator;
+    
     public CommAgentIterator(M pModel, Policy pInitialPolicy, int pAgent, State pInitialState,
-            double pMessageCost, double pBadRewardThreshold, double pBadMessageThreshold) {
+            double pMessageCost, double pBadRewardThreshold, double pBadMessageThreshold,
+            RewardCombinator pRewardCombinator) {
         super(pModel, pInitialPolicy, pAgent, pInitialState, pBadRewardThreshold);
         messageCost = pMessageCost;
         badMessageThreshold = pBadMessageThreshold;
+        rewardCombinator = pRewardCombinator;
         history = new MessageHistory();
         messagePropositionsReputation = new HashMap<Proposition, Double>();
     }
-
+    
     public void messageReceived(final StateRewardMessage pMsg) {
         print("received message: " + pMsg + " from agent: " + pMsg.getSender());
         history.add(pMsg);
@@ -50,16 +54,16 @@ public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterato
             }
         }
     }
-
+    
     protected void sendMessage(final Message pMsg) {
         print("sent broadcast: " + pMsg);
         addReward(null, messageCost);
     }
-
+    
     protected boolean mustSendMessage(final State state) {
         boolean somePropChanged = false;
         final Collection<Proposition> props = getPropositionsForState(state);
-
+        
         if (props != null) {
             for (final Proposition proposition : props) {
                 final Double rep = getPropositionReputation(proposition);
@@ -72,12 +76,12 @@ public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterato
         //send message if some proposition changed
         return somePropChanged;
     }
-
+    
     @Override
     protected Double getPropositionReputation(final Proposition pProposition) {
         final Double localValue = super.getPropositionReputation(pProposition);
         final Double externalValue = messagePropositionsReputation.get(pProposition);
-
+        
         if (localValue != null && externalValue != null) {
             return (localValue + externalValue) / 2;
         } else if (localValue != null) {
@@ -88,7 +92,7 @@ public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterato
         //if doesn't exist
         return null;
     }
-
+    
     @Override
     protected void manageBadReward(State nextState, double reward) {
         super.manageBadReward(nextState, reward);
@@ -100,5 +104,20 @@ public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterato
             //broadcast it!
             sendMessage(msg);
         }
+    }
+    
+    public Map<Proposition, Double> getMessagePropositionsReputation() {
+        return messagePropositionsReputation;
+    }
+    
+    @Override
+    public Map<Proposition, Double> getPropositionsReputation() {
+        Collection<Map<Proposition, Double>> reps =
+                Arrays.asList(getLocalPropositionsReputation(), getMessagePropositionsReputation());
+        return rewardCombinator.combine(reps);
+    }
+    
+    public RewardCombinator getRewardCombinator() {
+        return rewardCombinator;
     }
 }

@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.sourceforge.jeval.EvaluationException;
 import org.emast.model.model.ERG;
-import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -54,8 +54,8 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
             }
         }
     }
-    //TODO: define better what is a bad reward state (using state)
 
+    //TODO: define better what is a bad reward state (using state)
     private boolean isBadRewardState(final State pState, final double pReward) {
         return pReward < badRewardThreshold;
     }
@@ -124,7 +124,7 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
                     return p;
                 }
             }
-        } catch (Exception ex) {
+        } catch (EvaluationException ex) {
             ex.printStackTrace();
         }
         return null;
@@ -136,7 +136,7 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
                 pPolicy, getAgent(), getInitialState());
         //find the plan for the newly created problem
         //with the preservation goal changed
-        iterator.run();
+        iterator.run(null);
         //get the resulting plan
         final Plan agPlan = iterator.getPlan();
         return agPlan != null && !agPlan.isEmpty();
@@ -144,7 +144,7 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
 
     private Expression getNewPreservationGoal(final Expression pOriginalPreservGoal,
             final State pState) {
-        //get the prop func item, to get the "problematic" expression
+        //get the "problematic" expression
         //i.e. the one that is giving the bad reward
         Expression newPropsExp =
                 getModel().getPropositionFunction().getExpressionForState(pState);
@@ -169,5 +169,9 @@ public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator
         }
 
         return changedProp != null;
+    }
+
+    public Map<Proposition, Double> getPropositionsReputation() {
+        return localPropositionsReputation;
     }
 }
