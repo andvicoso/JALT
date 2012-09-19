@@ -1,6 +1,7 @@
 package org.emast.model.algorithm.planning.rewardcombinator.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,6 +17,9 @@ public class MeanRewardCombinator implements RewardCombinator {
 
     @Override
     public Map<Proposition, Double> combine(final Collection<Map<Proposition, Double>> pReputations) {
+        if (pReputations.isEmpty()) {
+            return Collections.EMPTY_MAP;
+        }
         final Map<Proposition, Double> result = new HashMap<Proposition, Double>();
         final Map<Proposition, Integer> count = new HashMap<Proposition, Integer>();
         //find sums and counts
@@ -41,6 +45,7 @@ public class MeanRewardCombinator implements RewardCombinator {
             result.put(prop, sum / c);
         }
 
-        return new TreeMap<Proposition, Double>(new ValueComparator(result));
+        return result;
+                //new TreeMap<Proposition, Double>(new ValueComparator(result));
     }
 }

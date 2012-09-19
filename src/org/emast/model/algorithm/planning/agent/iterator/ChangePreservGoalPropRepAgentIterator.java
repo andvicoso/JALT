@@ -64,7 +64,6 @@ public class ChangePreservGoalPropRepAgentIterator<M extends ERG> extends PropRe
         Expression newPreservGoal = new Expression(originalPreservGoal.toString());
         //and join them with an AND operator
         newPreservGoal.add(newPropsExp, BinaryOperator.AND);
-
         //compare previous goal with the newly created
         if (!newPreservGoal.equals(originalPreservGoal)
                 && !originalPreservGoal.contains(newPropsExp)

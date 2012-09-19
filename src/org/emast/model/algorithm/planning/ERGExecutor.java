@@ -2,7 +2,6 @@ package org.emast.model.algorithm.planning;
 
 import java.util.*;
 import org.emast.model.BadRewarder;
-import org.emast.model.algorithm.planning.agent.iterator.AgentIterator;
 import org.emast.model.algorithm.planning.agent.iterator.PropReputationAgentIterator;
 import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.model.ERG;
@@ -10,7 +9,6 @@ import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
-import org.emast.model.solution.Plan;
 import org.emast.model.solution.Policy;
 
 /**
@@ -61,10 +59,9 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
                 changePreservationGoal(pProblem, props);
             }
         } while (iterations++ < maxIterations);
-        //run problem again with the final combined preserv. goals
-        run(pProblem);
-
-        return null;// TODO: 
+        //run problem again with the combined preserv. goals
+        //to get the final policy
+        return planner.getPolicyGenerator().run(pProblem);
     }
 
     protected boolean changePreservationGoal(final Problem<ERG> pProblem,
@@ -72,23 +69,18 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
         final ERG model = pProblem.getModel();
         //save the original preservation goal
         final Expression originalPreservGoal = model.getPreservationGoal();
-        //get the new preservation goal, based on the original and the state
-        final Expression newPropsExp = createNewPreservationGoal(originalPreservGoal, pProps);
-        //copy the original preservation goal
-        final Expression newPreservGoal = new Expression(originalPreservGoal.toString());
-        //and join them with an AND operator
-        newPreservGoal.add(newPropsExp, BinaryOperator.AND);
+        //get the new preservation goal, based on the original and bad reward props
+        final Expression newPreservGoal = createNewPreservationGoal(originalPreservGoal, pProps);
         //compare previous goal with the newly created
         if (!newPreservGoal.equals(originalPreservGoal)
-                && !originalPreservGoal.contains(newPropsExp)
-                && !originalPreservGoal.contains(newPropsExp.negate())) {
+                && !originalPreservGoal.contains(newPreservGoal)
+                && !originalPreservGoal.contains(newPreservGoal.negate())) {
             //create a new cloned problem
             final ERG newModel = cloneModel(model, newPreservGoal);
             final Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
-            //Execute the base algorithm (PPFERG) over the new problem (with the new preservation goal)
-            run(newProblem);
-            //if there isn`t a path to reach the final goal,
-            if (canReachFinalGoal(newProblem)) {
+            //Execute the base algorithm (PPFERG) over the new model (with new preservation goal)
+            //if there are paths for all to reach the final goal,
+            if (planner.validPlan(newProblem)) {
                 //set the preservation goal to the current problem
                 pProblem.getModel().setPreservationGoal(newPreservGoal);
                 //confirm the goal modification
@@ -98,23 +90,6 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
             }
         }
         return false;
-    }
-
-    private boolean canReachFinalGoal(final Problem<ERG> pProblem) {
-        boolean ret = true;
-        final ERG model = pProblem.getModel();
-        for (int i = 0; i < model.getAgents(); i++) {
-            //create a new simple agent iterator
-            final AgentIterator iterator = new AgentIterator(i);
-            //find the plan for the newly created problem
-            //with the preservation goal changed
-            iterator.run(pProblem);
-            //get the resulting plan
-            final Plan plan = iterator.getPlan();
-            //save in ret if a plan was generated
-            ret &= plan != null && !plan.isEmpty();
-        }
-        return ret;
     }
 
     private Expression createNewPreservationGoal(final Expression pOriginalPreservGoal,

@@ -23,30 +23,30 @@ public class Test implements Runnable {
 
     @Override
     public void run() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("\nModel:");
-        sb.append(problem.getModel().toString());
-        sb.append("\n\nProblem:");
-        sb.append(problem.toString());
-        sb.append("\nExecution:");
+        out.print("\nModel:");
+        out.print(problem.getModel().toString());
+        out.print("\n\nProblem:");
+        out.print(problem.toString());
+        out.print("\nExecution:");
 
         for (Algorithm algorithm : algorithms) {
-            sb.append("\nAlgorithm: ").append(algorithm.getClass().getSimpleName());
+            out.print("\nAlgorithm: ");
+            out.print(algorithm.getClass().getSimpleName());
+            out.println();
             //execute
             long initMsecs = System.currentTimeMillis();
             Object result = algorithm.run(problem);
             msecs = System.currentTimeMillis() - initMsecs;
             //print time
-            sb.append("\nTime: ").append(toTimeString(msecs));
-            sb.append(algorithm.printResults());
+            out.print("\nTime: ");
+            out.print(toTimeString(msecs));
+            out.print(algorithm.printResults());
             //if a solution was found...
             if (result != null) {
-                sb.append("\n\nResult:");
-                sb.append(problem.toString(result));
+                out.print("\n\nResult:");
+                out.print(problem.toString(result));
             }
         }
-
-        out.print(sb);
     }
 
     public static String toTimeString(final long pMsecs) {
