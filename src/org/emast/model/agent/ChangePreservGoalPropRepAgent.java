@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.planning.agent.iterator;
+package org.emast.model.agent;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,9 +16,9 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class ChangePreservGoalPropRepAgentIterator<M extends ERG> extends PropReputationAgentIterator<M> {
+public class ChangePreservGoalPropRepAgent<M extends ERG> extends PropReputationAgent<M> {
 
-    public ChangePreservGoalPropRepAgentIterator(int pAgent, double pBadRewardThreshold) {
+    public ChangePreservGoalPropRepAgent(int pAgent, double pBadRewardThreshold) {
         super(pAgent, pBadRewardThreshold);
     }
 
@@ -46,7 +46,7 @@ public class ChangePreservGoalPropRepAgentIterator<M extends ERG> extends PropRe
         M cloneModel = (M) model.copy();
         //set new preservation goal
         cloneModel.setPreservationGoal(pNewPreservGoal);
-        //set the initial state only for the current agent
+        //set the initial state only for the current number
         //return a new problem with a new preservation goal and initial state
         return new Problem<M>(cloneModel, Collections.singletonMap(getAgent(), currentState));
     }
@@ -86,8 +86,8 @@ public class ChangePreservGoalPropRepAgentIterator<M extends ERG> extends PropRe
     }
 
     private boolean canReachFinalGoal(Problem pProblem) {
-        //create a new simple agent iterator
-        AgentIterator agentIt = new AgentIterator(getAgent());
+        //create a new simple number iterator
+        Agent agentIt = new Agent(getAgent());
         agentIt.setPolicy(getPolicy());
         //find the plan for the newly created problem
         //with the preservation goal changed

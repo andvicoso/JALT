@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.List;
 import org.emast.model.algorithm.planning.ERGExecutor;
 import org.emast.model.algorithm.planning.PolicyGenerator;
-import org.emast.model.algorithm.planning.agent.factory.AgentIteratorFactory;
-import org.emast.model.algorithm.planning.agent.factory.CommAgentIteratorFactory;
-import org.emast.model.algorithm.planning.agent.iterator.PropReputationAgentIterator;
+import org.emast.model.agent.factory.AgentFactory;
+import org.emast.model.agent.factory.CommAgentFactory;
+import org.emast.model.agent.PropReputationAgent;
 import org.emast.model.algorithm.planning.rewardcombinator.impl.MeanRewardCombinator;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.model.ERG;
@@ -47,8 +47,8 @@ public class MarsRoverExecutorTest extends Test {
         double badRewardValue = -20;
         int maxIterations = 10;
         PolicyGenerator<ERG> pg = new PPFERG<ERG>();
-        AgentIteratorFactory factory = new CommAgentIteratorFactory(1, badRewardValue, -20);//PropReputationAgentIteratorFactory();
-        List<PropReputationAgentIterator> agentIts = factory.createAgentIterators(agents);
+        AgentFactory factory = new CommAgentFactory(1, badRewardValue, -20);//PropReputationAgentIteratorFactory();
+        List<PropReputationAgent> agentIts = factory.createAgentIterators(agents);
 
         return new ERGExecutor(pg, agentIts, new MeanRewardCombinator(), maxIterations);
     }

@@ -1,22 +1,26 @@
-package org.emast.model.algorithm.planning.agent.iterator;
+package org.emast.model.agent;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.comm.Message;
 import org.emast.model.comm.MessageHistory;
 import org.emast.model.comm.StateRewardMessage;
+import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.propositional.Proposition;
+import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 
 /**
  *
  * @author Anderson
  */
-public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterator<M> {
+public class CommChangePreservAgent<M extends ERG> extends ChangePreservGoalPropRepAgent<M> {
 
     private final double badMessageThreshold;
     private final MessageHistory history;
@@ -24,7 +28,7 @@ public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterato
     private final double messageCost;
     private final RewardCombinator rewardCombinator;
 
-    public CommAgentIterator(int pAgent, double pMessageCost, double pBadRewardThreshold,
+    public CommChangePreservAgent(int pAgent, double pMessageCost, double pBadRewardThreshold,
             double pBadMessageThreshold, RewardCombinator pRewardCombinator) {
         super(pAgent, pBadRewardThreshold);
         messageCost = pMessageCost;
@@ -40,6 +44,20 @@ public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterato
         //save proposition reputation based on the state and reward received
         savePropositionReputation(pMsg.getState(), pMsg.getValue(), messagePropositionsReputation);
         //verify the need to change the preservation goal
+        if (mustChangePreservationGoal(pMsg.getState())) {
+            try {
+                //verify the need to change the preservation goal
+                final Policy p = changePreservationGoal(pMsg.getState());
+                //if found a policy
+                if (p != null) {
+                    //changed preservation goal, continue iteration 
+                    //with the new preservation goal and policy
+                    setPolicy(p);
+                }
+            } catch (InvalidExpressionException ex) {
+                Logger.getLogger(CommChangePreservAgent.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     protected void sendMessage(final Message pMsg) {
@@ -47,18 +65,21 @@ public class CommAgentIterator<M extends ERG> extends PropReputationAgentIterato
         addReward(null, messageCost);
     }
 
-    protected boolean mustSendMessage(final State pState) {
-        final Collection<Proposition> props = getPropositionsForState(pState);
+    protected boolean mustSendMessage(final State state) {
+        boolean somePropChanged = false;
+        final Collection<Proposition> props = getPropositionsForState(state);
 
         if (props != null) {
             for (final Proposition proposition : props) {
                 final Double rep = getPropositionReputation(proposition);
-                if (rep <= badMessageThreshold) {
-                    return true;
+                if (rep < badMessageThreshold) {
+                    somePropChanged = true;
+                    break;
                 }
             }
         }
-        return false;
+        //send message if some proposition changed
+        return somePropChanged;
     }
 
     @Override

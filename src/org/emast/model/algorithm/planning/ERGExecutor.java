@@ -2,7 +2,7 @@ package org.emast.model.algorithm.planning;
 
 import java.util.*;
 import org.emast.model.BadRewarder;
-import org.emast.model.algorithm.planning.agent.iterator.PropReputationAgentIterator;
+import org.emast.model.agent.PropReputationAgent;
 import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
@@ -21,13 +21,13 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
 
     protected RewardCombinator rewardCombinator;
     protected int maxIterations;
-    private Planner<ERG, PropReputationAgentIterator> planner;
+    private Planner<ERG, PropReputationAgent> planner;
 
-    public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator, List<PropReputationAgentIterator> pAgents,
+    public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator, List<PropReputationAgent> pAgents,
             RewardCombinator pRewardCombinator, int pMaxIterations) {
         rewardCombinator = pRewardCombinator;
         maxIterations = pMaxIterations;
-        planner = new Planner<ERG, PropReputationAgentIterator>(pPolicyGenerator, pAgents);
+        planner = new Planner<ERG, PropReputationAgent>(pPolicyGenerator, pAgents);
     }
 
     @Override
@@ -47,9 +47,9 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
             //run problem
             planner.run(pProblem);
             //iterators
-            List<PropReputationAgentIterator> as = planner.getIterators();
+            List<PropReputationAgent> as = planner.getIterators();
             //get results for each agent iterator
-            for (PropReputationAgentIterator agentIt : as) {
+            for (PropReputationAgent agentIt : as) {
                 Map<Proposition, Double> propsRep = agentIt.getPropositionsReputation();
                 reps.add(propsRep);
             }

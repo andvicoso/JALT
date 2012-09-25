@@ -1,7 +1,7 @@
 package org.emast.model.algorithm.planning;
 
 import java.util.List;
-import org.emast.model.algorithm.planning.agent.iterator.AgentIterator;
+import org.emast.model.agent.Agent;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Plan;
@@ -11,7 +11,7 @@ import org.emast.model.solution.Policy;
  *
  * @author anderson
  */
-public class Planner<M extends MDP, A extends AgentIterator> implements PolicyGenerator<M> {
+public class Planner<M extends MDP, A extends Agent> implements PolicyGenerator<M> {
 
     private final List<A> agents;
     private final PolicyGenerator<M> policyGenerator;
@@ -53,7 +53,7 @@ public class Planner<M extends MDP, A extends AgentIterator> implements PolicyGe
         M model = pProblem.getModel();
         for (int i = 0; i < model.getAgents(); i++) {
             //create a new simple agent iterator
-            final AgentIterator iterator = new AgentIterator(i);
+            final Agent iterator = new Agent(i);
             iterator.setPolicy(policy);
             //find the plan for the newly created problem
             //with the preservation goal changed

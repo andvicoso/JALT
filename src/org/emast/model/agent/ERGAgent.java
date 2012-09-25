@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.planning.agent.iterator;
+package org.emast.model.agent;
 
 import java.util.Collection;
 import org.emast.model.algorithm.reachability.PPFERG;
@@ -10,9 +10,9 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
+public class ERGAgent<M extends ERG> extends Agent<M> {
 
-    public ERGAgentIterator(int pAgent) {
+    public ERGAgent(int pAgent) {
         super(pAgent);
     }
 

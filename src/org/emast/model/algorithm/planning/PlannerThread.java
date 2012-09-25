@@ -1,7 +1,7 @@
 package org.emast.model.algorithm.planning;
 
 import java.util.List;
-import org.emast.model.algorithm.planning.agent.iterator.AgentIterator;
+import org.emast.model.agent.Agent;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
@@ -10,7 +10,7 @@ import org.emast.model.solution.Policy;
  *
  * @author anderson
  */
-public class PlannerThread<M extends MDP, A extends AgentIterator> {
+public class PlannerThread<M extends MDP, A extends Agent> {
 
     private final List<A> agents;
     private final PolicyGenerator<M> policyGenerator;

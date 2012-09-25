@@ -1,10 +1,10 @@
-package org.emast.model.algorithm.planning.agent.iterator;
+package org.emast.model.agent;
 
 /**
  *
  * @author Anderson
  */
-public enum AgentIteratorState {
+public enum AgentState {
 
     INITIAL, RUNNING, FINISHED, FINISHED_MAX_ITERATIONS, ERROR;
 }

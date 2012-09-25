@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.planning.agent.iterator;
+package org.emast.model.agent;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,12 +11,12 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class PropReputationAgentIterator<M extends ERG> extends ERGAgentIterator<M> {
+public class PropReputationAgent<M extends ERG> extends ERGAgent<M> {
 
     protected double badRewardThreshold;
     protected Map<Proposition, Double> localPropositionsReputation;
 
-    public PropReputationAgentIterator(int pAgent, double pBadRewardThreshold) {
+    public PropReputationAgent(int pAgent, double pBadRewardThreshold) {
         super(pAgent);
         badRewardThreshold = pBadRewardThreshold;
         localPropositionsReputation = new HashMap<Proposition, Double>();
