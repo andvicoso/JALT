@@ -18,26 +18,30 @@ import org.emast.util.Utils;
  */
 public class Agent<M extends MDP> implements Algorithm<M, Plan> {
 
-    private static final PrintStream DEBUG_WRITER = System.out;
-    protected static final int MAX_ITERATIONS = 1000;
-    private static final boolean DEBUG = true;
+    private static PrintStream DEBUG_WRITER = System.out;
+    protected static int MAX_ITERATIONS = 1000;
+    private static boolean DEBUG = true;
     protected double totalReward;
-    protected final int number;
+    protected int number;
     private long msecs;
     protected State currentState;
     protected Plan plan;
-    private AgentState itState = AgentState.INITIAL;
+    private AgentState itState;
     protected M model;
     private Policy policy;
 
-    public Agent(final int pNumber) {
+    public Agent(int pNumber) {
         number = pNumber;
+    }
+
+    public void init(Problem<M> pProblem, Policy pPolicy) {
+        itState = AgentState.INITIAL;
+        model = pProblem.getModel();
+        policy = pPolicy;
     }
 
     @Override
     public Plan run(Problem<M> pProblem) {
-        model = pProblem.getModel();
-
         long initMsecs = System.currentTimeMillis();
 
         itState = doRun(pProblem);
@@ -53,7 +57,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
      * @param pNextState
      * @param pReward
      */
-    protected void changeState(final State pNextState, final Action pAction) {
+    protected void changeState(State pNextState, Action pAction) {
         print("changed state from " + currentState + " to " + pNextState);
         //and go to it
         currentState = pNextState;
@@ -79,11 +83,11 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
             //if has somewhere to go to
             if (action != null) {
                 //get the states that the action points to
-                final Collection<State> nextStates = model.getTransitionFunction().getFinalStates(
+                Collection<State> nextStates = model.getTransitionFunction().getFinalStates(
                         model.getStates(), currentState, action);
                 //is there a state pointed by the action?
                 if (nextStates != null && !nextStates.isEmpty()) {
-                    final double reward = model.getRewardFunction().getValue(currentState, action);
+                    double reward = model.getRewardFunction().getValue(currentState, action);
                     State nextState = nextStates.iterator().next();//TODO:
                     //add reward to total reward
                     addReward(nextState, reward);
@@ -107,7 +111,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
 
     @Override
     public String printResults() {
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("\nAgent ").append(getAgent()).append(": ");
         sb.append("\n- Time: ").append(Utils.toTimeString(msecs)).append(" (").append(msecs).append(" ms)");
         sb.append("\n- Plan: ").append(getPlan());
@@ -136,7 +140,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
         return plan;
     }
 
-    protected void setPlan(final Plan pPlan) {
+    protected void setPlan(Plan pPlan) {
         this.plan = pPlan;
     }
 
@@ -148,11 +152,11 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
         return policy;
     }
 
-    public void setPolicy(final Policy pPolicy) {
+    public void setPolicy(Policy pPolicy) {
         policy = pPolicy;
     }
 
-    protected void print(final String pMsg) {
+    protected void print(String pMsg) {
         if (DEBUG) {
             DEBUG_WRITER.println("Agent " + getAgent() + " " + pMsg);
         }

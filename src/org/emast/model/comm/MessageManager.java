@@ -9,10 +9,12 @@ import java.util.Collection;
  */
 public class MessageManager {
 
-    private Collection<Messenger> messengers;
+    private final Collection<Messenger> messengers;
+    private final boolean sendToSender;
 
-    public MessageManager() {
+    public MessageManager(boolean pSendToSender) {
         messengers = new ArrayList<Messenger>();
+        sendToSender = pSendToSender;
     }
 
     public void add(Messenger pMessenger) {
@@ -25,7 +27,7 @@ public class MessageManager {
 
     public void broadcast(Messenger pSender, Message pMsg) {
         for (Messenger m : messengers) {
-            if (!m.equals(pSender)) {
+            if ((!sendToSender && !m.equals(pSender)) || sendToSender) {
                 m.messageReceived(pMsg);
             }
         }

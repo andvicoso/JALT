@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.planning.rewardcombinator.impl;
+package org.emast.model.algorithm.planning.rewardcombinator;
 
 import java.util.Collection;
 import java.util.Collections;

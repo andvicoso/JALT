@@ -12,21 +12,21 @@ import org.emast.model.model.MDP;
 public class DefaultAgentFactory<M extends MDP> implements AgentFactory<M> {
 
     @Override
-    public List<Agent> createAgentIterators(int pAgents) {
-        final List<Agent> iterators = new ArrayList<Agent>();
+    public List<Agent> createAgents(int pAgents) {
+        final List<Agent> agents = new ArrayList<Agent>();
         //for each agent, create an agent planner
         for (int i = 0; i < pAgents; i++) {
             //create an agent iterator for each agent
-            final Agent ap = createAgentIterator(i);
+            final Agent ap = createAgent(i);
             //save them
-            iterators.add(ap);
+            agents.add(ap);
         }
 
-        return iterators;
+        return agents;
     }
 
     @Override
-    public Agent createAgentIterator(int pAgent) {
+    public Agent createAgent(int pAgent) {
         return new Agent(pAgent);
     }
 }

@@ -86,14 +86,14 @@ public class ChangePreservGoalPropRepAgent<M extends ERG> extends PropReputation
     }
 
     private boolean canReachFinalGoal(Problem pProblem) {
-        //create a new simple number iterator
-        Agent agentIt = new Agent(getAgent());
-        agentIt.setPolicy(getPolicy());
+        //create a new simple agent
+        Agent agent = new Agent(getAgent());
+        agent.setPolicy(getPolicy());
         //find the plan for the newly created problem
         //with the preservation goal changed
-        agentIt.run(pProblem);
+        agent.run(pProblem);
         //get the resulting plan
-        Plan agPlan = agentIt.getPlan();
+        Plan agPlan = agent.getPlan();
 
         return agPlan != null && !agPlan.isEmpty();
     }

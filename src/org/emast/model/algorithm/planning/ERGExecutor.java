@@ -1,5 +1,8 @@
 package org.emast.model.algorithm.planning;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.PrintStream;
 import java.util.*;
 import org.emast.model.BadRewarder;
 import org.emast.model.agent.PropReputationAgent;
@@ -17,11 +20,13 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class ERGExecutor implements PolicyGenerator<ERG> {
+public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener {
 
-    protected RewardCombinator rewardCombinator;
-    protected int maxIterations;
+    private static PrintStream DEBUG_WRITER = System.out;
+    private static boolean DEBUG = true;
+    private RewardCombinator rewardCombinator;
     private Planner<ERG, PropReputationAgent> planner;
+    private int maxIterations;
 
     public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator, List<PropReputationAgent> pAgents,
             RewardCombinator pRewardCombinator, int pMaxIterations) {
@@ -36,21 +41,29 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
     }
 
     @Override
-    public Policy run(Problem<ERG> pProblem) {
+    public synchronized Policy run(Problem<ERG> pProblem) {
         ERG model = pProblem.getModel();
         int iterations = 0;
-
+        //listen to planner property changes
+        planner.getPropertyChangeSupport().addPropertyChangeListener(this);
+        //start main loop
         do {
-            System.out.println("\nITERATION " + iterations + ":\n");
+            print("\nITERATION " + iterations + ":\n");
             //Policy policy = 
             Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
             //run problem
             planner.run(pProblem);
-            //iterators
-            List<PropReputationAgent> as = planner.getIterators();
-            //get results for each agent iterator
-            for (PropReputationAgent agentIt : as) {
-                Map<Proposition, Double> propsRep = agentIt.getPropositionsReputation();
+            //wait to be awakened from planner notification (when it finished running all agents)
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                return null;
+            }
+            //get agents
+            List<PropReputationAgent> agents = planner.getAgents();
+            //get results for each agent
+            for (PropReputationAgent agent : agents) {
+                Map<Proposition, Double> propsRep = agent.getPropositionsReputation();
                 reps.add(propsRep);
             }
             //combine reputations for propositions from agents
@@ -133,5 +146,18 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
         }
 
         return false;
+    }
+
+    @Override
+    public synchronized void propertyChange(PropertyChangeEvent pEvt) {
+        if (Planner.FINISHED_ALL_PROP.equals(pEvt.getPropertyName())) {
+            notifyAll();
+        }
+    }
+
+    private void print(String pMsg) {
+        if (DEBUG) {
+            DEBUG_WRITER.println(pMsg);
+        }
     }
 }

@@ -26,6 +26,6 @@ public class StateRewardMessage extends Message<Double> {
 
     @Override
     public String toString() {
-        return "(" + getValue() + ", " + getValue() + ")";
+        return "(" + getState() + ", " + getValue() + ")";
     }
 }
