@@ -6,7 +6,6 @@ import org.emast.model.algorithm.planning.ERGExecutor;
 import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.algorithm.planning.agent.factory.AgentIteratorFactory;
 import org.emast.model.algorithm.planning.agent.factory.CommAgentIteratorFactory;
-import org.emast.model.algorithm.planning.agent.factory.PropReputationAgentIteratorFactory;
 import org.emast.model.algorithm.planning.agent.iterator.PropReputationAgentIterator;
 import org.emast.model.algorithm.planning.rewardcombinator.impl.MeanRewardCombinator;
 import org.emast.model.algorithm.reachability.PPFERG;
@@ -14,7 +13,6 @@ import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.test.Test;
 import org.emast.util.FileUtils;
-import org.emast.util.Utils;
 
 /**
  *

@@ -4,12 +4,14 @@ import java.util.*;
 import org.emast.model.BadRewarder;
 import org.emast.model.algorithm.planning.agent.iterator.PropReputationAgentIterator;
 import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
+import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.solution.Policy;
+import org.emast.model.state.State;
 
 /**
  *
@@ -75,7 +77,8 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
         //compare previous goal with the newly created
         if (!newPreservGoal.equals(originalPreservGoal)
                 && !originalPreservGoal.contains(newPreservGoal)
-                && !originalPreservGoal.contains(newPreservGoal.negate())) {
+                && !originalPreservGoal.contains(newPreservGoal.negate())
+                && existValidFinalState(model, newPreservGoal)) {
             //create a new cloned problem
             ERG newModel = cloneModel(model, newPreservGoal);
             Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
@@ -114,5 +117,21 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
         return pModel instanceof BadRewarder
                 ? ((BadRewarder) pModel).getBadRewardProps()
                 : Collections.EMPTY_LIST;
+    }
+
+    private boolean existValidFinalState(ERG model, Expression newPreservGoal) {
+        try {
+            Collection<State> finalStates = model.getPropositionFunction().intension(
+                    model.getStates(), model.getPropositions(), model.getGoal());
+
+            for (State state : finalStates) {
+                if (model.getPropositionFunction().satisfies(state, newPreservGoal)) {
+                    return true;
+                }
+            }
+        } catch (InvalidExpressionException ex) {
+        }
+
+        return false;
     }
 }
