@@ -11,7 +11,8 @@ import org.emast.util.Utils;
  */
 public class Test implements Runnable {
 
-    private static PrintStream out = System.out;
+    private static final boolean DEBUG = true;
+    private static final PrintStream DEBUG_WRITER = System.out;
     private Problem problem;
     private Algorithm[] algorithms;
     private long msecs;
@@ -23,28 +24,29 @@ public class Test implements Runnable {
 
     @Override
     public void run() {
-        out.print("\nModel:");
-        out.print(problem.getModel().toString());
-        out.print("\n\nProblem:");
-        out.print(problem.toString());
-        out.print("\nExecution:");
+        print("\nModel:");
+        print(problem.getModel().toString());
+        print("\n\nProblem:");
+        print(problem.toString());
+        print("\nExecution:");
 
         for (Algorithm algorithm : algorithms) {
-            out.print("\nAlgorithm: ");
-            out.print(algorithm.getClass().getSimpleName());
-            out.println();
+            print("\nAlgorithm: ");
+            print(algorithm.getClass().getSimpleName());
+            println();
             //execute
             long initMsecs = System.currentTimeMillis();
             Object result = algorithm.run(problem);
             msecs = System.currentTimeMillis() - initMsecs;
             //print time
-            out.print("\nTime: ");
-            out.print(toTimeString(msecs));
-            out.print(algorithm.printResults());
+            print("\nTime: ");
+            print(toTimeString(msecs));
+            //print results
+            print(algorithm.printResults());
             //if a solution was found...
             if (result != null) {
-                out.print("\n\nResult:");
-                out.print(problem.toString(result));
+                print("\n\nResult:");
+                print(problem.toString(result));
             }
         }
     }
@@ -55,5 +57,15 @@ public class Test implements Runnable {
 
     public long getMsecs() {
         return msecs;
+    }
+
+    protected void print(String pMsg) {
+        if (DEBUG) {
+            DEBUG_WRITER.print(pMsg);
+        }
+    }
+
+    protected void println() {
+        print("\n");
     }
 }

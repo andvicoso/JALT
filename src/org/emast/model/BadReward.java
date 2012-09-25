@@ -1,12 +1,13 @@
 package org.emast.model;
 
+import java.io.Serializable;
 import org.emast.model.propositional.Proposition;
 
 /**
  *
  * @author Anderson
  */
-public class BadReward {
+public class BadReward implements Serializable{
 
     private Proposition prop;
     private double badReward;

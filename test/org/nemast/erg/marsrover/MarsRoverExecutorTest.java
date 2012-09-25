@@ -1,9 +1,11 @@
 package org.nemast.erg.marsrover;
 
+import java.io.File;
 import java.util.List;
 import org.emast.model.algorithm.planning.ERGExecutor;
 import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.algorithm.planning.agent.factory.AgentIteratorFactory;
+import org.emast.model.algorithm.planning.agent.factory.CommAgentIteratorFactory;
 import org.emast.model.algorithm.planning.agent.factory.PropReputationAgentIteratorFactory;
 import org.emast.model.algorithm.planning.agent.iterator.PropReputationAgentIterator;
 import org.emast.model.algorithm.planning.rewardcombinator.impl.MeanRewardCombinator;
@@ -11,6 +13,8 @@ import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.test.Test;
+import org.emast.util.FileUtils;
+import org.emast.util.Utils;
 
 /**
  *
@@ -29,14 +33,23 @@ public class MarsRoverExecutorTest extends Test {
     }
 
     private static Problem createProblem() {
-        final MarsRoverProblemFactory factory = new MarsRoverProblemFactory();
-        return factory.createProblem(rows, cols, agents, obstacles);
+        String dir = "problems" + File.separator
+                + "mars" + File.separator;
+//        final MarsRoverProblemFactory factory = new MarsRoverProblemFactory();
+//        Problem p = factory.createProblem(rows, cols, agents, obstacles);
+//
+//        FileUtils.toFile(p,  dir+"MarsRoverProblem.emast");
+
+        Problem p = FileUtils.fromFile(dir + "MarsRoverProblem_.emast");
+
+        return p;
     }
 
     private static ERGExecutor createExecutor() {
-        int maxIterations = 100;
+        double badRewardValue = -20;
+        int maxIterations = 10;
         PolicyGenerator<ERG> pg = new PPFERG<ERG>();
-        AgentIteratorFactory factory = new PropReputationAgentIteratorFactory(-20);
+        AgentIteratorFactory factory = new CommAgentIteratorFactory(1, badRewardValue, -20);//PropReputationAgentIteratorFactory();
         List<PropReputationAgentIterator> agentIts = factory.createAgentIterators(agents);
 
         return new ERGExecutor(pg, agentIts, new MeanRewardCombinator(), maxIterations);

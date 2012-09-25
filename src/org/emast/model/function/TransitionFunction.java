@@ -1,5 +1,6 @@
 package org.emast.model.function;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import org.emast.util.CollectionsUtils;
  *
  * @author Anderson
  */
-public abstract class TransitionFunction {
+public abstract class TransitionFunction implements Serializable{
 
     public abstract double getValue(final State pState, final State pFinalState,
             final Action pActions);

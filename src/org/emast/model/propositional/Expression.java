@@ -26,17 +26,6 @@ public final class Expression implements Serializable {
     private static final String EVALUATE_DELIMS = " !()";
     private String expression;
 
-    public Expression(final Proposition pProposition) {
-        this(pProposition.getName());
-    }
-
-    public Expression(final Collection<Proposition> pPropositions, final BinaryOperator pGlueOperator) {
-        for (final Proposition proposition : pPropositions) {
-            add(new Expression(proposition), pGlueOperator);
-        }
-        optimize();
-    }
-
     public Expression(final String pExpressionText) {
         expression = pExpressionText;
         optimize();
@@ -44,6 +33,28 @@ public final class Expression implements Serializable {
 
     public Expression(Expression pExpression) {
         this(pExpression.expression);
+    }
+
+    public Expression(final Proposition pProposition) {
+        this(pProposition.getName());
+    }
+
+    public Expression(final BinaryOperator pGlueOperator, final Expression... pExpressions) {
+        for (final Expression exp : pExpressions) {
+            add(exp, pGlueOperator);
+        }
+        optimize();
+    }
+
+    public Expression(final BinaryOperator pGlueOperator, final Collection<Proposition> pPropositions) {
+        for (final Proposition proposition : pPropositions) {
+            add(new Expression(proposition), pGlueOperator);
+        }
+        optimize();
+    }
+
+    public Expression(final BinaryOperator pGlueOperator, final Proposition... pPropositions) {
+        this(pGlueOperator, Arrays.asList(pPropositions));
     }
 
     public static boolean isNegated(final String exp) {

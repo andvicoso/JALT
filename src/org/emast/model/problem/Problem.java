@@ -1,5 +1,6 @@
 package org.emast.model.problem;
 
+import java.io.Serializable;
 import java.util.Map;
 import org.emast.model.model.MDP;
 import org.emast.model.model.impl.GridModel;
@@ -11,7 +12,7 @@ import org.emast.util.Utils;
  *
  * @author Anderson
  */
-public class Problem<M extends MDP> {
+public class Problem<M extends MDP> implements Serializable{
 
     private double error = 0.009;
     private Map<Integer, State> initialStates;

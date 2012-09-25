@@ -47,7 +47,7 @@ public class Planner<M extends MDP, A extends AgentIterator> implements PolicyGe
         return ret;
     }
 
-    public boolean validPlan(Problem<M> pProblem) {
+    public boolean existValidPlan(Problem<M> pProblem) {
         Policy policy = policyGenerator.run(pProblem);
         boolean ret = true;
         M model = pProblem.getModel();

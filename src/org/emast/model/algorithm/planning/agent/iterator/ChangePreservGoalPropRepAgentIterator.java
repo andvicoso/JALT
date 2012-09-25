@@ -2,8 +2,6 @@ package org.emast.model.algorithm.planning.agent.iterator;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
@@ -39,7 +37,7 @@ public class ChangePreservGoalPropRepAgentIterator<M extends ERG> extends PropRe
                     setPolicy(p);
                 }
             } catch (InvalidExpressionException ex) {
-                Logger.getLogger(ChangePreservGoalPropRepAgentIterator.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             }
         }
     }

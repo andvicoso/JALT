@@ -1,11 +1,11 @@
 package org.emast.model.function;
 
+import java.io.Serializable;
 import java.util.Collection;
 import org.emast.model.BadReward;
 import org.emast.model.BadRewarder;
 import org.emast.model.action.Action;
 import org.emast.model.model.ERG;
-import org.emast.model.model.MDP;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
 
@@ -13,7 +13,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class BadRewardFunction<M extends ERG & BadRewarder> implements RewardFunction {
+public class BadRewardFunction<M extends ERG & BadRewarder> implements RewardFunction, Serializable {
 
     private final M model;
 

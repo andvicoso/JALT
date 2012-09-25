@@ -17,9 +17,9 @@ import org.emast.model.solution.Policy;
  */
 public class ERGExecutor implements PolicyGenerator<ERG> {
 
-    protected final RewardCombinator rewardCombinator;
-    protected final int maxIterations;
-    private final Planner<ERG, PropReputationAgentIterator> planner;
+    protected RewardCombinator rewardCombinator;
+    protected int maxIterations;
+    private Planner<ERG, PropReputationAgentIterator> planner;
 
     public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator, List<PropReputationAgentIterator> pAgents,
             RewardCombinator pRewardCombinator, int pMaxIterations) {
@@ -39,14 +39,15 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
         int iterations = 0;
 
         do {
+            System.out.println("\nITERATION " + iterations + ":\n");
             //Policy policy = 
-            final Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
+            Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
             //run problem
             planner.run(pProblem);
             //iterators
             List<PropReputationAgentIterator> as = planner.getIterators();
             //get results for each agent iterator
-            for (final PropReputationAgentIterator agentIt : as) {
+            for (PropReputationAgentIterator agentIt : as) {
                 Map<Proposition, Double> propsRep = agentIt.getPropositionsReputation();
                 reps.add(propsRep);
             }
@@ -60,27 +61,27 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
             }
         } while (iterations++ < maxIterations);
         //run problem again with the combined preserv. goals
-        //to get the final policy
+        //to get the policy
         return planner.getPolicyGenerator().run(pProblem);
     }
 
-    protected boolean changePreservationGoal(final Problem<ERG> pProblem,
-            final Collection<Proposition> pProps) {
-        final ERG model = pProblem.getModel();
+    protected boolean changePreservationGoal(Problem<ERG> pProblem,
+            Collection<Proposition> pProps) {
+        ERG model = pProblem.getModel();
         //save the original preservation goal
-        final Expression originalPreservGoal = model.getPreservationGoal();
+        Expression originalPreservGoal = model.getPreservationGoal();
         //get the new preservation goal, based on the original and bad reward props
-        final Expression newPreservGoal = createNewPreservationGoal(originalPreservGoal, pProps);
+        Expression newPreservGoal = createNewPreservationGoal(originalPreservGoal, pProps);
         //compare previous goal with the newly created
         if (!newPreservGoal.equals(originalPreservGoal)
                 && !originalPreservGoal.contains(newPreservGoal)
                 && !originalPreservGoal.contains(newPreservGoal.negate())) {
             //create a new cloned problem
-            final ERG newModel = cloneModel(model, newPreservGoal);
-            final Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
+            ERG newModel = cloneModel(model, newPreservGoal);
+            Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
             //Execute the base algorithm (PPFERG) over the new model (with new preservation goal)
-            //if there are paths for all to reach the final goal,
-            if (planner.validPlan(newProblem)) {
+            //if there are paths for all to reach the goal,
+            if (planner.existValidPlan(newProblem)) {
                 //set the preservation goal to the current problem
                 pProblem.getModel().setPreservationGoal(newPreservGoal);
                 //confirm the goal modification
@@ -92,18 +93,16 @@ public class ERGExecutor implements PolicyGenerator<ERG> {
         return false;
     }
 
-    private Expression createNewPreservationGoal(final Expression pOriginalPreservGoal,
-            final Collection<Proposition> pProps) {
-        Expression exp = new Expression(pProps, BinaryOperator.AND);
+    private Expression createNewPreservationGoal(Expression pOriginalPreservGoal,
+            Collection<Proposition> pProps) {
+        Expression exp = new Expression(BinaryOperator.AND, pProps);
         //negate it
         exp = exp.negate();
-        //join with the current
-        exp.add(pOriginalPreservGoal, BinaryOperator.AND);
-
-        return exp;
+        //join with the current preserv goal
+        return new Expression(BinaryOperator.AND, pOriginalPreservGoal, exp);
     }
 
-    protected ERG cloneModel(final ERG pModel, final Expression pNewPreservGoal) {
+    protected ERG cloneModel(ERG pModel, Expression pNewPreservGoal) {
         ERG newModel = (ERG) pModel.copy();
         //set new preservation goal
         newModel.setPreservationGoal(pNewPreservGoal);

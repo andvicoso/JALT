@@ -1,5 +1,6 @@
 package org.emast.model.function;
 
+import java.io.Serializable;
 import java.util.*;
 import net.sourceforge.jeval.EvaluationException;
 import org.emast.model.exception.InvalidExpressionException;
@@ -13,7 +14,7 @@ import org.emast.util.GridUtils;
  *
  * @author And
  */
-public class PropositionFunction {
+public class PropositionFunction implements Serializable{
 
     private Map<State, Set<Proposition>> table;
 
@@ -97,7 +98,7 @@ public class PropositionFunction {
 
     public Expression getExpressionForState(State pState) {
         final Set<Proposition> props = getPropositionsForState(pState);
-        return props != null ? new Expression(props, BinaryOperator.AND) : new Expression("");
+        return props != null ? new Expression(BinaryOperator.AND, props) : new Expression("");
     }
 
     public void addGridStatePropositions(int pRow, int pCol, Proposition... pProps) {
