@@ -1,7 +1,7 @@
 package org.emast.model.agent;
 
-import java.io.PrintStream;
 import java.util.Collection;
+import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
 import static org.emast.model.agent.AgentState.*;
 import org.emast.model.algorithm.Algorithm;
@@ -18,9 +18,7 @@ import org.emast.util.Utils;
  */
 public class Agent<M extends MDP> implements Algorithm<M, Plan> {
 
-    private static PrintStream DEBUG_WRITER = System.out;
     protected static int MAX_ITERATIONS = 1000;
-    private static boolean DEBUG = true;
     protected double totalReward;
     protected int number;
     private long msecs;
@@ -157,13 +155,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     }
 
     protected void print(String pMsg) {
-        if (DEBUG) {
-            DEBUG_WRITER.println("Agent " + getAgent() + " " + pMsg);
-        }
-    }
-
-    protected static boolean isDebug() {
-        return DEBUG;
+        Log.info("Agent " + getAgent() + " " + pMsg);
     }
 
     public double getTotalReward() {

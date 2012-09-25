@@ -2,8 +2,8 @@ package org.emast.model.algorithm.planning;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.PrintStream;
 import java.util.*;
+import org.emast.infra.log.Log;
 import org.emast.model.BadRewarder;
 import org.emast.model.agent.PropReputationAgent;
 import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
@@ -22,8 +22,6 @@ import org.emast.model.state.State;
  */
 public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener {
 
-    private static PrintStream DEBUG_WRITER = System.out;
-    private static boolean DEBUG = true;
     private RewardCombinator rewardCombinator;
     private Planner<ERG, PropReputationAgent> planner;
     private int maxIterations;
@@ -48,7 +46,7 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
         planner.getPropertyChangeSupport().addPropertyChangeListener(this);
         //start main loop
         do {
-            print("\nITERATION " + iterations + ":\n");
+            Log.info("\nITERATION " + iterations + ":\n");
             //Policy policy = 
             Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
             //run problem
@@ -101,7 +99,7 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
                 //set the preservation goal to the current problem
                 pProblem.getModel().setPreservationGoal(newPreservGoal);
                 //confirm the goal modification
-                System.out.println("changed preservation goal from {"
+                Log.info("changed preservation goal from {"
                         + originalPreservGoal + "} to {" + newPreservGoal + "}");
                 return true;
             }
@@ -152,12 +150,6 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
     public synchronized void propertyChange(PropertyChangeEvent pEvt) {
         if (Planner.FINISHED_ALL_PROP.equals(pEvt.getPropertyName())) {
             notifyAll();
-        }
-    }
-
-    private void print(String pMsg) {
-        if (DEBUG) {
-            DEBUG_WRITER.println(pMsg);
         }
     }
 }

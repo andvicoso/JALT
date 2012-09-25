@@ -1,6 +1,6 @@
 package org.emast.model.test;
 
-import java.io.PrintStream;
+import org.emast.infra.log.Log;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.problem.Problem;
 import org.emast.util.Utils;
@@ -11,8 +11,6 @@ import org.emast.util.Utils;
  */
 public class Test implements Runnable {
 
-    private static final boolean DEBUG = true;
-    private static final PrintStream DEBUG_WRITER = System.out;
     private Problem problem;
     private Algorithm[] algorithms;
     private long msecs;
@@ -60,9 +58,7 @@ public class Test implements Runnable {
     }
 
     protected void print(String pMsg) {
-        if (DEBUG) {
-            DEBUG_WRITER.print(pMsg);
-        }
+        Log.info(pMsg);
     }
 
     protected void println() {
