@@ -1,4 +1,4 @@
-package org.nemast.erg.marsrover;
+package org.emast.erg.marsrover;
 
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.problem.Problem;

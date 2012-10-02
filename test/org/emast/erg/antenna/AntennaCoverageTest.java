@@ -1,4 +1,4 @@
-package org.nemast.erg.antenna;
+package org.emast.erg.antenna;
 
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.problem.Problem;

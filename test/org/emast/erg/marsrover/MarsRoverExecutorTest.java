@@ -1,4 +1,4 @@
-package org.nemast.erg.marsrover;
+package org.emast.erg.marsrover;
 
 import java.io.File;
 import java.util.List;

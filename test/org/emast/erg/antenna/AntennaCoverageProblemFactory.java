@@ -1,4 +1,4 @@
-package org.nemast.erg.antenna;
+package org.emast.erg.antenna;
 
 import java.util.*;
 import org.emast.model.function.PropositionFunction;
