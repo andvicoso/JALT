@@ -17,7 +17,7 @@ public class DefaultAgentFactory<M extends MDP> implements AgentFactory<M> {
         //for each agent, create an agent planner
         for (int i = 0; i < pAgents; i++) {
             //create an agent iterator for each agent
-            final Agent ap = createAgent(i);
+            final Agent ap = create(i);
             //save them
             agents.add(ap);
         }
@@ -26,7 +26,7 @@ public class DefaultAgentFactory<M extends MDP> implements AgentFactory<M> {
     }
 
     @Override
-    public Agent createAgent(int pAgent) {
-        return new Agent(pAgent);
+    public Agent create(int pAgentIndex) {
+        return new Agent(pAgentIndex);
     }
 }

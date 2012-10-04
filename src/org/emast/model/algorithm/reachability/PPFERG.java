@@ -32,7 +32,11 @@ public class PPFERG<M extends ERG> extends PPF<M> {
 
     @Override
     public Policy run(Problem<M> pProblem) {
+        //get model
         model = pProblem.getModel();
+        //print initial msg
+        String modelName = model.getClass().getSimpleName();
+        System.out.println("Running PPFERG for " + modelName + ". Initial states: " + pProblem.getInitialStates());
         //get the initial state for only one agent
         final Collection<State> preserveIntension = intension(model.getPreservationGoal());
         final Collection<State> goalsIntension = intension(model.getGoal());

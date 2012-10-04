@@ -25,20 +25,15 @@ public class PropReputationAgent<M extends ERG> extends ERGAgent<M> {
     @Override
     protected void addReward(State pNextState, double pReward) {
         super.addReward(pNextState, pReward);
-        //if this is a bad reward state,
-        if (pNextState != null && isBadRewardState(pNextState, pReward)) {
-            manageBadReward(pNextState, pReward);
+        //manage reward
+        if (pNextState != null) {
+            manageReward(pNextState, pReward);
         }
     }
 
-    protected void manageBadReward(State pNextState, double pReward) {
+    protected void manageReward(State pNextState, double pReward) {
         //save proposition reputation based on the state and reward received
         savePropositionReputation(pNextState, pReward, localPropositionsReputation);
-    }
-
-    //TODO: define better what is a bad reward state (using state)
-    private boolean isBadRewardState(State pState, double pReward) {
-        return pReward <= badRewardThreshold;
     }
 
     protected void savePropositionReputation(State pNextState,

@@ -23,7 +23,7 @@ public class Log {
 //    }
     public static void info(String pMsg) {
         //logger.info(pMsg);
-        System.out.print(pMsg);
+        System.out.println(pMsg);
     }
 
     public static void debug(String pMsg) {

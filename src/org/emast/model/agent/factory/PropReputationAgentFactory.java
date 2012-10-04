@@ -16,7 +16,7 @@ public class PropReputationAgentFactory<M extends ERG> extends ERGAgentFactory<M
     }
 
     @Override
-    public PropReputationAgent createAgent(int pAgent) {
-        return new PropReputationAgent(pAgent, badRewardThreshold);
+    public PropReputationAgent create(int pAgentIndex) {
+        return new PropReputationAgent(pAgentIndex, badRewardThreshold);
     }
 }

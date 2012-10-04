@@ -4,15 +4,17 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
 import org.emast.infra.log.Log;
-import org.emast.model.BadRewarder;
+import org.emast.model.agent.Agent;
 import org.emast.model.agent.PropReputationAgent;
-import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
+import org.emast.model.agent.factory.AgentFactory;
+import org.emast.model.algorithm.planning.propositionschooser.PropositionsChooser;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
+import org.emast.model.solution.Plan;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 
@@ -22,15 +24,17 @@ import org.emast.model.state.State;
  */
 public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener {
 
-    private RewardCombinator rewardCombinator;
-    private Planner<ERG, PropReputationAgent> planner;
-    private int maxIterations;
+    private final PropositionsChooser chooser;
+    private final int maxIterations;
+    private final PolicyGenerator<ERG> policyGenerator;
+    private final AgentFactory agentFactory;
 
-    public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator, List<PropReputationAgent> pAgents,
-            RewardCombinator pRewardCombinator, int pMaxIterations) {
-        rewardCombinator = pRewardCombinator;
+    public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator, AgentFactory pAgentFactory,
+            PropositionsChooser pPropositionBadReward, int pMaxIterations) {
+        chooser = pPropositionBadReward;
         maxIterations = pMaxIterations;
-        planner = new Planner<ERG, PropReputationAgent>(pPolicyGenerator, pAgents);
+        policyGenerator = pPolicyGenerator;
+        agentFactory = pAgentFactory;
     }
 
     @Override
@@ -39,35 +43,35 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
     }
 
     @Override
-    public synchronized Policy run(Problem<ERG> pProblem) {
-        ERG model = pProblem.getModel();
-        int iterations = 0;
-        //listen to planner property changes
-        planner.getPropertyChangeSupport().addPropertyChangeListener(this);
+    public synchronized Policy run(final Problem<ERG> pProblem) {
+        Problem<ERG> problem = pProblem;
+        ERG model = problem.getModel();
+        int iterations = 1;
         //start main loop
         do {
             Log.info("\nITERATION " + iterations + ":\n");
-            //Policy policy = 
-            Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
+            //vars
+            List<PropReputationAgent> agents = agentFactory.createAgents(model.getAgents());
+            Planner<ERG, PropReputationAgent> planner = createPlanner(agents);
             //run problem
             planner.run(pProblem);
-            //wait to be awakened from planner notification (when it finished running all agents)
+            //wait to be awakened from a planner notification (when it finished running all agents)
             try {
-                wait();
+                if (!planner.isFinished()) {
+                    wait();
+                }
             } catch (InterruptedException ex) {
+                Log.debug("Executou falhou: Erro de thread ");
                 return null;
             }
-            //get agents
-            List<PropReputationAgent> agents = planner.getAgents();
+            //results
+            Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
             //get results for each agent
             for (PropReputationAgent agent : agents) {
-                Map<Proposition, Double> propsRep = agent.getPropositionsReputation();
-                reps.add(propsRep);
+                reps.add(agent.getPropositionsReputation());
             }
-            //combine reputations for propositions from agents
-            Map<Proposition, Double> combined = rewardCombinator.combine(reps);
-            //get "bad" propositions
-            Collection<Proposition> props = getBadPropositions(model, combined);
+            //choose "bad" propositions
+            Collection<Proposition> props = chooser.choose(reps);
             //verify the need to change the preservation goal
             if (!props.isEmpty()) {
                 changePreservationGoal(pProblem, props);
@@ -75,11 +79,29 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
         } while (iterations++ < maxIterations);
         //run problem again with the combined preserv. goals
         //to get the policy
-        return planner.getPolicyGenerator().run(pProblem);
+        return policyGenerator.run(pProblem);
     }
 
-    protected boolean changePreservationGoal(Problem<ERG> pProblem,
-            Collection<Proposition> pProps) {
+    public boolean existValidPlan(Problem<ERG> pProblem) {
+        Policy policy = policyGenerator.run(pProblem);
+        boolean ret = true;
+        ERG model = pProblem.getModel();
+        for (int i = 0; i < model.getAgents(); i++) {
+            //create a new simple agent iterator
+            final Agent agent = new Agent(i);
+            agent.init(pProblem, policy);
+            //find the plan for the newly created problem
+            //with the preservation goal changed
+            agent.run(pProblem);
+            //get the resulting plan
+            final Plan plan = agent.getPlan();
+            //save in ret if a plan was generated
+            ret &= plan != null && !plan.isEmpty();
+        }
+        return ret;
+    }
+
+    protected boolean changePreservationGoal(Problem<ERG> pProblem, Collection<Proposition> pProps) {
         ERG model = pProblem.getModel();
         //save the original preservation goal
         Expression originalPreservGoal = model.getPreservationGoal();
@@ -94,12 +116,12 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
             ERG newModel = cloneModel(model, newPreservGoal);
             Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
             //Execute the base algorithm (PPFERG) over the new model (with new preservation goal)
-            //if there are paths for all to reach the goal,
-            if (planner.existValidPlan(newProblem)) {
+            //if there are paths for all to reach the goal
+            if (existValidPlan(newProblem)) {
                 //set the preservation goal to the current problem
                 pProblem.getModel().setPreservationGoal(newPreservGoal);
                 //confirm the goal modification
-                Log.info("changed preservation goal from {"
+                Log.info("Changed preservation goal from {"
                         + originalPreservGoal + "} to {" + newPreservGoal + "}");
                 return true;
             }
@@ -109,11 +131,16 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
 
     private Expression createNewPreservationGoal(Expression pOriginalPreservGoal,
             Collection<Proposition> pProps) {
-        Expression exp = new Expression(BinaryOperator.AND, pProps);
-        //negate it
-        exp = exp.negate();
-        //join with the current preserv goal
-        return new Expression(BinaryOperator.AND, pOriginalPreservGoal, exp);
+        Expression exp = new Expression(pOriginalPreservGoal);
+        for (Proposition prop : pProps) {
+            //create expression for each bad reward proposition
+            Expression e = new Expression(BinaryOperator.AND, prop);
+            //negate it
+            e = e.negate();
+            //add to the returned exp
+            exp.add(e, BinaryOperator.AND);
+        }
+        return exp;
     }
 
     protected ERG cloneModel(ERG pModel, Expression pNewPreservGoal) {
@@ -122,12 +149,6 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
         newModel.setPreservationGoal(pNewPreservGoal);
 
         return newModel;
-    }
-
-    private Collection<Proposition> getBadPropositions(ERG pModel, Map<Proposition, Double> pCombined) {
-        return pModel instanceof BadRewarder
-                ? ((BadRewarder) pModel).getBadRewardProps()
-                : Collections.EMPTY_LIST;
     }
 
     private boolean existValidFinalState(ERG model, Expression newPreservGoal) {
@@ -151,5 +172,13 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
         if (Planner.FINISHED_ALL_PROP.equals(pEvt.getPropertyName())) {
             notifyAll();
         }
+    }
+
+    private Planner<ERG, PropReputationAgent> createPlanner(List<PropReputationAgent> pAgents) {
+        Planner<ERG, PropReputationAgent> planner = new Planner<ERG, PropReputationAgent>(policyGenerator, pAgents);
+        //listen to changes of planner properties
+        planner.getPropertyChangeSupport().addPropertyChangeListener(this);
+
+        return planner;
     }
 }

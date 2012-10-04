@@ -10,7 +10,7 @@ import org.emast.model.model.ERG;
 public class ERGAgentFactory<M extends ERG> extends DefaultAgentFactory<M> {
 
     @Override
-    public ERGAgent createAgent(int pAgent) {
-        return new ERGAgent(pAgent);
+    public ERGAgent create(int pAgentIndex) {
+        return new ERGAgent(pAgentIndex);
     }
 }

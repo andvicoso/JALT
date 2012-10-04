@@ -18,7 +18,6 @@ public abstract class ProblemFactory {
     private static final Random random = new Random();
 
     public ProblemFactory() {
-        usedStates = new ArrayList<State>();
     }
 
     protected State getRandomEmptyState(final MDPModel pModel) {
@@ -33,7 +32,7 @@ public abstract class ProblemFactory {
     }
 
     protected static <O> O getRandom(final Collection<O> pObjects) {
-        int r = random.nextInt(pObjects.size());
+        int r = Math.abs(random.nextInt() % pObjects.size());
         O obj = null;
 
         if (pObjects instanceof List) {
@@ -42,7 +41,7 @@ public abstract class ProblemFactory {
             int i = 0;
             for (O o : pObjects) {
                 obj = o;
-                if (i == r) {
+                if (i++ == r) {
                     break;
                 }
             }
@@ -82,11 +81,10 @@ public abstract class ProblemFactory {
         return (State) pModel.getStates().toArray()[index];
     }
 
-    public List<State> getUsedStates() {
-        return usedStates;
-    }
+    protected abstract Problem doCreate();
 
-    public static Random getRandom() {
-        return random;
+    public Problem create() {
+        usedStates = new ArrayList<State>();
+        return doCreate();
     }
 }

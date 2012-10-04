@@ -155,7 +155,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     }
 
     protected void print(String pMsg) {
-        Log.info("Agent " + getAgent() + " " + pMsg);
+        Log.info("Agent " + getAgent() + ": " + pMsg);
     }
 
     public double getTotalReward() {

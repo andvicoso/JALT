@@ -4,10 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
-import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.propositional.Proposition;
-import org.emast.util.comparator.ValueComparator;
 
 /**
  *
@@ -46,6 +43,6 @@ public class MeanRewardCombinator implements RewardCombinator {
         }
 
         return result;
-                //new TreeMap<Proposition, Double>(new ValueComparator(result));
+        //new TreeMap<Proposition, Double>(new ValueComparator(result));
     }
 }

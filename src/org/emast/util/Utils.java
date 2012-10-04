@@ -12,6 +12,9 @@ import org.emast.model.problem.Problem;
 
 public class Utils {
 
+    private static final String DEFAULT_DATE_FORMAT_PATTERN = "dd/MM/yy";
+    public static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN);
+
     private Utils() {
     }
 
@@ -27,7 +30,7 @@ public class Utils {
         Method m;
         try {
             m = pClazz.getDeclaredMethod(pName);
-        } catch (NoSuchMethodException nsme) {
+        } catch (NoSuchMethodException name) {
             if (pClazz.equals(Object.class)) {
                 throw new RuntimeException("Method not found in any super class.");
             }

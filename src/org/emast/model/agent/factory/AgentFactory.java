@@ -10,7 +10,7 @@ import org.emast.model.model.MDP;
  */
 public interface AgentFactory<M extends MDP> {
 
-    Agent createAgent(int pAgent);
+    Agent create(int pAgentIndex);
 
     List<Agent> createAgents(int pAgents);
 }

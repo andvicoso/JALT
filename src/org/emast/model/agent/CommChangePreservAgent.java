@@ -99,8 +99,8 @@ public class CommChangePreservAgent<M extends ERG> extends ChangePreservGoalProp
     }
 
     @Override
-    protected void manageBadReward(State nextState, double reward) {
-        super.manageBadReward(nextState, reward);
+    protected void manageReward(State nextState, double reward) {
+        super.manageReward(nextState, reward);
         //verify the need to send message for listeners
         if (mustSendMessage(nextState)) {
             //create the message to be sent

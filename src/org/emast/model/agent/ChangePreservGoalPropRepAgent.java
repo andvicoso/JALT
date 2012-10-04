@@ -23,8 +23,8 @@ public class ChangePreservGoalPropRepAgent<M extends ERG> extends PropReputation
     }
 
     @Override
-    protected void manageBadReward(State pNextState, double pReward) {
-        super.manageBadReward(pNextState, pReward);
+    protected void manageReward(State pNextState, double pReward) {
+        super.manageReward(pNextState, pReward);
         //verify the need to change the preservation goal
         if (mustChangePreservationGoal(pNextState)) {
             try {

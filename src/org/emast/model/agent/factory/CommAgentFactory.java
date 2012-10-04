@@ -23,8 +23,8 @@ public class CommAgentFactory<M extends ERG> extends PropReputationAgentFactory<
     }
 
     @Override
-    public CommAgent createAgent(int pAgent) {
-        CommAgent a = new CommAgent(pAgent, messageCost, badRewardThreshold,
+    public CommAgent create(int pAgentIndex) {
+        CommAgent a = new CommAgent(pAgentIndex, messageCost, badRewardThreshold,
                 badMsgThreshold, new MeanRewardCombinator(), messageManager);
         messageManager.add(a);
 

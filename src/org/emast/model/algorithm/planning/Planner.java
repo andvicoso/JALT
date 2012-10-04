@@ -85,26 +85,7 @@ public class Planner<M extends MDP, A extends Agent> {
     }
 
     protected void finished() {
-        pcs.firePropertyChange(FINISHED_ALL_PROP, 0, 0);
-    }
-
-    public boolean existValidPlan(Problem<M> pProblem) {
-        Policy policy = policyGenerator.run(pProblem);
-        boolean ret = true;
-        M model = pProblem.getModel();
-        for (int i = 0; i < model.getAgents(); i++) {
-            //create a new simple agent iterator
-            final Agent agent = new Agent(i);
-            agent.init(pProblem, policy);
-            //find the plan for the newly created problem
-            //with the preservation goal changed
-            agent.run(pProblem);
-            //get the resulting plan
-            final Plan plan = agent.getPlan();
-            //save in ret if a plan was generated
-            ret &= plan != null && !plan.isEmpty();
-        }
-        return ret;
+        pcs.firePropertyChange(FINISHED_ALL_PROP, 0, 1);
     }
 
     public PolicyGenerator<M> getPolicyGenerator() {
