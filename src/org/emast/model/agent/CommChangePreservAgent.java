@@ -4,14 +4,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
-import org.emast.model.comm.Message;
 import org.emast.model.comm.MessageHistory;
+import org.emast.model.comm.MessageManager;
+import org.emast.model.comm.Messenger;
 import org.emast.model.comm.StateRewardMessage;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
+import org.emast.model.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
@@ -20,24 +19,28 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class CommChangePreservAgent<M extends ERG> extends ChangePreservGoalPropRepAgent<M> {
+public class CommChangePreservAgent<M extends ERG> extends ChangePreservGoalPropRepAgent<M>
+        implements Messenger<StateRewardMessage> {
 
-    private final double badMessageThreshold;
     private final MessageHistory history;
     private final Map<Proposition, Double> messagePropositionsReputation;
-    private final double messageCost;
     private final RewardCombinator rewardCombinator;
+    private final MessageManager messageManager;
+    private final double badMessageThreshold;
+    private final double messageCost;
 
     public CommChangePreservAgent(int pAgent, double pMessageCost, double pBadRewardThreshold,
-            double pBadMessageThreshold, RewardCombinator pRewardCombinator) {
+            double pBadMessageThreshold, RewardCombinator pRewardCombinator, MessageManager pMessageManager) {
         super(pAgent, pBadRewardThreshold);
         messageCost = pMessageCost;
         badMessageThreshold = pBadMessageThreshold;
         rewardCombinator = pRewardCombinator;
+        messageManager = pMessageManager;
         history = new MessageHistory();
         messagePropositionsReputation = new HashMap<Proposition, Double>();
     }
 
+    @Override
     public void messageReceived(final StateRewardMessage pMsg) {
         print("received message: " + pMsg + " from agent: " + pMsg.getSender());
         history.add(pMsg);
@@ -55,14 +58,16 @@ public class CommChangePreservAgent<M extends ERG> extends ChangePreservGoalProp
                     setPolicy(p);
                 }
             } catch (InvalidExpressionException ex) {
-                Logger.getLogger(CommChangePreservAgent.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             }
         }
     }
 
-    protected void sendMessage(final Message pMsg) {
+    @Override
+    public void sendMessage(final StateRewardMessage pMsg) {
         print("sent broadcast: " + pMsg);
         addReward(null, messageCost);
+        messageManager.broadcast(this, pMsg);
     }
 
     protected boolean mustSendMessage(final State state) {
@@ -72,7 +77,7 @@ public class CommChangePreservAgent<M extends ERG> extends ChangePreservGoalProp
         if (props != null) {
             for (final Proposition proposition : props) {
                 final Double rep = getPropositionReputation(proposition);
-                if (rep < badMessageThreshold) {
+                if (rep <= badMessageThreshold) {
                     somePropChanged = true;
                     break;
                 }
@@ -104,7 +109,7 @@ public class CommChangePreservAgent<M extends ERG> extends ChangePreservGoalProp
         //verify the need to send message for listeners
         if (mustSendMessage(nextState)) {
             //create the message to be sent
-            final Message msg = new StateRewardMessage(nextState, reward, getAgent());
+            final StateRewardMessage msg = new StateRewardMessage(nextState, reward, getAgent());
             //broadcast it!
             sendMessage(msg);
         }

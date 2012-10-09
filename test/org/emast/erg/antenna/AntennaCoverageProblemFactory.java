@@ -15,13 +15,35 @@ import org.emast.util.GridUtils;
  */
 public class AntennaCoverageProblemFactory extends ProblemFactory {
 
-    public Problem createProblem(
+    private final int rows;
+    private final int cols;
+    private final int agents;
+    private final int numberOfAntennas;
+    private final int numberOfObstacles;
+    private final int antennaSignalCityBlockRadius;
+
+    public AntennaCoverageProblemFactory(final int pRows,
+            final int pCols, final int pAgents,
+            final int pNumberOfObstacles) {
+        this(pRows, pCols, pAgents, pNumberOfObstacles, 2, 1);
+    }
+
+    public AntennaCoverageProblemFactory(
             final int pRows, final int pCols, final int pAgents,
             final int pNumberOfObstacles, final int pNumberOfAntennas,
             final int pAntennaSignalCityBlockRadius) {
+        rows = pRows;
+        cols = pCols;
+        agents = pAgents;
+        numberOfAntennas = pNumberOfAntennas;
+        numberOfObstacles = pNumberOfObstacles;
+        antennaSignalCityBlockRadius = pAntennaSignalCityBlockRadius;
+    }
 
-        final AntennaCoverageModel model = new AntennaCoverageModel(pRows, pCols, pAgents,
-                pAntennaSignalCityBlockRadius);
+    @Override
+    public Problem doCreate() {
+        final AntennaCoverageModel model = new AntennaCoverageModel(rows, cols, agents,
+                antennaSignalCityBlockRadius);
 
         final Proposition hole = new Proposition("hole");
         final Proposition stone = new Proposition("stone");
@@ -36,16 +58,16 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
 
         final PropositionFunction pf = new PropositionFunction();
         //spread obstacles over the grid
-        for (int i = 0; i < pNumberOfObstacles; i++) {
+        for (int i = 0; i < numberOfObstacles; i++) {
             pf.add(getRandomEmptyState(model), getRandom(obstacles));
         }
         //distribute antennas over the grid
-        for (int i = 0; i < pNumberOfAntennas; i++) {
+        for (int i = 0; i < numberOfAntennas; i++) {
             pf.add(getRandomEmptyState(model), antenna);
         }
         model.setPropositionFunction(pf);
 
-        createAntennaCoverage(model.getStates(), pf, antenna, coverage, pAntennaSignalCityBlockRadius,
+        createAntennaCoverage(model.getStates(), pf, antenna, coverage, antennaSignalCityBlockRadius,
                 model.getPropositions());
 
         final Set<State> sts = pf.getStatesWithProposition(coverage);
@@ -53,7 +75,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         pf.add(getRandom(sts), up, exit);
         pf.add(getRandom(sts), down, exit);
         //create initial states
-        final List<State> initStates = getRandomEmptyStates(model, pAgents);
+        final List<State> initStates = getRandomEmptyStates(model, agents);
 
         return new Problem(model, CollectionsUtils.asMap(initStates));
     }
@@ -71,12 +93,6 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         }
 
         return getRandom(coverage);
-    }
-
-    public Problem createProblem(final int pRows,
-            final int pCols, final int pAgents,
-            final int pNumberOfObstacles) {
-        return createProblem(pRows, pCols, pAgents, pNumberOfObstacles, 2, 1);
     }
 
     /**

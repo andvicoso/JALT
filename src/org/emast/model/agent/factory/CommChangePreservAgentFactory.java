@@ -1,6 +1,6 @@
 package org.emast.model.agent.factory;
 
-import org.emast.model.agent.CommAgent;
+import org.emast.model.agent.CommChangePreservAgent;
 import org.emast.model.comm.MessageManager;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.rewardcombinator.MeanRewardCombinator;
@@ -9,13 +9,13 @@ import org.emast.model.planning.rewardcombinator.MeanRewardCombinator;
  *
  * @author Anderson
  */
-public class CommAgentFactory<M extends ERG> extends PropReputationAgentFactory< M> {
+public class CommChangePreservAgentFactory<M extends ERG> extends PropReputationAgentFactory<M> {
 
     private final double badMsgThreshold;
     private final double messageCost;
     private final MessageManager messageManager;
 
-    public CommAgentFactory(double pMessageCost, double pBadRewardThreshold, double pBadMsgThreshold) {
+    public CommChangePreservAgentFactory(double pMessageCost, double pBadRewardThreshold, double pBadMsgThreshold) {
         super(pBadRewardThreshold);
         badMsgThreshold = pBadMsgThreshold;
         messageCost = pMessageCost;
@@ -23,8 +23,8 @@ public class CommAgentFactory<M extends ERG> extends PropReputationAgentFactory<
     }
 
     @Override
-    public CommAgent create(int pAgentIndex) {
-        CommAgent a = new CommAgent(pAgentIndex, messageCost, badRewardThreshold,
+    public CommChangePreservAgent create(int pAgentIndex) {
+        CommChangePreservAgent a = new CommChangePreservAgent<M>(pAgentIndex, messageCost, badRewardThreshold,
                 badMsgThreshold, new MeanRewardCombinator(), messageManager);
         messageManager.add(a);
 

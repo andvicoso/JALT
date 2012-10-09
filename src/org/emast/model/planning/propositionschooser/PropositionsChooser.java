@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.planning.propositionschooser;
+package org.emast.model.planning.propositionschooser;
 
 import java.util.Collection;
 import java.util.Map;

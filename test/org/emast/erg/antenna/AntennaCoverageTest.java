@@ -2,38 +2,33 @@ package org.emast.erg.antenna;
 
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.problem.Problem;
+import org.emast.model.problem.ProblemFactory;
 import org.emast.model.test.Test;
 
 /**
  *
  * @author anderson
  */
-public class AntennaCoverageTest extends Test {
-
-    private static final AntennaCoverageProblemFactory factory = new AntennaCoverageProblemFactory();
-
-    public AntennaCoverageTest() {
-        super(createProblem(), new PPFERG());
-    }
+public class AntennaCoverageTest {
 
     private static Problem createProblem() {
-        final double antennasRatio = 0.025;
-        final double obstaclesRatio = 0.2;
-        final double agentsRatio = 0.02;
-        final int rows = 10;
-        final int cols = rows;
-        final int agents = (int) (rows * cols * agentsRatio);
-        final int obstacles = (int) (rows * cols * obstaclesRatio);
-        final int antennas = (int) (rows * cols * antennasRatio);
-        final int antennaRadius = 3;
+        double antennasRatio = 0.025;
+        double obstaclesRatio = 0.2;
+        double agentsRatio = 0.02;
+        int rows = 10;
+        int cols = rows;
+        int agents = (int) (rows * cols * agentsRatio);
+        int obstacles = (int) (rows * cols * obstaclesRatio);
+        int antennas = (int) (rows * cols * antennasRatio);
+        int antennaRadius = 3;
 
-        final Problem problem = factory.createProblem(rows, cols,
+        ProblemFactory factory = new AntennaCoverageProblemFactory(rows, cols,
                 agents, obstacles, antennas, antennaRadius);
 
-        return problem;
+        return factory.create();
     }
 
-    public static void main(final String[] pArgs) {
-        new AntennaCoverageTest().run();
+    public static void main(String[] pArgs) {
+        new Test(createProblem(), new PPFERG()).run();
     }
 }

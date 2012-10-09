@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.comm.MessageHistory;
 import org.emast.model.comm.MessageManager;
 import org.emast.model.comm.Messenger;
 import org.emast.model.comm.StateRewardMessage;
 import org.emast.model.model.ERG;
+import org.emast.model.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
 

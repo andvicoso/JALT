@@ -102,7 +102,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
             //while there is a valid state to go to and did not reach the max iteration
         } while (action != null && currentState != null && iterations < MAX_ITERATIONS);
 
-        print(printResults());
+        //print(printResults());
 
         return iterations < MAX_ITERATIONS ? FINISHED : FINISHED_MAX_ITERATIONS;
     }

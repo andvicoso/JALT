@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.Collections;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
+import org.emast.model.planning.ValidPlanFinder;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
-import org.emast.model.solution.Plan;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 
@@ -72,8 +72,8 @@ public class ChangePreservGoalPropRepAgent<M extends ERG> extends PropReputation
             Problem<M> newProblem = cloneProblem(model, newPreservGoal);
             //Execute the base algorithm (PPFERG) over the new problem (with the new preservation goal)
             Policy p = getAlgorithm().run(newProblem);
-            //if there isn`t a path to reach the goal,
-            if (canReachFinalGoal(newProblem)) {
+            //if there is a path to reach the goal
+            if (ValidPlanFinder.exist(newProblem, getPolicy(), getAgent())) {
                 //set the new preservation goal to the current problem
                 newProblem.getModel().setPreservationGoal(newPreservGoal);
                 //confirm the goal modification
@@ -83,19 +83,6 @@ public class ChangePreservGoalPropRepAgent<M extends ERG> extends PropReputation
             }
         }
         return null;
-    }
-
-    private boolean canReachFinalGoal(Problem pProblem) {
-        //create a new simple agent
-        Agent agent = new Agent(getAgent());
-        agent.setPolicy(getPolicy());
-        //find the plan for the newly created problem
-        //with the preservation goal changed
-        agent.run(pProblem);
-        //get the resulting plan
-        Plan agPlan = agent.getPlan();
-
-        return agPlan != null && !agPlan.isEmpty();
     }
 
     private Expression getNewPreservationGoal(Expression pOriginalPreservGoal, State pState) {
@@ -116,7 +103,7 @@ public class ChangePreservGoalPropRepAgent<M extends ERG> extends PropReputation
         if (props != null) {
             for (Proposition proposition : props) {
                 Double rep = getPropositionReputation(proposition);
-                if (rep < badRewardThreshold) {
+                if (rep <= badRewardThreshold) {
                     changedProp = proposition;
                     break;
                 }

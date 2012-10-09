@@ -41,11 +41,13 @@ public class PropReputationAgent<M extends ERG> extends ERGAgent<M> {
         if (pPropositionsReputation != null) {
             //bad reward value is distributed equally over the state`s propostions
             Collection<Proposition> props = getPropositionsForState(pNextState);
-            double propReward = pReward / props.size();
-            for (Proposition proposition : props) {
-                Double currPropReward = pPropositionsReputation.get(proposition);
-                currPropReward = currPropReward == null ? 0d : currPropReward;
-                pPropositionsReputation.put(proposition, propReward + currPropReward);
+            if (props != null) {
+                double propReward = pReward / props.size();
+                for (Proposition proposition : props) {
+                    Double currPropReward = pPropositionsReputation.get(proposition);
+                    currPropReward = currPropReward == null ? 0d : currPropReward;
+                    pPropositionsReputation.put(proposition, propReward + currPropReward);
+                }
             }
         }
     }

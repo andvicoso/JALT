@@ -1,18 +1,18 @@
-package org.emast.model.algorithm.planning;
+package org.emast.model.planning;
 
 import java.beans.PropertyChangeSupport;
 import java.util.List;
 import org.emast.model.agent.Agent;
+import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
-import org.emast.model.solution.Plan;
 import org.emast.model.solution.Policy;
 
 /**
  *
  * @author anderson
  */
-public class Planner<M extends MDP, A extends Agent> {
+public class Planner<M extends MDP, A extends Agent> implements PolicyGenerator<M> {
 
     public static final String FINISHED_PROP = "FINISHED";
     public static final String FINISHED_ALL_PROP = "FINISHED_ALL";
@@ -30,12 +30,24 @@ public class Planner<M extends MDP, A extends Agent> {
         return pcs;
     }
 
-    public void run(final Problem<M> pProblem) {
+    @Override
+    public Policy run(final Problem<M> pProblem) {
         final Policy policy = policyGenerator.run(pProblem);
         //init
         init(pProblem, policy);
         //run
         doRun(pProblem);
+
+        return policy;
+    }
+
+    @Override
+    public String printResults() {
+        final StringBuilder sb = new StringBuilder();
+        for (A agent : agents) {
+            sb.append(agent.printResults());
+        }
+        return sb.toString();
     }
 
     private void init(Problem<M> pProblem, Policy pPolicy) {
@@ -86,6 +98,7 @@ public class Planner<M extends MDP, A extends Agent> {
 
     protected void finished() {
         pcs.firePropertyChange(FINISHED_ALL_PROP, 0, 1);
+        System.out.println(printResults());
     }
 
     public PolicyGenerator<M> getPolicyGenerator() {

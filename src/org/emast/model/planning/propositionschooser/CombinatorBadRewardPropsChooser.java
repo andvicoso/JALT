@@ -1,10 +1,10 @@
-package org.emast.model.algorithm.planning.propositionschooser;
+package org.emast.model.planning.propositionschooser;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.emast.model.algorithm.planning.rewardcombinator.RewardCombinator;
+import org.emast.model.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.propositional.Proposition;
 
 /**
