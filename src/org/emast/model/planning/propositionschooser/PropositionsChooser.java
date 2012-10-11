@@ -12,4 +12,6 @@ import org.emast.model.propositional.Proposition;
 public interface PropositionsChooser {
 
     Set<Proposition> choose(Collection<Map<Proposition, Double>> pReps);
+
+    Proposition chooseOne(Collection<Map<Proposition, Double>> pReps);
 }

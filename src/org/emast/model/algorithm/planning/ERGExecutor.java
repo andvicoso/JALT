@@ -5,17 +5,12 @@ import java.beans.PropertyChangeListener;
 import java.util.*;
 import org.emast.infra.log.Log;
 import org.emast.model.agent.PropReputationAgent;
+import org.emast.model.agent.combineresults.CombineResults;
 import org.emast.model.agent.factory.AgentFactory;
-import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.Planner;
-import org.emast.model.planning.propositionschooser.PropositionsChooser;
 import org.emast.model.problem.Problem;
-import org.emast.model.propositional.Expression;
-import org.emast.model.propositional.Proposition;
-import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.solution.Policy;
-import org.emast.model.state.State;
 
 /**
  *
@@ -23,16 +18,16 @@ import org.emast.model.state.State;
  */
 public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener {
 
-    private final PropositionsChooser chooser;
     private final int maxIterations;
     private final PolicyGenerator<ERG> policyGenerator;
     private final AgentFactory agentFactory;
+    private final CombineResults<ERG, PropReputationAgent> combineResults;
     private List<PropReputationAgent> agents;
 
     public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator,
             AgentFactory pAgentFactory,
-            PropositionsChooser pPropositionBadReward, int pMaxIterations) {
-        chooser = pPropositionBadReward;
+            CombineResults<ERG, PropReputationAgent> pCombineResults, int pMaxIterations) {
+        combineResults = pCombineResults;
         maxIterations = pMaxIterations;
         policyGenerator = pPolicyGenerator;
         agentFactory = pAgentFactory;
@@ -57,104 +52,28 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
             Log.info("\nITERATION " + iterations + ":\n");
             //vars
             agents = agentFactory.createAgents(model.getAgents());
-            Planner<ERG, PropReputationAgent> planner = createPlanner(agents);
+            Planner planner = createPlanner(agents);
             //run problem
-            planner.run(pProblem);
+            planner.run(problem);
             //wait to be awakened from a planner notification (when it finished running all agents)
             try {
                 if (!planner.isFinished()) {
                     wait();
                 }
             } catch (InterruptedException ex) {
-                Log.debug("Executou falhou: Erro de thread ");
+                Log.debug("Execution failed. Thread interrupted");
                 return null;
             }
-            //results
-            Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
-            //get results for each agent
-            for (PropReputationAgent agent : agents) {
-                reps.add(agent.getPropositionsReputation());
-            }
-            //choose "bad" propositions
-            Collection<Proposition> props = Collections.singleton(chooser.choose(reps).iterator().next());
-            //verify the need to change the preservation goal
-            if (!props.isEmpty()) {
-                changePreservationGoal(pProblem, props);
-            }
+
+            combineResults.combine(problem, agents);
         } while (iterations++ < maxIterations);
         //run problem again with the combined preserv. goals
         //to get the policy
         agents = agentFactory.createAgents(model.getAgents());
-        Planner<ERG, PropReputationAgent> planner = createPlanner(agents);
+        //create a new planner
+        Planner planner = createPlanner(agents);
         //run problem
         return planner.run(pProblem);
-    }
-
-    protected boolean changePreservationGoal(Problem<ERG> pProblem, Collection<Proposition> pProps) {
-        ERG model = pProblem.getModel();
-        //save the original preservation goal
-        Expression originalPreservGoal = model.getPreservationGoal();
-        //get the new preservation goal, based on the original and bad reward props
-        Expression newPreservGoal = createNewPreservationGoal(originalPreservGoal, pProps);
-        //compare previous goal with the newly created
-        if (!newPreservGoal.equals(originalPreservGoal)
-                && !originalPreservGoal.contains(newPreservGoal)
-                && !originalPreservGoal.contains(newPreservGoal.negate())
-                && existValidFinalState(model, newPreservGoal)) {
-            //create a new cloned problem
-            //ERG newModel = cloneModel(model, newPreservGoal);
-            //Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
-            //Execute the base algorithm (PPFERG) over the new model (with new preservation goal)
-            //if there are paths for all to reach the goal
-            //Log.info("Trying to find a valid plan for preserv: " + model.getPreservationGoal());
-            //if (ValidPlanFinder.exist(newProblem, policyGenerator)) {
-            //set the preservation goal to the current problem
-            pProblem.getModel().setPreservationGoal(newPreservGoal);
-            //confirm the goal modification
-            Log.info("Changed preservation goal from {"
-                    + originalPreservGoal + "} to {" + newPreservGoal + "}");
-            return true;
-            // }
-        }
-        return false;
-    }
-
-    private Expression createNewPreservationGoal(Expression pOriginalPreservGoal,
-            Collection<Proposition> pProps) {
-        Expression exp = new Expression(pOriginalPreservGoal);
-        for (Proposition prop : pProps) {
-            //create expression for each bad reward proposition
-            Expression e = new Expression(BinaryOperator.AND, prop);
-            //negate it
-            e = e.negate();
-            //add to the returned exp
-            exp.add(e, BinaryOperator.AND);
-        }
-        return exp;
-    }
-
-    protected ERG cloneModel(ERG pModel, Expression pNewPreservGoal) {
-        ERG newModel = (ERG) pModel.copy();
-        //set new preservation goal
-        newModel.setPreservationGoal(pNewPreservGoal);
-
-        return newModel;
-    }
-
-    private boolean existValidFinalState(ERG model, Expression newPreservGoal) {
-        try {
-            Collection<State> finalStates = model.getPropositionFunction().intension(
-                    model.getStates(), model.getPropositions(), model.getGoal());
-
-            for (State state : finalStates) {
-                if (model.getPropositionFunction().satisfies(state, newPreservGoal)) {
-                    return true;
-                }
-            }
-        } catch (InvalidExpressionException ex) {
-        }
-
-        return false;
     }
 
     @Override

@@ -1,14 +1,16 @@
 package org.emast;
 
+import org.emast.model.agent.combineresults.CombineResults;
+import org.emast.model.agent.combineresults.PropRepCombineResults;
 import org.emast.model.agent.factory.AgentFactory;
 import org.emast.model.agent.factory.CommAgentFactory;
-import org.emast.model.agent.factory.PropReputationAgentFactory;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.planning.ERGExecutor;
 import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.model.ERG;
-import org.emast.model.planning.propositionschooser.CombinatorBadRewardPropsChooser;
+import org.emast.model.planning.PreservationGoalFactory;
+import org.emast.model.planning.propositionschooser.CombinePropsChooser;
 import org.emast.model.planning.propositionschooser.PropositionsChooser;
 import org.emast.model.planning.rewardcombinator.MeanRewardCombinator;
 import org.emast.model.problem.Problem;
@@ -26,12 +28,15 @@ public class MultipleTest {
         double badRewardValue = -20;
         double messageCost = -1;
         int maxIterations = 1;
-        PropositionsChooser chooser =
-                new CombinatorBadRewardPropsChooser(new MeanRewardCombinator(), badMsgValue);
+        
+        PreservationGoalFactory goalFactory = new PreservationGoalFactory();
+        PropositionsChooser chooser = new CombinePropsChooser(new MeanRewardCombinator(), badRewardValue);
+        CombineResults comb = new PropRepCombineResults(chooser, goalFactory);
         PolicyGenerator<ERG> pg = new PPFERG<ERG>();
-        PropReputationAgentFactory factory = new CommAgentFactory(messageCost, badRewardValue, badMsgValue);
-
-        return new ERGExecutor(pg, factory, chooser, maxIterations);
+        AgentFactory factory = //new PropReputationAgentFactory<ERG>(badRewardValue);
+                new CommAgentFactory(messageCost, badRewardValue, badMsgValue);
+        
+        return new ERGExecutor(pg, factory, comb, maxIterations);//new Planner(pg, factory.createAgents(agents));//
     }
 
     private static Algorithm[] createAlgorithms() {
