@@ -2,6 +2,7 @@ package org.emast.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ public final class Lookup {
     }
 
     public <O> List<O> getAll(Class<O> pKey) {
-        return map.get(pKey);
+        return Collections.unmodifiableList(map.get(pKey));
     }
 
     public void put(Object pObj) {

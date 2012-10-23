@@ -9,7 +9,7 @@ import org.emast.model.problem.Problem;
  */
 public interface Algorithm<M extends MDP, R> {
 
-    R run(Problem<M> pProblem);
+    R run(Problem<M> pProblem, Object... pParameters);
 
     String printResults();
 }

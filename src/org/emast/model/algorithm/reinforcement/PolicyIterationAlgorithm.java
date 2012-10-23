@@ -17,7 +17,7 @@ public class PolicyIterationAlgorithm implements PolicyGenerator<MDP> {
     private int iterations = 0;
 
     @Override
-    public Policy run(Problem<MDP> pProblem) {
+    public Policy run(Problem<MDP> pProblem, Object... pParameters) {
         MDP model = pProblem.getModel();
         boolean changed;
         final Policy pi = PolicyUtils.createRandom(model);

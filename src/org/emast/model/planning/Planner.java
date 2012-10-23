@@ -31,12 +31,10 @@ public class Planner<M extends MDP> implements PolicyGenerator<M> {
     }
 
     @Override
-    public Policy run(final Problem<M> pProblem) {
+    public Policy run(Problem<M> pProblem, Object... pParameters) {
         final Policy policy = policyGenerator.run(pProblem);
-        //init
-        init(pProblem, policy);
         //run
-        doRun(pProblem);
+        doRun(pProblem, policy);
 
         return policy;
     }
@@ -50,15 +48,7 @@ public class Planner<M extends MDP> implements PolicyGenerator<M> {
         return sb.toString();
     }
 
-    private void init(Problem<M> pProblem, Policy pPolicy) {
-        //execute them all
-        for (final Agent agent : agents) {
-            //set the initial policy and model
-            agent.init(pProblem, pPolicy);
-        }
-    }
-
-    private void doRun(final Problem<M> pProblem) {
+    private void doRun(final Problem<M> pProblem, final Policy policy) {
         //execute them all
         for (final Agent agent : agents) {
             //get new thread name
@@ -68,7 +58,7 @@ public class Planner<M extends MDP> implements PolicyGenerator<M> {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    agent.run(pProblem);
+                    agent.run(pProblem, policy);
 
                     finished(agent);
                 }
@@ -76,7 +66,7 @@ public class Planner<M extends MDP> implements PolicyGenerator<M> {
         }
     }
 
-    protected void finished(Agent agent) {
+    protected void finished(final Agent agent) {
         pcs.firePropertyChange(FINISHED_PROP, 0, 0);
         if (isFinished()) {
             finished();

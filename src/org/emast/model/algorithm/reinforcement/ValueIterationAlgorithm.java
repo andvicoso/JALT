@@ -23,7 +23,7 @@ public class ValueIterationAlgorithm<M extends MDP> implements PolicyGenerator<M
     }
 
     @Override
-    public Policy run(final Problem<M> pProblem) {
+    public Policy run(Problem<M> pProblem, Object... pParameters) {
         Policy pi;
         model = pProblem.getModel();
         // Start the main loop

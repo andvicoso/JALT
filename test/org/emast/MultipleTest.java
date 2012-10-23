@@ -1,11 +1,11 @@
 package org.emast;
 
-import org.emast.model.agent.combineresults.CombineResults;
-import org.emast.model.agent.combineresults.PropRepCombineResults;
+import org.emast.model.agent.behaviour.changemodel.ChangeModelBehaviour;
+import org.emast.model.agent.behaviour.collective.ChangePreservGoal;
 import org.emast.model.agent.factory.AgentFactory;
 import org.emast.model.agent.factory.CommAgentFactory;
 import org.emast.model.algorithm.Algorithm;
-import org.emast.model.algorithm.planning.ERGExecutor;
+import org.emast.model.algorithm.planning.AgentGroup;
 import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.model.ERG;
@@ -23,7 +23,7 @@ import org.emast.util.FileUtils;
  */
 public class MultipleTest {
 
-    private static ERGExecutor createExecutor() {
+    private static AgentGroup createExecutor() {
         double badMsgValue = -20;
         double badRewardValue = -20;
         double messageCost = -1;
@@ -31,12 +31,12 @@ public class MultipleTest {
         
         PreservationGoalFactory goalFactory = new PreservationGoalFactory();
         PropositionsChooser chooser = new CombinePropsChooser(new MeanRewardCombinator(), badRewardValue);
-        CombineResults comb = new PropRepCombineResults(chooser, goalFactory);
+        ChangeModelBehaviour comb = new ChangePreservGoal(chooser, goalFactory);
         PolicyGenerator<ERG> pg = new PPFERG<ERG>();
         AgentFactory factory = //new PropReputationAgentFactory<ERG>(badRewardValue);
                 new CommAgentFactory(messageCost, badRewardValue, badMsgValue);
         
-        return new ERGExecutor(pg, factory, comb, maxIterations);//new Planner(pg, factory.createAgents(agents));//
+        return new AgentGroup(pg, factory, comb, maxIterations);//new Planner(pg, factory.createAgents(agents));//
     }
 
     private static Algorithm[] createAlgorithms() {

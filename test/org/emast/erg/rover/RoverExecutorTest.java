@@ -2,18 +2,17 @@ package org.emast.erg.rover;
 
 import java.util.Arrays;
 import java.util.List;
-import org.emast.model.agent.behaviour.Behaviour;
-import org.emast.model.agent.behaviour.reward.CommRewardBehaviour;
-import org.emast.model.agent.behaviour.reward.PropRepRewardBehaviour;
-import org.emast.model.agent.combineresults.CombineResults;
-import org.emast.model.agent.combineresults.PropRepCombineResults;
+import org.emast.model.agent.behaviour.CollectiveBehaviour;
+import org.emast.model.agent.behaviour.IndividualBehaviour;
+import org.emast.model.agent.behaviour.collective.ChangePreservGoal;
+import org.emast.model.agent.behaviour.individual.reward.CommRewardBehaviour;
+import org.emast.model.agent.behaviour.individual.reward.PropRepRewardBehaviour;
 import org.emast.model.algorithm.Algorithm;
-import org.emast.model.algorithm.planning.ERGExecutor;
+import org.emast.model.algorithm.planning.AgentGroup;
 import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.comm.MessageManager;
 import org.emast.model.model.ERG;
-import org.emast.model.planning.PreservationGoalFactory;
 import org.emast.model.planning.propositionschooser.CombinePropsChooser;
 import org.emast.model.planning.propositionschooser.PropositionsChooser;
 import org.emast.model.planning.rewardcombinator.MeanRewardCombinator;
@@ -31,13 +30,11 @@ public class RoverExecutorTest {
         int maxIterations = 1;
         double badRewardValue = -20;
 
-        PreservationGoalFactory goalFactory = new PreservationGoalFactory();
-        PropositionsChooser chooser = new CombinePropsChooser(new MeanRewardCombinator(), badRewardValue);
-        CombineResults comb = new PropRepCombineResults(chooser, goalFactory);
         PolicyGenerator<ERG> pg = new PPFERG<ERG>();
-        List<Behaviour> behaviours = createBehaviours(badRewardValue);
+        List<CollectiveBehaviour<ERG>> behaviours = createCollectiveBehaviours(badRewardValue);
+        List<IndividualBehaviour<ERG>> agentBehaviours = createIndividualBehaviours(badRewardValue);
 
-        return new ERGExecutor(pg, behaviours, comb, maxIterations);//new Planner(pg, factory.createAgents(agents));//
+        return new AgentGroup<ERG>(pg, behaviours, agentBehaviours, maxIterations);//new Planner(pg, factory.createAgents(agents));//
     }
 
     private static Problem createProblem() {
@@ -46,7 +43,7 @@ public class RoverExecutorTest {
         int size = rows * cols;
         int obstacles = (int) (0.3 * size);
         int agents = (int) (0.15 * size);
-        
+
         RoverProblemFactory factory = new RoverProblemFactory(rows, cols, agents, obstacles);
         RandomProblemGenerator rpg = new RandomProblemGenerator(factory);
 
@@ -57,15 +54,22 @@ public class RoverExecutorTest {
         new Test(createProblem(), createAlgorithm()).run();
     }
 
-    private static List<Behaviour> createBehaviours(double pBadRewardThreshold) {
+    private static List<IndividualBehaviour<ERG>> createIndividualBehaviours(double pBadRewardThreshold) {
         double badMsgValue = -20;
         double messageCost = -1;
 
-        Behaviour propRepRewardBehaviour =
+        IndividualBehaviour<ERG> propRepRewardBehaviour =
                 new PropRepRewardBehaviour(pBadRewardThreshold);
-        Behaviour commRewardBehaviour =
+        IndividualBehaviour<ERG> commRewardBehaviour =
                 new CommRewardBehaviour(messageCost, badMsgValue, new MessageManager(false));
 
         return Arrays.asList(propRepRewardBehaviour, commRewardBehaviour);
+    }
+
+    private static List<CollectiveBehaviour<ERG>> createCollectiveBehaviours(double badRewardValue) {
+        PropositionsChooser chooser = new CombinePropsChooser(new MeanRewardCombinator(), badRewardValue);
+        CollectiveBehaviour<ERG> change = new ChangePreservGoal(chooser);
+
+        return Arrays.asList(change);
     }
 }

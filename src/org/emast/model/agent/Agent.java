@@ -3,19 +3,20 @@ package org.emast.model.agent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.emast.infra.log.Log;
-import org.emast.model.Lookup;
 import org.emast.model.action.Action;
 import static org.emast.model.agent.AgentState.*;
-import org.emast.model.agent.behaviour.Behaviour;
-import org.emast.model.agent.behaviour.changemodel.ChangeModelBehaviour;
-import org.emast.model.agent.behaviour.reward.RewardBehaviour;
+import org.emast.model.agent.behaviour.IndividualBehaviour;
+import org.emast.model.agent.behaviour.individual.ChangeModel;
+import org.emast.model.agent.behaviour.individual.reward.RewardBehaviour;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Plan;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
+import org.emast.util.CollectionsUtils;
 import org.emast.util.Utils;
 
 /**
@@ -33,29 +34,29 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     private AgentState itState;
     private M model;
     private Policy policy;
-    private Lookup behaviours;
+    private List<IndividualBehaviour<M>> behaviours;
+    private Problem<M> problem;
 
     public Agent(int pNumber) {
         this(pNumber, Collections.EMPTY_LIST);
     }
 
-    public Agent(int pNumber, List<Behaviour> pBehaviours) {
+    public Agent(int pNumber, List<IndividualBehaviour<M>> pBehaviours) {
         number = pNumber;
-        behaviours = new Lookup(pBehaviours);
+        behaviours = pBehaviours;
     }
 
-    public List<Behaviour> getBehaviours(Class<Behaviour> pClass) {
-        return behaviours.getAll(pClass);
-    }
-
-    public void init(Problem<M> pProblem, Policy pPolicy) {
-        itState = AgentState.INITIAL;
-        model = pProblem.getModel();
-        policy = pPolicy;
+    public List<IndividualBehaviour<M>> getBehaviours() {
+        return behaviours;
     }
 
     @Override
-    public Plan run(Problem<M> pProblem) {
+    public Plan run(Problem<M> pProblem, Object... pParameters) {
+        itState = AgentState.INITIAL;
+        problem = pProblem;
+        model = pProblem.getModel();
+        policy = (Policy) pParameters[0];
+        //run
         long initMsecs = System.currentTimeMillis();
 
         itState = doRun(pProblem);
@@ -71,7 +72,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
      * @param pNextState
      * @param pReward
      */
-    private void changeState(State pNextState, Action pAction) {
+    private void changeState(State pNextState) {
         print("changed state from " + currentState + " to " + pNextState);
         //and go to it
         currentState = pNextState;
@@ -82,10 +83,8 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
         totalReward += pReward;
         print("received reward of: " + pReward + ". Total: " + totalReward);
 
-        if (pNextState != null && behaviours.contains(RewardBehaviour.class)) {
-            for (RewardBehaviour beh : behaviours.getAll(RewardBehaviour.class)) {
-                beh.manageReward(this, model, pNextState, pReward);
-            }
+        if (pNextState != null) {
+            behave(RewardBehaviour.class, "state", pNextState, "reward", pReward);
         }
     }
 
@@ -111,14 +110,10 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
                     State nextState = nextStates.iterator().next();//TODO:
                     //add reward to total reward
                     addReward(nextState, reward);
-                    //search for change model behaviours
-                    if (behaviours.contains(ChangeModelBehaviour.class)) {
-                        for (ChangeModelBehaviour beh : behaviours.getAll(ChangeModelBehaviour.class)) {
-                            beh.changeModel(this, model, nextState);
-                        }
-                    }
+                    //run change model behaviours
+                    behave(ChangeModel.class, "state", nextState);
                     //change to next state
-                    changeState(nextState, action);
+                    changeState(nextState);
                 } else {
                     currentState = null;
                 }
@@ -188,5 +183,17 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
 
     public State getCurrentState() {
         return currentState;
+    }
+
+    private void behave(Class<? extends IndividualBehaviour> pClass, Object... pParameters) {
+        behave(pClass, CollectionsUtils.asStringMap(pParameters));
+    }
+
+    private void behave(Class<? extends IndividualBehaviour> pClass, Map<String, Object> pParameters) {
+        for (final IndividualBehaviour<M> b : behaviours) {
+            if (pClass.isAssignableFrom(b.getClass())) {
+                b.behave(this, problem, pParameters);
+            }
+        }
     }
 }

@@ -46,7 +46,7 @@ public class RoverProblemFactory extends ProblemFactory {
         model.setPropositionFunction(pf);
         //create initial states
         final List<State> initStates = getRandomEmptyStates(model, agents);
-        final Map<Integer, State> map = CollectionsUtils.asMap(initStates);
+        final Map<Integer, State> map = CollectionsUtils.asIndexMap(initStates);
 
         return new Problem(model, map);
     }

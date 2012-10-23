@@ -21,7 +21,19 @@ import org.emast.model.NamedObject;
  */
 public class CollectionsUtils {
 
-    public static <S> Map<Integer, S> asMap(List<S> pList) {
+    public static <S> Map<String, S> asStringMap(S[] pParameters) {
+        assert pParameters.length % 2 == 0;
+        final Map<String, S> map = new HashMap<String, S>();
+        for (int i = 0; i < pParameters.length; i++) {
+            String key = pParameters[i].toString();
+            S value = pParameters[i + 1];
+            map.put(key, value);
+        }
+
+        return map;
+    }
+
+    public static <S> Map<Integer, S> asIndexMap(List<S> pList) {
         final HashMap<Integer, S> map = new HashMap<Integer, S>(pList.size());
         for (final S s : pList) {
             map.put(pList.indexOf(s), s);

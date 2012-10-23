@@ -20,10 +20,9 @@ public class ValidPlanFinder {
         for (int i = 0; i < model.getAgents(); i++) {
             //create a new simple agent iterator
             final Agent agent = new Agent(i);
-            agent.init(pProblem, policy);
             //find the plan for the newly created problem
             //with the preservation goal changed
-            agent.run(pProblem);
+            agent.run(pProblem, policy);
             //get the resulting plan
             final Plan plan = agent.getPlan();
             //save in ret if a plan was generated
@@ -35,10 +34,9 @@ public class ValidPlanFinder {
     public static boolean exist(Problem pProblem, Policy pPolicy, int pAgent) {
         //create a new simple agent iterator
         final Agent agent = new Agent(pAgent);
-        agent.init(pProblem, pPolicy);
         //find the plan for the newly created problem
         //with the preservation goal changed
-        agent.run(pProblem);
+        agent.run(pProblem, pPolicy);
         //get the resulting plan
         final Plan plan = agent.getPlan();
         return plan != null && !plan.isEmpty();

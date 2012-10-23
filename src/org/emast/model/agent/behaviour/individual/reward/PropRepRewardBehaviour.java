@@ -1,10 +1,11 @@
-package org.emast.model.agent.behaviour.reward;
+package org.emast.model.agent.behaviour.individual.reward;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.emast.model.agent.Agent;
 import org.emast.model.model.ERG;
+import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
 
@@ -12,7 +13,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class PropRepRewardBehaviour<M extends ERG> implements PropRewardBehaviour<M> {
+public class PropRepRewardBehaviour implements PropRewardBehaviour {
 
     protected double badRewardThreshold;
     protected Map<Proposition, Double> localPropositionsReputation;
@@ -23,12 +24,14 @@ public class PropRepRewardBehaviour<M extends ERG> implements PropRewardBehaviou
     }
 
     @Override
-    public void manageReward(Agent pAgent, M pModel, State pNextState, double pReward) {
+    public void behave(Agent pAgent, Problem<ERG> pProblem, Map<String, Object> pParameters) {
+        State pNextState = (State) pParameters.get("state");
+        Double pReward = (Double) pParameters.get("reward");
         //save proposition reputation based on the state and reward received
-        savePropositionReputation(pModel, pNextState, pReward, localPropositionsReputation);
+        savePropositionReputation(pProblem.getModel(), pNextState, pReward, localPropositionsReputation);
     }
 
-    private void savePropositionReputation(M pModel, State pNextState,
+    private void savePropositionReputation(ERG pModel, State pNextState,
             double pReward, Map<Proposition, Double> pPropositionsReputation) {
         if (pPropositionsReputation != null) {
             //bad reward value is distributed equally over the state`s propostions

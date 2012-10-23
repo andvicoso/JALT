@@ -11,16 +11,16 @@ import org.emast.model.transition.Transition;
 public class PPFERG<M extends ERG> extends PPF<M> {
 
     /**
-     * if is true, then the algorithm will stop when it finds a valid path to some agent's initial position.
-     * Else, it will find all the paths for all valid states.
+     * if is true, then the algorithm will stop when it finds a valid path to some agent's initial position. Else, it
+     * will find all the paths for all valid states.
      */
     private final boolean stopWhenOneAgentFindPath;
     private static final Double INITIAL_VALUE = 1d;
 
     /**
      *
-     * @param pStopWhenOneAgentFindPath if is true, then the algorithm will stop when it finds a valid path to
-     * some agent's initial position. Else, it will find all the paths for all valid states.
+     * @param pStopWhenOneAgentFindPath if is true, then the algorithm will stop when it finds a valid path to some
+     * agent's initial position. Else, it will find all the paths for all valid states.
      */
     public PPFERG(final boolean pStopWhenOneAgentFindPath) {
         stopWhenOneAgentFindPath = pStopWhenOneAgentFindPath;
@@ -31,7 +31,7 @@ public class PPFERG<M extends ERG> extends PPF<M> {
     }
 
     @Override
-    public Policy run(Problem<M> pProblem) {
+    public Policy run(Problem<M> pProblem, Object... pParameters) {
         //get model
         model = pProblem.getModel();
         //print initial msg

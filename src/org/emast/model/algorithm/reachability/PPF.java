@@ -4,8 +4,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.emast.model.action.Action;
+import org.emast.model.agent.behaviour.individual.reward.PropRepRewardBehaviour;
 import org.emast.model.algorithm.planning.PolicyGenerator;
-import org.emast.model.agent.behaviour.reward.PropRepRewardBehaviour;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.function.TransitionFunction;
 import org.emast.model.model.MDP;
@@ -18,7 +18,7 @@ import org.emast.model.transition.Transition;
 import org.emast.util.ModelUtils;
 
 /**
- * Algoritmo de planejamento probabilistico forte
+ * Strong probabilistic planning algorithm
  *
  * @author Anderson
  * @param <P> Simple reachability problem to be resolved
@@ -30,7 +30,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
     protected int iterations = 0;
 
     @Override
-    public Policy run(Problem<M> pProblem) {
+    public Policy run(Problem<M> pProblem, Object... pParameters) {
         model = pProblem.getModel();
         final Map<State, Double> values = new HashMap<State, Double>();
         Policy pi = new Policy();

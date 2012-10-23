@@ -15,8 +15,12 @@ public class Message {
         return attachments.get(pKey);
     }
 
-    public void putAttachment(String pKey, Object pAttachment) {
+    public void attach(String pKey, Object pAttachment) {
         attachments.put(pKey, pAttachment);
+    }
+
+    public void attachAll(Map<String, Object> pAttachments) {
+        attachments.putAll(pAttachments);
     }
 
     public int getSender() {

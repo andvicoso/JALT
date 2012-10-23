@@ -1,4 +1,4 @@
-package org.emast.model.agent.behaviour.reward;
+package org.emast.model.agent.behaviour.individual.reward;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,6 +10,7 @@ import org.emast.model.comm.MessageHistory;
 import org.emast.model.comm.MessageManager;
 import org.emast.model.comm.Messenger;
 import org.emast.model.model.ERG;
+import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
 
@@ -17,8 +18,8 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class CommRewardBehaviour<M extends ERG>
-        implements PropRewardBehaviour<M>, Messenger {
+public class CommRewardBehaviour
+        implements PropRewardBehaviour, Messenger {
 
     private final MessageHistory history;
     private final Map<Proposition, Double> messagePropositionsReputation;
@@ -39,14 +40,14 @@ public class CommRewardBehaviour<M extends ERG>
     public void messageReceived(final Message pMsg) {
         Log.info("received message: " + pMsg + " from agent: " + pMsg.getSender());
         history.add(pMsg);
-        M model = (M) pMsg.getAttachment("model");
+        ERG model = (ERG) pMsg.getAttachment("model");
         State state = (State) pMsg.getAttachment("state");
         Double reward = (Double) pMsg.getAttachment("reward");
         //save proposition reputation based on the state and reward received
         savePropositionReputation(model, state, reward, messagePropositionsReputation);
     }
 
-    private void savePropositionReputation(M pModel, State pNextState,
+    private void savePropositionReputation(ERG pModel, State pNextState,
             double pReward, Map<Proposition, Double> pPropositionsReputation) {
         if (pPropositionsReputation != null) {
             //bad reward value is distributed equally over the state`s propostions
@@ -70,7 +71,7 @@ public class CommRewardBehaviour<M extends ERG>
         messageManager.broadcast(this, pMsg);
     }
 
-    protected boolean mustSendMessage(M pModel, State pNextState, double pReward) {
+    protected boolean mustSendMessage(ERG pModel, State pNextState, double pReward) {
         Collection<Proposition> props = pModel.getPropositionFunction().getPropositionsForState(pNextState);
 
         if (props != null) {
@@ -85,16 +86,19 @@ public class CommRewardBehaviour<M extends ERG>
     }
 
     @Override
-    public void manageReward(Agent pAgent, M pModel, State pNextState, double pReward) {
+    public void behave(Agent pAgent, Problem<ERG> pProblem, Map<String, Object> pParameters) {
+        State pNextState = (State) pParameters.get("state");
+        Double pReward = (Double) pParameters.get("reward");
+        ERG pModel = pProblem.getModel();
         //verify the need to send message for listeners
         if (mustSendMessage(pModel, pNextState, pReward)) {
             //create the message to be sent
             final Message msg = new Message(pAgent.getNumber());
             //attach important information
-            msg.putAttachment("agent", pAgent);
-            msg.putAttachment("model", pModel);
-            msg.putAttachment("state", pNextState);
-            msg.putAttachment("reward", pReward);
+            msg.attach("agent", pAgent);
+            msg.attach("model", pModel);
+            msg.attach("state", pNextState);
+            msg.attach("reward", pReward);
             //broadcast it!
             sendMessage(msg);
         }

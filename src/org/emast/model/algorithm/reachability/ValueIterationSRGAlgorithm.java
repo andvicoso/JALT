@@ -18,7 +18,7 @@ public class ValueIterationSRGAlgorithm<M extends SRG>
     private int iterations = 0;
 
     @Override
-    public Policy run(Problem<M> pProblem) {
+    public Policy run(Problem<M> pProblem, Object... pParameters) {
         M model = pProblem.getModel();
         // Initialize the variables
         final List<Map<State, Double>> values = new ArrayList<Map<State, Double>>();

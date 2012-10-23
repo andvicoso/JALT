@@ -1,4 +1,4 @@
-package org.emast.model.agent.combineresults;
+package org.emast.model.agent.behaviour.collective;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,40 +6,45 @@ import java.util.List;
 import java.util.Map;
 import org.emast.infra.log.Log;
 import org.emast.model.agent.Agent;
+import org.emast.model.agent.behaviour.CollectiveBehaviour;
+import org.emast.model.agent.behaviour.individual.reward.PropRewardBehaviour;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.PreservationGoalFactory;
 import org.emast.model.planning.propositionschooser.PropositionsChooser;
+import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
+import org.emast.util.CollectionsUtils;
 
 /**
  *
  * @author Anderson
  */
-public class PropRepCombineResults implements CombineResults<ERG> {
+public class ChangePreservGoal implements CollectiveBehaviour<ERG>, ChangeModel<ERG> {
 
     private final PropositionsChooser chooser;
-    private final PreservationGoalFactory factory;
+    private final PreservationGoalFactory factory = new PreservationGoalFactory();
 
-    public PropRepCombineResults(PropositionsChooser pChooser, PreservationGoalFactory pFactory) {
+    public ChangePreservGoal(PropositionsChooser pChooser) {
         chooser = pChooser;
-        factory = pFactory;
     }
 
     @Override
-    public void combine(ERG pModel, List<Agent> pAgents) {
+    public void behave(List<Agent> pAgents, Problem<ERG> pProblem, Map<String, Object> pParameters) {
         Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
         //get results for each agent
         for (Agent agent : pAgents) {
-            reps.add(agent.get());
+            List<PropRewardBehaviour> behaviours = CollectionsUtils.getElementsOfType(agent.getBehaviours(),
+                    PropRewardBehaviour.class);
+            reps.addAll(getPropositions(behaviours));
         }
         //choose "bad" propositions
         Collection<Proposition> props = chooser.choose(reps);
         //verify the need to change the preservation goal
         if (!props.isEmpty()) {
-            changePreservationGoal(pProblem, props);
+            changePreservationGoal(pProblem.getModel(), props);
         }
     }
 
@@ -93,5 +98,16 @@ public class PropRepCombineResults implements CombineResults<ERG> {
         }
 
         return false;
+    }
+
+    private Collection<Map<Proposition, Double>> getPropositions(List<PropRewardBehaviour> pBehaviours) {
+        Collection<Map<Proposition, Double>> list = new ArrayList<Map<Proposition, Double>>();
+
+        for (PropRewardBehaviour beh : pBehaviours) {
+            Map<Proposition, Double> map = beh.getResult();
+            list.add(map);
+        }
+
+        return list;
     }
 }

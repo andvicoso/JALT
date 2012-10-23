@@ -6,33 +6,35 @@ import java.util.*;
 import org.emast.infra.log.Log;
 import org.emast.model.agent.Agent;
 import org.emast.model.agent.AgentFactory;
-import org.emast.model.agent.behaviour.Behaviour;
-import org.emast.model.agent.combineresults.CombineResults;
-import org.emast.model.model.ERG;
+import org.emast.model.agent.behaviour.CollectiveBehaviour;
+import org.emast.model.agent.behaviour.IndividualBehaviour;
+import org.emast.model.agent.behaviour.collective.ChangeModel;
+import org.emast.model.model.MDP;
 import org.emast.model.planning.Planner;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
+import org.emast.util.CollectionsUtils;
 
 /**
  *
  * @author Anderson
  */
-public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener {
+public class AgentGroup<M extends MDP> implements PolicyGenerator<M>, PropertyChangeListener {
 
-    private final int maxIterations;
-    private final PolicyGenerator<ERG> policyGenerator;
+    private final PolicyGenerator<M> policyGenerator;
     private final AgentFactory agentFactory;
-    private final CombineResults<ERG> combineResults;
-    private final List<Behaviour> behaviours;
+    private final List<IndividualBehaviour<M>> agentBehaviours;
+    private final List<CollectiveBehaviour<M>> behaviours;
+    private final int maxIterations;
     private List<Agent> agents;
 
-    public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator, List<Behaviour> pBehaviours,
-            CombineResults<ERG> pCombineResults, int pMaxIterations) {
-        combineResults = pCombineResults;
+    public AgentGroup(PolicyGenerator<M> pPolicyGenerator,
+            List<CollectiveBehaviour<M>> pBehaviours, List<IndividualBehaviour<M>> pAgentBehaviours, int pMaxIterations) {
         maxIterations = pMaxIterations;
         policyGenerator = pPolicyGenerator;
         agentFactory = new AgentFactory();
         behaviours = pBehaviours;
+        agentBehaviours = pAgentBehaviours;
     }
 
     @Override
@@ -45,9 +47,9 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
     }
 
     @Override
-    public synchronized Policy run(final Problem<ERG> pProblem) {
-        Problem<ERG> problem = pProblem;
-        ERG model = problem.getModel();
+    public Policy run(Problem<M> pProblem, Object... pParameters) {
+        Problem<M> problem = pProblem;
+        M model = problem.getModel();
         int iterations = 1;
         //start main loop
         do {
@@ -66,7 +68,7 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
                 return null;
             }
 
-            combineResults.combine(problem, agents);
+            behave(ChangeModel.class, problem);
         } while (iterations++ < maxIterations);
         //run problem again with the combined preserv. goals
         //to get the policy
@@ -84,15 +86,29 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
         }
     }
 
-    private Planner<ERG> createPlanner(List<Agent> pAgents) {
-        Planner<ERG> planner = new Planner<ERG>(policyGenerator, pAgents);
+    private Planner<M> createPlanner(List<Agent> pAgents) {
+        Planner<M> planner = new Planner<M>(policyGenerator, pAgents);
         //listen to changes of planner properties
         planner.getPropertyChangeSupport().addPropertyChangeListener(this);
 
         return planner;
     }
 
-    private void createAgents(ERG model) {
-        agents = agentFactory.createAgents(model.getAgents(), behaviours);
+    private void createAgents(M model) {
+        agents = agentFactory.createAgents(model.getAgents(), agentBehaviours);
+    }
+
+    private void behave(Class<? extends CollectiveBehaviour> pClass,
+            Problem<M> pProblem, Object... pParameters) {
+        behave(pClass, pProblem, CollectionsUtils.asStringMap(pParameters));
+    }
+
+    private void behave(Class<? extends CollectiveBehaviour> pClass,
+            Problem<M> pProblem, Map<String, Object> pParameters) {
+        for (final CollectiveBehaviour b : behaviours) {
+            if (pClass.isAssignableFrom(b.getClass())) {
+                b.behave(agents, pProblem, pParameters);
+            }
+        }
     }
 }

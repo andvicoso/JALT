@@ -77,7 +77,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         //create initial states
         final List<State> initStates = getRandomEmptyStates(model, agents);
 
-        return new Problem(model, CollectionsUtils.asMap(initStates));
+        return new Problem(model, CollectionsUtils.asIndexMap(initStates));
     }
 
     public State getRandomCoverageState(final AntennaCoverageModel model, final List<State> pInitialStates) {
