@@ -1,8 +1,9 @@
-package org.emast.model.agent;
+package org.emast.model.agent.behaviour.reward;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.emast.model.agent.Agent;
 import org.emast.model.model.ERG;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
@@ -11,36 +12,27 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class PropReputationAgent<M extends ERG> extends ERGAgent<M> {
+public class PropRepRewardBehaviour<M extends ERG> implements PropRewardBehaviour<M> {
 
     protected double badRewardThreshold;
     protected Map<Proposition, Double> localPropositionsReputation;
 
-    public PropReputationAgent(int pAgent, double pBadRewardThreshold) {
-        super(pAgent);
+    public PropRepRewardBehaviour(double pBadRewardThreshold) {
         badRewardThreshold = pBadRewardThreshold;
         localPropositionsReputation = new HashMap<Proposition, Double>();
     }
 
     @Override
-    protected void addReward(State pNextState, double pReward) {
-        super.addReward(pNextState, pReward);
-        //manage reward
-        if (pNextState != null) {
-            manageReward(pNextState, pReward);
-        }
-    }
-
-    protected void manageReward(State pNextState, double pReward) {
+    public void manageReward(Agent pAgent, M pModel, State pNextState, double pReward) {
         //save proposition reputation based on the state and reward received
-        savePropositionReputation(pNextState, pReward, localPropositionsReputation);
+        savePropositionReputation(pModel, pNextState, pReward, localPropositionsReputation);
     }
 
-    protected void savePropositionReputation(State pNextState,
+    private void savePropositionReputation(M pModel, State pNextState,
             double pReward, Map<Proposition, Double> pPropositionsReputation) {
         if (pPropositionsReputation != null) {
             //bad reward value is distributed equally over the state`s propostions
-            Collection<Proposition> props = getPropositionsForState(pNextState);
+            Collection<Proposition> props = pModel.getPropositionFunction().getPropositionsForState(pNextState);
             if (props != null) {
                 double propReward = pReward / props.size();
                 for (Proposition proposition : props) {
@@ -52,15 +44,8 @@ public class PropReputationAgent<M extends ERG> extends ERGAgent<M> {
         }
     }
 
-    protected Double getPropositionReputation(Proposition pProposition) {
-        return localPropositionsReputation.get(pProposition);
-    }
-
-    public Map<Proposition, Double> getLocalPropositionsReputation() {
-        return localPropositionsReputation;
-    }
-
-    public Map<Proposition, Double> getPropositionsReputation() {
+    @Override
+    public Map<Proposition, Double> getResult() {
         return localPropositionsReputation;
     }
 }

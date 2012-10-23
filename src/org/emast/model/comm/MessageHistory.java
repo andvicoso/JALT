@@ -6,5 +6,5 @@ import java.util.LinkedList;
  *
  * @author Anderson
  */
-public class MessageHistory<V> extends LinkedList<Message<V>> {
+public class MessageHistory extends LinkedList<Message> {
 }

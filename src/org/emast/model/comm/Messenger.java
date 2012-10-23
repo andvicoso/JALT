@@ -4,9 +4,9 @@ package org.emast.model.comm;
  *
  * @author Anderson
  */
-public interface Messenger<M extends Message> {
+public interface Messenger {
 
-    void messageReceived(final M pMsg);
+    void messageReceived(final Message pMsg);
 
-    void sendMessage(final M pMsg);
+    void sendMessage(final Message pMsg);
 }

@@ -12,15 +12,15 @@ import org.emast.model.solution.Policy;
  *
  * @author anderson
  */
-public class Planner<M extends MDP, A extends Agent> implements PolicyGenerator<M> {
+public class Planner<M extends MDP> implements PolicyGenerator<M> {
 
     public static final String FINISHED_PROP = "FINISHED";
     public static final String FINISHED_ALL_PROP = "FINISHED_ALL";
-    private final List<A> agents;
+    private final List<Agent> agents;
     private final PolicyGenerator<M> policyGenerator;
     private final PropertyChangeSupport pcs;
 
-    public Planner(PolicyGenerator<M> pPolicyGen, List<A> pAgents) {
+    public Planner(PolicyGenerator<M> pPolicyGen, List<Agent> pAgents) {
         agents = pAgents;
         policyGenerator = pPolicyGen;
         pcs = new PropertyChangeSupport(this);
@@ -44,7 +44,7 @@ public class Planner<M extends MDP, A extends Agent> implements PolicyGenerator<
     @Override
     public String printResults() {
         final StringBuilder sb = new StringBuilder();
-        for (A agent : agents) {
+        for (Agent agent : agents) {
             sb.append(agent.printResults());
         }
         return sb.toString();
@@ -52,7 +52,7 @@ public class Planner<M extends MDP, A extends Agent> implements PolicyGenerator<
 
     private void init(Problem<M> pProblem, Policy pPolicy) {
         //execute them all
-        for (final A agent : agents) {
+        for (final Agent agent : agents) {
             //set the initial policy and model
             agent.init(pProblem, pPolicy);
         }
@@ -60,7 +60,7 @@ public class Planner<M extends MDP, A extends Agent> implements PolicyGenerator<
 
     private void doRun(final Problem<M> pProblem) {
         //execute them all
-        for (final A agent : agents) {
+        for (final Agent agent : agents) {
             //get new thread name
             String threadName = agent.getClass().getSimpleName()
                     + " - " + pProblem.getClass().getSimpleName();
@@ -76,20 +76,20 @@ public class Planner<M extends MDP, A extends Agent> implements PolicyGenerator<
         }
     }
 
-    protected void finished(A agent) {
+    protected void finished(Agent agent) {
         pcs.firePropertyChange(FINISHED_PROP, 0, 0);
         if (isFinished()) {
             finished();
         }
     }
 
-    public List<A> getAgents() {
+    public List<Agent> getAgents() {
         return agents;
     }
 
     public boolean isFinished() {
         boolean ret = true;
-        for (A agent : agents) {
+        for (Agent agent : agents) {
             ret &= agent.isFinished();
         }
 

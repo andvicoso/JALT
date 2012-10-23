@@ -1,40 +1,25 @@
 package org.emast.model.comm;
 
-public class Message<V> {
+import java.util.Map;
 
-    private V value;
-    private int agentSender;
+public class Message {
 
-    public Message() {
-    }
+    private Map<String, Object> attachments;
+    private final int agentSender;
 
-    public Message(final V value) {
-        this.value = value;
-    }
-
-    public Message(final V value, final int pAgentSender) {
-        this.value = value;
+    public Message(final int pAgentSender) {
         this.agentSender = pAgentSender;
     }
 
-    public V getValue() {
-        return value;
+    public Object getAttachment(String pKey) {
+        return attachments.get(pKey);
     }
 
-    public void setValue(final V value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return getValue() != null ? getValue().toString() : "";
+    public void putAttachment(String pKey, Object pAttachment) {
+        attachments.put(pKey, pAttachment);
     }
 
     public int getSender() {
         return agentSender;
-    }
-
-    public void setSender(final int pAgentSender) {
-        agentSender = pAgentSender;
     }
 }

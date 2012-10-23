@@ -1,9 +1,15 @@
 package org.emast.model.agent;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.emast.infra.log.Log;
+import org.emast.model.Lookup;
 import org.emast.model.action.Action;
 import static org.emast.model.agent.AgentState.*;
+import org.emast.model.agent.behaviour.Behaviour;
+import org.emast.model.agent.behaviour.changemodel.ChangeModelBehaviour;
+import org.emast.model.agent.behaviour.reward.RewardBehaviour;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -18,18 +24,28 @@ import org.emast.util.Utils;
  */
 public class Agent<M extends MDP> implements Algorithm<M, Plan> {
 
-    protected static int MAX_ITERATIONS = 1000;
-    protected double totalReward;
-    protected int number;
+    private static int MAX_ITERATIONS = 1000;
+    private double totalReward;
+    private int number;
     private long msecs;
-    protected State currentState;
-    protected Plan plan;
+    private State currentState;
+    private Plan plan;
     private AgentState itState;
-    protected M model;
+    private M model;
     private Policy policy;
+    private Lookup behaviours;
 
     public Agent(int pNumber) {
+        this(pNumber, Collections.EMPTY_LIST);
+    }
+
+    public Agent(int pNumber, List<Behaviour> pBehaviours) {
         number = pNumber;
+        behaviours = new Lookup(pBehaviours);
+    }
+
+    public List<Behaviour> getBehaviours(Class<Behaviour> pClass) {
+        return behaviours.getAll(pClass);
     }
 
     public void init(Problem<M> pProblem, Policy pPolicy) {
@@ -55,23 +71,29 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
      * @param pNextState
      * @param pReward
      */
-    protected void changeState(State pNextState, Action pAction) {
+    private void changeState(State pNextState, Action pAction) {
         print("changed state from " + currentState + " to " + pNextState);
         //and go to it
         currentState = pNextState;
     }
 
-    protected void addReward(State pNextState, double pReward) {
+    public void addReward(State pNextState, double pReward) {
         //add current reward to total reward
         totalReward += pReward;
         print("received reward of: " + pReward + ". Total: " + totalReward);
+
+        if (pNextState != null && behaviours.contains(RewardBehaviour.class)) {
+            for (RewardBehaviour beh : behaviours.getAll(RewardBehaviour.class)) {
+                beh.manageReward(this, model, pNextState, pReward);
+            }
+        }
     }
 
-    protected AgentState doRun(Problem<M> pProblem) {
+    private AgentState doRun(Problem<M> pProblem) {
         Action action;
         int iterations = 0;
         //get the number's initial state
-        currentState = pProblem.getInitialStates().get(getAgent());
+        currentState = pProblem.getInitialStates().get(getNumber());
         //create a plan for number
         plan = new Plan();
         //main loop
@@ -89,6 +111,12 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
                     State nextState = nextStates.iterator().next();//TODO:
                     //add reward to total reward
                     addReward(nextState, reward);
+                    //search for change model behaviours
+                    if (behaviours.contains(ChangeModelBehaviour.class)) {
+                        for (ChangeModelBehaviour beh : behaviours.getAll(ChangeModelBehaviour.class)) {
+                            beh.changeModel(this, model, nextState);
+                        }
+                    }
                     //change to next state
                     changeState(nextState, action);
                 } else {
@@ -110,7 +138,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     @Override
     public String printResults() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\nAgent ").append(getAgent()).append(": ");
+        sb.append("\nAgent ").append(getNumber()).append(": ");
         sb.append("\n- Time: ").append(Utils.toTimeString(msecs)).append(" (").append(msecs).append(" ms)");
         sb.append("\n- Plan: ").append(getPlan());
         sb.append("\n- Reward: ").append(getTotalReward());
@@ -126,7 +154,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
         return msecs;
     }
 
-    protected Action getAction() {
+    private Action getAction() {
         return policy.get(currentState);
     }
 
@@ -138,11 +166,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
         return plan;
     }
 
-    protected void setPlan(Plan pPlan) {
-        this.plan = pPlan;
-    }
-
-    public int getAgent() {
+    public int getNumber() {
         return number;
     }
 
@@ -154,8 +178,8 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
         policy = pPolicy;
     }
 
-    protected void print(String pMsg) {
-        Log.info("Agent " + getAgent() + ": " + pMsg);
+    private void print(String pMsg) {
+        Log.info("Agent " + getNumber() + ": " + pMsg);
     }
 
     public double getTotalReward() {

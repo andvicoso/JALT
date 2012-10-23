@@ -1,7 +1,9 @@
-package org.emast.model.agent;
+package org.emast.model.agent.behaviour.changemodel;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.emast.infra.log.Log;
+import org.emast.model.agent.Agent;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.ValidPlanFinder;
@@ -11,30 +13,26 @@ import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
+import org.emast.util.BehaviourUtil;
 
 /**
  *
  * @author Anderson
  */
-public class ChangePreservGoalPropRepAgent<M extends ERG> extends PropReputationAgent<M> {
-
-    public ChangePreservGoalPropRepAgent(int pAgent, double pBadRewardThreshold) {
-        super(pAgent, pBadRewardThreshold);
-    }
+public class ChangePreservGoalBehaviour<M extends ERG> implements ChangeModelBehaviour<M> {
 
     @Override
-    protected void manageReward(State pNextState, double pReward) {
-        super.manageReward(pNextState, pReward);
+    public void changeModel(Agent pAgent, M pModel, State pState) {
         //verify the need to change the preservation goal
-        if (mustChangePreservationGoal(pNextState)) {
+        if (mustChangePreservationGoal(pModel, pState)) {
             try {
                 //get the new policy for the new preservation goal (if one exists)
-                Policy p = changePreservationGoal(pNextState);
+                Policy p = changePreservationGoal(pAgent, pModel, pState);
                 //if found a policy
                 if (p != null) {
                     //changed preservation goal, continue iteration 
                     //with the new preservation goal and policy
-                    setPolicy(p);
+                    pAgent.setPolicy(p);
                 }
             } catch (InvalidExpressionException ex) {
                 ex.printStackTrace();
@@ -42,22 +40,23 @@ public class ChangePreservGoalPropRepAgent<M extends ERG> extends PropReputation
         }
     }
 
-    protected Problem<M> cloneProblem(M model, Expression pNewPreservGoal) {
-        M cloneModel = (M) model.copy();
+    protected Problem<M> cloneProblem(M pModel, State pState, int pAgent, Expression pNewPreservGoal) {
+        M cloneModel = (M) pModel.copy();
         //set new preservation goal
         cloneModel.setPreservationGoal(pNewPreservGoal);
         //set the initial state only for the current number
         //return a new problem with a new preservation goal and initial state
-        return new Problem<M>(cloneModel, Collections.singletonMap(getAgent(), currentState));
+        return new Problem<M>(cloneModel, Collections.singletonMap(pAgent, pState));
     }
 
-    protected Policy changePreservationGoal(State pState) throws InvalidExpressionException {
+    protected Policy changePreservationGoal(Agent pAgent, M pModel, State pState)
+            throws InvalidExpressionException {
         //save the goal
-        Expression finalGoal = model.getGoal();
+        Expression finalGoal = pModel.getGoal();
         //save the original preservation goal
-        Expression originalPreservGoal = model.getPreservationGoal();
+        Expression originalPreservGoal = pModel.getPreservationGoal();
         //get the new preservation goal, based on the original and the state
-        Expression newPropsExp = getNewPreservationGoal(originalPreservGoal, pState);
+        Expression newPropsExp = getNewPreservationGoal(pModel, originalPreservGoal, pState);
         //copy the original preservation goal
         Expression newPreservGoal = new Expression(originalPreservGoal.toString());
         //and join them with an AND operator
@@ -66,18 +65,18 @@ public class ChangePreservGoalPropRepAgent<M extends ERG> extends PropReputation
         if (!newPreservGoal.equals(originalPreservGoal)
                 && !originalPreservGoal.contains(newPropsExp)
                 && !originalPreservGoal.contains(newPropsExp.negate())
-                && !model.getPropositionFunction().satisfies(pState, finalGoal)) {
+                && !pModel.getPropositionFunction().satisfies(pState, finalGoal)) {
             //TODO: Decide which propositions are giving a bad reward
             //create a new cloned problem
-            Problem<M> newProblem = cloneProblem(model, newPreservGoal);
+            Problem<M> newProblem = cloneProblem(pModel, pState, pAgent.getNumber(), newPreservGoal);
             //Execute the base algorithm (PPFERG) over the new problem (with the new preservation goal)
-            Policy p = getAlgorithm().run(newProblem);
+            Policy p = pAgent.getAlgorithm().run(newProblem);
             //if there is a path to reach the goal
-            if (ValidPlanFinder.exist(newProblem, getPolicy(), getAgent())) {
+            if (ValidPlanFinder.exist(newProblem, pAgent.getPolicy(), pAgent.getNumber())) {
                 //set the new preservation goal to the current problem
                 newProblem.getModel().setPreservationGoal(newPreservGoal);
                 //confirm the goal modification
-                print("changed preservation goal from {"
+                Log.info("changed preservation goal from {"
                         + originalPreservGoal + "} to {" + newPreservGoal + "}");
                 return p;
             }
@@ -85,29 +84,23 @@ public class ChangePreservGoalPropRepAgent<M extends ERG> extends PropReputation
         return null;
     }
 
-    private Expression getNewPreservationGoal(Expression pOriginalPreservGoal, State pState) {
+    private Expression getNewPreservationGoal(M pModel, Expression pOriginalPreservGoal, State pState) {
         //get the "problematic" expression
         //i.e. the one that is giving the bad reward
         Expression newPropsExp =
-                model.getPropositionFunction().getExpressionForState(pState);
+                pModel.getPropositionFunction().getExpressionForState(pState);
         //negate it
         newPropsExp = newPropsExp.negate();
 
         return newPropsExp;
     }
 
-    protected boolean mustChangePreservationGoal(State pState) {
+    protected boolean mustChangePreservationGoal(M pModel, State pState) {
         Proposition changedProp = null;
-        Collection<Proposition> props = getPropositionsForState(pState);
+        Collection<Proposition> props = pModel.getPropositionFunction().getPropositionsForState(pState);
 
         if (props != null) {
-            for (Proposition proposition : props) {
-                Double rep = getPropositionReputation(proposition);
-                if (rep <= badRewardThreshold) {
-                    changedProp = proposition;
-                    break;
-                }
-            }
+            BehaviourUtil.getPropositionsRewards(null, null)
         }
 
         return changedProp != null;

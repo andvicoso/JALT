@@ -4,9 +4,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
 import org.emast.infra.log.Log;
-import org.emast.model.agent.PropReputationAgent;
+import org.emast.model.agent.Agent;
+import org.emast.model.agent.AgentFactory;
+import org.emast.model.agent.behaviour.Behaviour;
 import org.emast.model.agent.combineresults.CombineResults;
-import org.emast.model.agent.factory.AgentFactory;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.Planner;
 import org.emast.model.problem.Problem;
@@ -21,22 +22,23 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
     private final int maxIterations;
     private final PolicyGenerator<ERG> policyGenerator;
     private final AgentFactory agentFactory;
-    private final CombineResults<ERG, PropReputationAgent> combineResults;
-    private List<PropReputationAgent> agents;
+    private final CombineResults<ERG> combineResults;
+    private final List<Behaviour> behaviours;
+    private List<Agent> agents;
 
-    public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator,
-            AgentFactory pAgentFactory,
-            CombineResults<ERG, PropReputationAgent> pCombineResults, int pMaxIterations) {
+    public ERGExecutor(PolicyGenerator<ERG> pPolicyGenerator, List<Behaviour> pBehaviours,
+            CombineResults<ERG> pCombineResults, int pMaxIterations) {
         combineResults = pCombineResults;
         maxIterations = pMaxIterations;
         policyGenerator = pPolicyGenerator;
-        agentFactory = pAgentFactory;
+        agentFactory = new AgentFactory();
+        behaviours = pBehaviours;
     }
 
     @Override
     public String printResults() {
         final StringBuilder sb = new StringBuilder();
-        for (PropReputationAgent agent : agents) {
+        for (Agent agent : agents) {
             sb.append(agent.printResults());
         }
         return sb.toString();
@@ -50,8 +52,7 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
         //start main loop
         do {
             Log.info("\nITERATION " + iterations + ":\n");
-            //vars
-            agents = agentFactory.createAgents(model.getAgents());
+            createAgents(model);
             Planner planner = createPlanner(agents);
             //run problem
             planner.run(problem);
@@ -69,7 +70,7 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
         } while (iterations++ < maxIterations);
         //run problem again with the combined preserv. goals
         //to get the policy
-        agents = agentFactory.createAgents(model.getAgents());
+        createAgents(model);
         //create a new planner
         Planner planner = createPlanner(agents);
         //run problem
@@ -83,11 +84,15 @@ public class ERGExecutor implements PolicyGenerator<ERG>, PropertyChangeListener
         }
     }
 
-    private Planner<ERG, PropReputationAgent> createPlanner(List<PropReputationAgent> pAgents) {
-        Planner<ERG, PropReputationAgent> planner = new Planner<ERG, PropReputationAgent>(policyGenerator, pAgents);
+    private Planner<ERG> createPlanner(List<Agent> pAgents) {
+        Planner<ERG> planner = new Planner<ERG>(policyGenerator, pAgents);
         //listen to changes of planner properties
         planner.getPropertyChangeSupport().addPropertyChangeListener(this);
 
         return planner;
+    }
+
+    private void createAgents(ERG model) {
+        agents = agentFactory.createAgents(model.getAgents(), behaviours);
     }
 }

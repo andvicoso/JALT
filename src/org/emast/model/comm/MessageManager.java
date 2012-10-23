@@ -26,10 +26,16 @@ public class MessageManager {
     }
 
     public void broadcast(Messenger pSender, Message pMsg) {
-        for (Messenger m : messengers) {
-            if ((!sendToSender && !m.equals(pSender)) || sendToSender) {
-                m.messageReceived(pMsg);
+        for (Messenger receiver : messengers) {
+            if ((sendToSender && receiver.equals(pSender)) || !sendToSender) {
+                receiver.messageReceived(pMsg);
             }
+        }
+    }
+
+    public void send(Messenger pSender, Messenger pReceiver, Message pMsg) {
+        if ((sendToSender && pReceiver.equals(pSender)) || !sendToSender) {
+            pReceiver.messageReceived(pMsg);
         }
     }
 }

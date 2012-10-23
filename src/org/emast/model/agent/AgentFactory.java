@@ -1,32 +1,26 @@
-package org.emast.model.agent.factory;
+package org.emast.model.agent;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.emast.model.agent.Agent;
+import org.emast.model.agent.behaviour.Behaviour;
 import org.emast.model.model.MDP;
 
 /**
  *
  * @author Anderson
  */
-public class DefaultAgentFactory<M extends MDP> implements AgentFactory<M> {
+public class AgentFactory<M extends MDP> {
 
-    @Override
-    public List<Agent> createAgents(int pAgents) {
+    public List<Agent> createAgents(int pAgents, List<Behaviour> pBehaviours) {
         final List<Agent> agents = new ArrayList<Agent>();
         //for each agent, create an agent planner
         for (int i = 0; i < pAgents; i++) {
             //create an agent iterator for each agent
-            final Agent ap = create(i);
+            final Agent ap = new Agent(i, pBehaviours);
             //save them
             agents.add(ap);
         }
 
         return agents;
-    }
-
-    @Override
-    public Agent create(int pAgentIndex) {
-        return new Agent(pAgentIndex);
     }
 }

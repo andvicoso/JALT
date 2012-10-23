@@ -5,12 +5,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.emast.infra.log.Log;
-import org.emast.model.agent.PropReputationAgent;
+import org.emast.model.agent.Agent;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.PreservationGoalFactory;
 import org.emast.model.planning.propositionschooser.PropositionsChooser;
-import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
@@ -19,7 +18,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class PropRepCombineResults implements CombineResults<ERG, PropReputationAgent> {
+public class PropRepCombineResults implements CombineResults<ERG> {
 
     private final PropositionsChooser chooser;
     private final PreservationGoalFactory factory;
@@ -30,11 +29,11 @@ public class PropRepCombineResults implements CombineResults<ERG, PropReputation
     }
 
     @Override
-    public void combine(Problem<ERG> pProblem, List<PropReputationAgent> pAgents) {
+    public void combine(ERG pModel, List<Agent> pAgents) {
         Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
         //get results for each agent
-        for (PropReputationAgent agent : pAgents) {
-            reps.add(agent.getPropositionsReputation());
+        for (Agent agent : pAgents) {
+            reps.add(agent.get());
         }
         //choose "bad" propositions
         Collection<Proposition> props = chooser.choose(reps);
@@ -44,17 +43,16 @@ public class PropRepCombineResults implements CombineResults<ERG, PropReputation
         }
     }
 
-    protected boolean changePreservationGoal(Problem<ERG> pProblem, Collection<Proposition> pProps) {
-        ERG model = pProblem.getModel();
+    protected boolean changePreservationGoal(ERG pModel, Collection<Proposition> pProps) {
         //save the original preservation goal
-        Expression originalPreservGoal = model.getPreservationGoal();
+        Expression originalPreservGoal = pModel.getPreservationGoal();
         //get the new preservation goal, based on the original and bad reward props
         Expression newPreservGoal = factory.createPreservationGoal(originalPreservGoal, pProps);
         //compare previous goal with the newly created
         if (!newPreservGoal.equals(originalPreservGoal)
                 && !originalPreservGoal.contains(newPreservGoal)
                 && !originalPreservGoal.contains(newPreservGoal.negate())
-                && existValidFinalState(model, newPreservGoal)) {
+                && existValidFinalState(pModel, newPreservGoal)) {
             //create a new cloned problem
             //ERG newModel = cloneModel(model, newPreservGoal);
             //Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
@@ -63,7 +61,7 @@ public class PropRepCombineResults implements CombineResults<ERG, PropReputation
             //Log.info("Trying to find a valid plan for preserv: " + model.getPreservationGoal());
             //if (ValidPlanFinder.exist(newProblem, policyGenerator)) {
             //set the preservation goal to the current problem
-            pProblem.getModel().setPreservationGoal(newPreservGoal);
+            pModel.setPreservationGoal(newPreservGoal);
             //confirm the goal modification
             Log.info("Changed preservation goal from {"
                     + originalPreservGoal + "} to {" + newPreservGoal + "}");

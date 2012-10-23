@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.planning.PolicyGenerator;
-import org.emast.model.agent.PropReputationAgent;
+import org.emast.model.agent.behaviour.reward.PropRepRewardBehaviour;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.function.TransitionFunction;
 import org.emast.model.model.MDP;
@@ -98,7 +98,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
             return model.getPropositionFunction().intension(model.getStates(),
                     model.getPropositions(), pExpression);
         } catch (InvalidExpressionException ex) {
-            Logger.getLogger(PropReputationAgent.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PropRepRewardBehaviour.class.getName()).log(Level.SEVERE, null, ex);
         }
         return Collections.emptyList();
     }

@@ -3,6 +3,7 @@ package org.emast.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,14 +12,23 @@ import java.util.Map;
  */
 public final class Lookup {
 
-    private final Map<Class, Collection> map;
+    private final Map<Class, List> map;
+
+    public Lookup() {
+        map = new HashMap<Class, List>();
+    }
+
+    public Lookup(List pObjs) {
+        this();
+        putAll(pObjs);
+    }
 
     public Lookup(Object... pObjs) {
         this();
         putAll(pObjs);
     }
 
-    public void putAll(Collection pObjs) {
+    public void putAll(List pObjs) {
         for (Object o : pObjs) {
             put(o);
         }
@@ -30,17 +40,13 @@ public final class Lookup {
         }
     }
 
-    public Lookup() {
-        map = new HashMap<Class, Collection>();
-    }
-
     public <O> O get(Class<O> key) {
         return (O) (map.containsKey(key)
-                ? map.get(key).iterator().next()
+                ? map.get(key).get(0)
                 : null);
     }
 
-    public <O> Collection<O> getAll(Class<O> pKey) {
+    public <O> List<O> getAll(Class<O> pKey) {
         return map.get(pKey);
     }
 
