@@ -24,9 +24,9 @@ import org.emast.util.RandomProblemGenerator;
  *
  * @author Anderson
  */
-public class RoverExecutorTest {
+public class RoverGroupTest {
 
-    private static Algorithm createAlgorithm() {
+    public static Algorithm createAlgorithm() {
         int maxIterations = 1;
         double badRewardValue = -20;
 
@@ -37,7 +37,7 @@ public class RoverExecutorTest {
         return new AgentGroup<ERG>(pg, behaviours, agentBehaviours, maxIterations);//new Planner(pg, factory.createAgents(agents));//
     }
 
-    private static Problem createProblem() {
+    public static Problem createProblem() {
         int rows = 10;
         int cols = 10;
         int size = rows * cols;
