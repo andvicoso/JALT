@@ -18,8 +18,8 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class CommRewardBehaviour
-        implements PropRewardBehaviour, Messenger {
+public class CommReward
+        implements PropReward, Messenger {
 
     private final MessageHistory history;
     private final Map<Proposition, Double> messagePropositionsReputation;
@@ -27,11 +27,10 @@ public class CommRewardBehaviour
     private final double badMessageThreshold;
     private final double messageCost;
 
-    public CommRewardBehaviour(double pMessageCost, double pBadMessageThreshold,
-            MessageManager pMessageManager) {
+    public CommReward(double pMessageCost, double pBadMessageThreshold, boolean pSendToSender) {
         messageCost = pMessageCost;
         badMessageThreshold = pBadMessageThreshold;
-        messageManager = pMessageManager;
+        messageManager = new MessageManager(pSendToSender);
         history = new MessageHistory();
         messagePropositionsReputation = new HashMap<Proposition, Double>();
     }
@@ -76,8 +75,8 @@ public class CommRewardBehaviour
 
         if (props != null) {
             for (final Proposition proposition : props) {
-                final Double rep = messagePropositionsReputation.get(proposition);
-                if (rep <= badMessageThreshold) {
+                Double rep = messagePropositionsReputation.get(proposition);
+                if (rep != null && rep <= badMessageThreshold) {
                     return true;
                 }
             }

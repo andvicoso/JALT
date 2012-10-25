@@ -12,12 +12,12 @@ import org.emast.model.propositional.Proposition;
  *
  * @author Anderson
  */
-public class CombinePropsChooser implements PropositionsChooser {
+public class CombinePropsRewardChooser implements PropositionsChooser {
 
     private final double badRewardThreshold;
     private final RewardCombinator combinator;
 
-    public CombinePropsChooser(RewardCombinator pCombinator, double pBadRewardThreshold) {
+    public CombinePropsRewardChooser(RewardCombinator pCombinator, double pBadRewardThreshold) {
         combinator = pCombinator;
         badRewardThreshold = pBadRewardThreshold;
     }

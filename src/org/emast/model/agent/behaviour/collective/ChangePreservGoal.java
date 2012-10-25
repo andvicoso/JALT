@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 import org.emast.infra.log.Log;
 import org.emast.model.agent.Agent;
-import org.emast.model.agent.behaviour.CollectiveBehaviour;
-import org.emast.model.agent.behaviour.individual.reward.PropRewardBehaviour;
+import org.emast.model.agent.behaviour.Collective;
+import org.emast.model.agent.behaviour.individual.reward.PropReward;
+import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.PreservationGoalFactory;
+import org.emast.model.planning.ValidPathFinder;
 import org.emast.model.planning.propositionschooser.PropositionsChooser;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
@@ -22,13 +24,26 @@ import org.emast.util.CollectionsUtils;
  *
  * @author Anderson
  */
-public class ChangePreservGoal implements CollectiveBehaviour<ERG>, ChangeModel<ERG> {
+public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
 
+    private final PolicyGenerator<ERG> algorithm;
     private final PropositionsChooser chooser;
-    private final PreservationGoalFactory factory = new PreservationGoalFactory();
+    private final boolean acceptOnePath;
+    private final PreservationGoalFactory factory;
 
-    public ChangePreservGoal(PropositionsChooser pChooser) {
+    /**
+     *
+     * @param pAlgorithm
+     * @param pChooser
+     * @param pAcceptOnePath Indicates if the algorithm should accept at least one 
+     * valid path to the final goal for one agent
+     */
+    public ChangePreservGoal(PolicyGenerator<ERG> pAlgorithm, PropositionsChooser pChooser,
+            boolean pAcceptOnePath) {
+        algorithm = pAlgorithm;
         chooser = pChooser;
+        acceptOnePath = pAcceptOnePath;
+        factory = new PreservationGoalFactory();
     }
 
     @Override
@@ -36,42 +51,44 @@ public class ChangePreservGoal implements CollectiveBehaviour<ERG>, ChangeModel<
         Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
         //get results for each agent
         for (Agent agent : pAgents) {
-            List<PropRewardBehaviour> behaviours = CollectionsUtils.getElementsOfType(agent.getBehaviours(),
-                    PropRewardBehaviour.class);
+            List<PropReward> behaviours = CollectionsUtils.getElementsOfType(agent.getBehaviours(),
+                    PropReward.class);
             reps.addAll(getPropositions(behaviours));
         }
+        //TODO: Decide which propositions are giving a bad reward
         //choose "bad" propositions
         Collection<Proposition> props = chooser.choose(reps);
         //verify the need to change the preservation goal
         if (!props.isEmpty()) {
-            changePreservationGoal(pProblem.getModel(), props);
+            changePreservationGoal(pProblem, props);
         }
     }
 
-    protected boolean changePreservationGoal(ERG pModel, Collection<Proposition> pProps) {
+    protected boolean changePreservationGoal(Problem<ERG> pProblem, Collection<Proposition> pProps) {
+        ERG model = pProblem.getModel();
         //save the original preservation goal
-        Expression originalPreservGoal = pModel.getPreservationGoal();
+        Expression originalPreservGoal = model.getPreservationGoal();
         //get the new preservation goal, based on the original and bad reward props
         Expression newPreservGoal = factory.createPreservationGoal(originalPreservGoal, pProps);
         //compare previous goal with the newly created
         if (!newPreservGoal.equals(originalPreservGoal)
                 && !originalPreservGoal.contains(newPreservGoal)
                 && !originalPreservGoal.contains(newPreservGoal.negate())
-                && existValidFinalState(pModel, newPreservGoal)) {
+                && existValidFinalState(model, newPreservGoal)) {
             //create a new cloned problem
-            //ERG newModel = cloneModel(model, newPreservGoal);
-            //Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
+            ERG newModel = cloneModel(model, newPreservGoal);
+            Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
             //Execute the base algorithm (PPFERG) over the new model (with new preservation goal)
             //if there are paths for all to reach the goal
-            //Log.info("Trying to find a valid plan for preserv: " + model.getPreservationGoal());
-            //if (ValidPlanFinder.exist(newProblem, policyGenerator)) {
-            //set the preservation goal to the current problem
-            pModel.setPreservationGoal(newPreservGoal);
-            //confirm the goal modification
-            Log.info("Changed preservation goal from {"
-                    + originalPreservGoal + "} to {" + newPreservGoal + "}");
-            return true;
-            // }
+            Log.info("Trying to find a valid plan for preserv: " + model.getPreservationGoal());
+            if (ValidPathFinder.exist(newProblem, algorithm, acceptOnePath)) {
+                //set the preservation goal to the current problem
+                model.setPreservationGoal(newPreservGoal);
+                //confirm the goal modification
+                Log.info("Changed preservation goal from {"
+                        + originalPreservGoal + "} to {" + newPreservGoal + "}");
+                return true;
+            }
         }
         return false;
     }
@@ -100,10 +117,10 @@ public class ChangePreservGoal implements CollectiveBehaviour<ERG>, ChangeModel<
         return false;
     }
 
-    private Collection<Map<Proposition, Double>> getPropositions(List<PropRewardBehaviour> pBehaviours) {
+    private Collection<Map<Proposition, Double>> getPropositions(List<PropReward> pBehaviours) {
         Collection<Map<Proposition, Double>> list = new ArrayList<Map<Proposition, Double>>();
 
-        for (PropRewardBehaviour beh : pBehaviours) {
+        for (PropReward beh : pBehaviours) {
             Map<Proposition, Double> map = beh.getResult();
             list.add(map);
         }

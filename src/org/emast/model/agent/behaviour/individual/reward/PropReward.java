@@ -8,6 +8,6 @@ import org.emast.model.propositional.Proposition;
  *
  * @author Anderson
  */
-public interface PropRewardBehaviour
+public interface PropReward
         extends RewardBehaviour<ERG, Map<Proposition, Double>> {
 }

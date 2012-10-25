@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.Set;
 import org.emast.infra.log.Log;
 import org.emast.model.agent.Agent;
-import org.emast.model.agent.behaviour.IndividualBehaviour;
-import org.emast.model.agent.behaviour.individual.reward.PropRewardBehaviour;
+import org.emast.model.agent.behaviour.Individual;
+import org.emast.model.agent.behaviour.individual.reward.PropReward;
 import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.PreservationGoalFactory;
-import org.emast.model.planning.ValidPlanFinder;
+import org.emast.model.planning.ValidPathFinder;
 import org.emast.model.planning.propositionschooser.PropositionsChooser;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
@@ -27,15 +27,16 @@ import org.emast.util.CollectionsUtils;
  *
  * @author Anderson
  */
-public class ChangePreservGoal implements IndividualBehaviour<ERG>, ChangeModel<ERG> {
+public class ChangePreservGoal implements Individual<ERG>, ChangeModel<ERG> {
 
     private final PolicyGenerator<ERG> algorithm;
     private final PropositionsChooser chooser;
-    private final PreservationGoalFactory factory = new PreservationGoalFactory();
+    private final PreservationGoalFactory factory;
 
     public ChangePreservGoal(PolicyGenerator<ERG> pAlgorithm, PropositionsChooser pChooser) {
         algorithm = pAlgorithm;
         chooser = pChooser;
+        factory = new PreservationGoalFactory();
     }
 
     @Override
@@ -73,6 +74,7 @@ public class ChangePreservGoal implements IndividualBehaviour<ERG>, ChangeModel<
         Expression finalGoal = pModel.getGoal();
         //save the original preservation goal
         Expression originalPreservGoal = pModel.getPreservationGoal();
+        //TODO: Decide which propositions are giving a bad reward
         Collection<Proposition> props = pModel.getPropositionFunction().getPropositionsForState(pState);
         //get the new preservation goal, based on the original and the state
         Expression newPreservGoal = factory.createPreservationGoal(originalPreservGoal, props);
@@ -81,13 +83,12 @@ public class ChangePreservGoal implements IndividualBehaviour<ERG>, ChangeModel<
                 && !originalPreservGoal.contains(newPreservGoal)
                 && !originalPreservGoal.contains(newPreservGoal.negate())
                 && !pModel.getPropositionFunction().satisfies(pState, finalGoal)) {
-            //TODO: Decide which propositions are giving a bad reward
             //create a new cloned problem
             Problem<ERG> newProblem = cloneProblem(pModel, pState, pAgent.getNumber(), newPreservGoal);
             //Execute the base algorithm (PPFERG) over the new problem (with the new preservation goal)
             Policy p = algorithm.run(newProblem);
             //if there is a path to reach the goal
-            if (ValidPlanFinder.exist(newProblem, pAgent.getPolicy(), pAgent.getNumber())) {
+            if (ValidPathFinder.exist(newProblem, pAgent.getPolicy(), pAgent.getNumber())) {
                 //set the new preservation goal to the current problem
                 newProblem.getModel().setPreservationGoal(newPreservGoal);
                 //confirm the goal modification
@@ -103,8 +104,8 @@ public class ChangePreservGoal implements IndividualBehaviour<ERG>, ChangeModel<
         Collection<Proposition> props = pModel.getPropositionFunction().getPropositionsForState(pState);
 
         if (props != null) {
-            List<PropRewardBehaviour> behaviours = CollectionsUtils.getElementsOfType(pAgent.getBehaviours(),
-                    PropRewardBehaviour.class);
+            List<PropReward> behaviours = CollectionsUtils.getElementsOfType(pAgent.getBehaviours(),
+                    PropReward.class);
             Set<Proposition> badProps = getPropositions(behaviours);
             //if have one bad property, change preservation goal
             for (final Proposition prop : badProps) {
@@ -117,10 +118,10 @@ public class ChangePreservGoal implements IndividualBehaviour<ERG>, ChangeModel<
         return false;
     }
 
-    private Set<Proposition> getPropositions(List<PropRewardBehaviour> pBehaviours) {
+    private Set<Proposition> getPropositions(List<PropReward> pBehaviours) {
         Collection<Map<Proposition, Double>> list = new ArrayList<Map<Proposition, Double>>();
 
-        for (PropRewardBehaviour beh : pBehaviours) {
+        for (PropReward beh : pBehaviours) {
             Map<Proposition, Double> map = beh.getResult();
             list.add(map);
         }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import org.emast.model.agent.behaviour.individual.reward.PropRewardBehaviour;
+import org.emast.model.agent.behaviour.individual.reward.PropReward;
 import org.emast.model.planning.rewardcombinator.RewardCombinator;
 import org.emast.model.propositional.Proposition;
 
@@ -15,10 +15,10 @@ import org.emast.model.propositional.Proposition;
 public class BehaviourUtil {
 
     public static Map<Proposition, Double> getPropositionsRewards(RewardCombinator pRewardCombinator,
-            List<PropRewardBehaviour> pBehaviours) {
+            List<PropReward> pBehaviours) {
         Collection<Map<Proposition, Double>> list = new ArrayList<Map<Proposition, Double>>();
 
-        for (PropRewardBehaviour beh : pBehaviours) {
+        for (PropReward beh : pBehaviours) {
             Map<Proposition, Double> map = (Map<Proposition, Double>) beh.getResult();
             list.add(map);
         }

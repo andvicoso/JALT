@@ -7,7 +7,7 @@ import java.util.Map;
 import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
 import static org.emast.model.agent.AgentState.*;
-import org.emast.model.agent.behaviour.IndividualBehaviour;
+import org.emast.model.agent.behaviour.Individual;
 import org.emast.model.agent.behaviour.individual.ChangeModel;
 import org.emast.model.agent.behaviour.individual.reward.RewardBehaviour;
 import org.emast.model.algorithm.Algorithm;
@@ -34,19 +34,20 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     private AgentState itState;
     private M model;
     private Policy policy;
-    private List<IndividualBehaviour<M>> behaviours;
+    private List<Individual<M>> behaviours;
     private Problem<M> problem;
 
     public Agent(int pNumber) {
         this(pNumber, Collections.EMPTY_LIST);
     }
 
-    public Agent(int pNumber, List<IndividualBehaviour<M>> pBehaviours) {
+    public Agent(int pNumber, List<Individual<M>> pBehaviours) {
         number = pNumber;
         behaviours = pBehaviours;
+        itState = AgentState.INITIAL;
     }
 
-    public List<IndividualBehaviour<M>> getBehaviours() {
+    public List<Individual<M>> getBehaviours() {
         return behaviours;
     }
 
@@ -185,12 +186,12 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
         return currentState;
     }
 
-    private void behave(Class<? extends IndividualBehaviour> pClass, Object... pParameters) {
+    private void behave(Class<? extends Individual> pClass, Object... pParameters) {
         behave(pClass, CollectionsUtils.asStringMap(pParameters));
     }
 
-    private void behave(Class<? extends IndividualBehaviour> pClass, Map<String, Object> pParameters) {
-        for (final IndividualBehaviour<M> b : behaviours) {
+    private void behave(Class<? extends Individual> pClass, Map<String, Object> pParameters) {
+        for (final Individual<M> b : behaviours) {
             if (pClass.isAssignableFrom(b.getClass())) {
                 b.behave(this, problem, pParameters);
             }

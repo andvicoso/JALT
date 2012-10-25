@@ -7,5 +7,5 @@ import org.emast.model.model.MDP;
  *
  * @author anderson
  */
-public interface ChangeModel<M extends MDP> extends IndividualBehaviour<M> {
+public interface ChangeModel<M extends MDP> extends Individual<M> {
 }

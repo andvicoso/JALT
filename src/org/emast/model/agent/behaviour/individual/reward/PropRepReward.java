@@ -13,12 +13,12 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class PropRepRewardBehaviour implements PropRewardBehaviour {
+public class PropRepReward implements PropReward {
 
     protected double badRewardThreshold;
     protected Map<Proposition, Double> localPropositionsReputation;
 
-    public PropRepRewardBehaviour(double pBadRewardThreshold) {
+    public PropRepReward(double pBadRewardThreshold) {
         badRewardThreshold = pBadRewardThreshold;
         localPropositionsReputation = new HashMap<Proposition, Double>();
     }

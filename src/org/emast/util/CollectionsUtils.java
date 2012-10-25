@@ -24,7 +24,7 @@ public class CollectionsUtils {
     public static <S> Map<String, S> asStringMap(S[] pParameters) {
         assert pParameters.length % 2 == 0;
         final Map<String, S> map = new HashMap<String, S>();
-        for (int i = 0; i < pParameters.length; i++) {
+        for (int i = 0; i < pParameters.length; i+=2) {
             String key = pParameters[i].toString();
             S value = pParameters[i + 1];
             map.put(key, value);

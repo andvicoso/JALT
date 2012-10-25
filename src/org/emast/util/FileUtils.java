@@ -33,7 +33,7 @@ public class FileUtils {
         File file;
         do {
             file = new File(path);
-            int uniqueId = ((int) System.currentTimeMillis()) % 100;
+            int uniqueId = Math.abs((int) System.currentTimeMillis()) % 100;
             path = dirPath + File.separator + uniqueId + "_" + filename;
         } while (pUnique && file.exists());
 

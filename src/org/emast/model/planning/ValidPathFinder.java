@@ -11,22 +11,27 @@ import org.emast.model.solution.Policy;
  *
  * @author Anderson
  */
-public class ValidPlanFinder {
+public class ValidPathFinder {
 
-    public static boolean exist(Problem pProblem, PolicyGenerator<? extends MDP> pPolicyGenerator) {
-        Policy policy = pPolicyGenerator.run(pProblem);
+    public static <M extends MDP> boolean exist(Problem<M> pProblem, PolicyGenerator<M> pPolicyGenerator,
+            boolean pAcceptOne) {
         boolean ret = true;
+        Policy policy = pPolicyGenerator.run(pProblem);
         MDP model = pProblem.getModel();
+
         for (int i = 0; i < model.getAgents(); i++) {
             //create a new simple agent iterator
             final Agent agent = new Agent(i);
-            //find the plan for the newly created problem
-            //with the preservation goal changed
+            //find the plan for the newly created agent
             agent.run(pProblem, policy);
             //get the resulting plan
             final Plan plan = agent.getPlan();
             //save in ret if a plan was generated
             ret &= plan != null && !plan.isEmpty();
+            //if found plan and need at least one plan, return true
+            if (ret && pAcceptOne) {
+                break;
+            }
         }
         return ret;
     }
@@ -42,7 +47,8 @@ public class ValidPlanFinder {
         return plan != null && !plan.isEmpty();
     }
 
-    public static boolean exist(Problem pProblem, PolicyGenerator<? extends MDP> pPolicyGenerator, int pAgent) {
+    public static <M extends MDP> boolean exist(Problem<M> pProblem, PolicyGenerator<M> pPolicyGenerator,
+            int pAgent) {
         Policy policy = pPolicyGenerator.run(pProblem);
         return exist(pProblem, policy, pAgent);
     }
