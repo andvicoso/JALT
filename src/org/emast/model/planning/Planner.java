@@ -3,7 +3,7 @@ package org.emast.model.planning;
 import java.beans.PropertyChangeSupport;
 import java.util.List;
 import org.emast.model.agent.Agent;
-import org.emast.model.algorithm.planning.PolicyGenerator;
+import org.emast.model.algorithm.Algorithm;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
@@ -12,31 +12,46 @@ import org.emast.model.solution.Policy;
  *
  * @author anderson
  */
-public class Planner<M extends MDP> implements PolicyGenerator<M> {
+public class Planner<M extends MDP> implements Algorithm<M, List<Agent>> {
 
     public static final String FINISHED_PROP = "FINISHED";
     public static final String FINISHED_ALL_PROP = "FINISHED_ALL";
     private final List<Agent> agents;
-    private final PolicyGenerator<M> policyGenerator;
+    private final Policy policy;
     private final PropertyChangeSupport pcs;
 
-    public Planner(PolicyGenerator<M> pPolicyGen, List<Agent> pAgents) {
+    public Planner(Policy pPolicy, List<Agent> pAgents) {
         agents = pAgents;
-        policyGenerator = pPolicyGen;
+        policy = pPolicy;
         pcs = new PropertyChangeSupport(this);
     }
 
-    public PropertyChangeSupport getPropertyChangeSupport() {
-        return pcs;
+    @Override
+    public List<Agent> run(final Problem<M> pProblem, Object... pParameters) {
+        //execute them all
+        for (final Agent agent : agents) {
+            createThread(agent, pProblem).start();
+        }
+
+        return agents;
     }
 
-    @Override
-    public Policy run(Problem<M> pProblem, Object... pParameters) {
-        final Policy policy = policyGenerator.run(pProblem);
-        //run
-        doRun(pProblem, policy);
+    private Thread createThread(final Agent agent, final Problem<M> pProblem) {
+        //get new thread name
+        String threadName = agent.getClass().getSimpleName()
+                + "-" + agent.getNumber()
+                + "-" + pProblem.getClass().getSimpleName();
+        //create and run an thread for the agent execution 
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                agent.run(pProblem, policy);
 
-        return policy;
+                finished(agent);
+            }
+        }, threadName);
+
+        return t;
     }
 
     @Override
@@ -48,33 +63,11 @@ public class Planner<M extends MDP> implements PolicyGenerator<M> {
         return sb.toString();
     }
 
-    private void doRun(final Problem<M> pProblem, final Policy policy) {
-        //execute them all
-        for (final Agent agent : agents) {
-            //get new thread name
-            String threadName = agent.getClass().getSimpleName()
-                    + " - " + pProblem.getClass().getSimpleName();
-            //create and run an thread for the agent iterator 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    agent.run(pProblem, policy);
-
-                    finished(agent);
-                }
-            }, threadName).start();
-        }
-    }
-
     protected void finished(final Agent agent) {
         pcs.firePropertyChange(FINISHED_PROP, 0, 0);
         if (isFinished()) {
             finished();
         }
-    }
-
-    public List<Agent> getAgents() {
-        return agents;
     }
 
     public boolean isFinished() {
@@ -91,7 +84,11 @@ public class Planner<M extends MDP> implements PolicyGenerator<M> {
         System.out.println(printResults());
     }
 
-    public PolicyGenerator<M> getPolicyGenerator() {
-        return policyGenerator;
+    public List<Agent> getAgents() {
+        return agents;
+    }
+
+    public PropertyChangeSupport getPropertyChangeSupport() {
+        return pcs;
     }
 }

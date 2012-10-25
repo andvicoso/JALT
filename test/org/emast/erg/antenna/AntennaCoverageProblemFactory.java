@@ -40,6 +40,21 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         antennaSignalCityBlockRadius = pAntennaSignalCityBlockRadius;
     }
 
+    public static ProblemFactory createDefaultFactory() {
+        double antennasRatio = 0.025;
+        double obstaclesRatio = 0.2;
+        double agentsRatio = 0.02;
+        int rows = 10;
+        int cols = rows;
+        int agents = (int) (rows * cols * agentsRatio);
+        int obstacles = (int) (rows * cols * obstaclesRatio);
+        int antennas = (int) (rows * cols * antennasRatio);
+        int antennaRadius = 3;
+
+        return new AntennaCoverageProblemFactory(rows, cols,
+                agents, obstacles, antennas, antennaRadius);
+    }
+
     @Override
     public Problem doCreate() {
         final AntennaCoverageModel model = new AntennaCoverageModel(rows, cols, agents,

@@ -29,6 +29,16 @@ public class RoverProblemFactory extends ProblemFactory {
         numberOfObstacles = pNumberOfObstacles;
     }
 
+    public static ProblemFactory createDefaultFactory() {
+        int rows = 10;
+        int cols = 10;
+        int size = rows * cols;
+        int obstacles = (int) (0.3 * size);
+        int agents = (int) (0.15 * size);
+
+        return new RoverProblemFactory(rows, cols, agents, obstacles);
+    }
+
     @Override
     public Problem doCreate() {
         //create model

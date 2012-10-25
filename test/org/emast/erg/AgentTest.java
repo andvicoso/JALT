@@ -1,4 +1,4 @@
-package org.emast.erg.rover;
+package org.emast.erg;
 
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.problem.Problem;
@@ -9,15 +9,9 @@ import org.emast.util.FileUtils;
  *
  * @author anderson
  */
-public class RoverTest {
+public class AgentTest {
 
     private static Problem createProblem() {
-        final int rows = 9;
-        final int cols = 9;
-        final int size = rows * cols;
-        final int agents = (int) (0.15 * size);
-        final int obstacles = (int) (0.3 * size);
-
         //ProblemFactory factory = new RoverProblemFactory(rows, cols, agents, obstacles);
 //        RandomProblemGenerator rpg = new RandomProblemGenerator(createFactory());
 //        Problem p = rpg.run();

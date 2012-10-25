@@ -1,7 +1,8 @@
-package org.emast.erg.rover;
+package org.emast.erg;
 
 import java.util.Arrays;
 import java.util.List;
+import org.emast.erg.rover.RoverProblemFactory;
 import org.emast.model.agent.behaviour.Collective;
 import org.emast.model.agent.behaviour.Individual;
 import org.emast.model.agent.behaviour.collective.ChangePreservGoal;
@@ -15,6 +16,7 @@ import org.emast.model.planning.propositionschooser.CombinePropsRewardChooser;
 import org.emast.model.planning.propositionschooser.PropositionsChooser;
 import org.emast.model.planning.rewardcombinator.MeanRewardCombinator;
 import org.emast.model.problem.Problem;
+import org.emast.model.problem.ProblemFactory;
 import org.emast.model.test.Test;
 import org.emast.util.FileUtils;
 import org.emast.util.RandomProblemGenerator;
@@ -23,7 +25,7 @@ import org.emast.util.RandomProblemGenerator;
  *
  * @author Anderson
  */
-public class RoverGroupTest {
+public class AgentGroupTest {
 
     public static void main(String[] args) {
         new Test(createProblem(), createAlgorithm()).run();
@@ -41,13 +43,7 @@ public class RoverGroupTest {
     }
 
     public static Problem createProblem() {
-        int rows = 10;
-        int cols = 10;
-        int size = rows * cols;
-        int obstacles = (int) (0.3 * size);
-        int agents = (int) (0.15 * size);
-
-        RoverProblemFactory factory = new RoverProblemFactory(rows, cols, agents, obstacles);
+        ProblemFactory factory = RoverProblemFactory.createDefaultFactory();
         RandomProblemGenerator rpg = new RandomProblemGenerator(factory);
 
         return FileUtils.fromFile("problems/RoverModel/82_problem.emast");//

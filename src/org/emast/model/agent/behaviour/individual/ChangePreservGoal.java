@@ -70,6 +70,7 @@ public class ChangePreservGoal implements Individual<ERG>, ChangeModel<ERG> {
 
     protected Policy changePreservationGoal(Agent pAgent, ERG pModel, State pState)
             throws InvalidExpressionException {
+        int number = pAgent.getNumber();
         //save the goal
         Expression finalGoal = pModel.getGoal();
         //save the original preservation goal
@@ -84,11 +85,11 @@ public class ChangePreservGoal implements Individual<ERG>, ChangeModel<ERG> {
                 && !originalPreservGoal.contains(newPreservGoal.negate())
                 && !pModel.getPropositionFunction().satisfies(pState, finalGoal)) {
             //create a new cloned problem
-            Problem<ERG> newProblem = cloneProblem(pModel, pState, pAgent.getNumber(), newPreservGoal);
+            Problem<ERG> newProblem = cloneProblem(pModel, pState, number, newPreservGoal);
             //Execute the base algorithm (PPFERG) over the new problem (with the new preservation goal)
             Policy p = algorithm.run(newProblem);
             //if there is a path to reach the goal
-            if (ValidPathFinder.exist(newProblem, pAgent.getPolicy(), pAgent.getNumber())) {
+            if (ValidPathFinder.exist(newProblem, pAgent.getPolicy(), number)) {
                 //set the new preservation goal to the current problem
                 newProblem.getModel().setPreservationGoal(newPreservGoal);
                 //confirm the goal modification

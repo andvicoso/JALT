@@ -1,6 +1,6 @@
 package org.emast;
 
-import org.emast.erg.rover.RoverGroupTest;
+import org.emast.erg.AgentGroupTest;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.problem.Problem;
@@ -14,7 +14,7 @@ import org.emast.util.FileUtils;
 public class MultipleTest {
 
     private static Algorithm createExecutor() {
-        return RoverGroupTest.createAlgorithm();
+        return AgentGroupTest.createAlgorithm();
     }
 
     private static Algorithm[] createAlgorithms() {

@@ -20,14 +20,13 @@ public class RandomProblemGenerator {
     public Problem run() {
         Scanner reader = new Scanner(System.in);
         Problem p;
-        String r;
 
         do {
             p = factory.create();
             System.out.println("Problem: " + p.toString());
             System.out.print("console: ");
 
-            r = reader.nextLine();
+            String r = reader.nextLine();
             if (r.equals("s") && save(p)) {
                 break;
             }
@@ -40,6 +39,7 @@ public class RandomProblemGenerator {
         String modelName = p.getModel().getClass().getSimpleName();
         String dir = "problems" + File.separator + modelName + File.separator;
         String filename = dir + "problem.emast";
+        
         return FileUtils.toFile(p, filename, true);
     }
 }

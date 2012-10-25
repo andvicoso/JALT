@@ -25,17 +25,18 @@ import org.emast.util.Utils;
  */
 public class Agent<M extends MDP> implements Algorithm<M, Plan> {
 
-    private static int MAX_ITERATIONS = 1000;
+    private static final int MAX_ITERATIONS = 1000;
     private double totalReward;
+    /**
+     * Number that identifies the agent in the problem
+     */
     private int number;
     private long msecs;
     private State currentState;
     private Plan plan;
-    private AgentState itState;
-    private M model;
+    private AgentState executionState;
     private Policy policy;
     private List<Individual<M>> behaviours;
-    private Problem<M> problem;
 
     public Agent(int pNumber) {
         this(pNumber, Collections.EMPTY_LIST);
@@ -44,7 +45,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     public Agent(int pNumber, List<Individual<M>> pBehaviours) {
         number = pNumber;
         behaviours = pBehaviours;
-        itState = AgentState.INITIAL;
+        executionState = AgentState.INITIAL;
     }
 
     public List<Individual<M>> getBehaviours() {
@@ -53,14 +54,12 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
 
     @Override
     public Plan run(Problem<M> pProblem, Object... pParameters) {
-        itState = AgentState.INITIAL;
-        problem = pProblem;
-        model = pProblem.getModel();
+        executionState = AgentState.RUNNING;
         policy = (Policy) pParameters[0];
         //run
         long initMsecs = System.currentTimeMillis();
 
-        itState = doRun(pProblem);
+        executionState = doRun(pProblem);
 
         msecs = System.currentTimeMillis() - initMsecs;
 
@@ -74,22 +73,18 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
      * @param pReward
      */
     private void changeState(State pNextState) {
-        print("changed state from " + currentState + " to " + pNextState);
-        //and go to it
         currentState = pNextState;
+        print("changed state from " + currentState + " to " + pNextState);
     }
 
     public void addReward(State pNextState, double pReward) {
-        //add current reward to total reward
+        //add received reward to total reward
         totalReward += pReward;
         print("received reward of: " + pReward + ". Total: " + totalReward);
-
-        if (pNextState != null) {
-            behave(RewardBehaviour.class, "state", pNextState, "reward", pReward);
-        }
     }
 
     private AgentState doRun(Problem<M> pProblem) {
+        M model = pProblem.getModel();
         Action action;
         int iterations = 0;
         //get the number's initial state
@@ -109,12 +104,14 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
                 if (nextStates != null && !nextStates.isEmpty()) {
                     double reward = model.getRewardFunction().getValue(currentState, action);
                     State nextState = nextStates.iterator().next();//TODO:
+                    //go to next state
+                    changeState(nextState);
                     //add reward to total reward
                     addReward(nextState, reward);
+                    //run add reward behaviours
+                    behave(RewardBehaviour.class, pProblem, "state", nextState, "reward", reward);
                     //run change model behaviours
-                    behave(ChangeModel.class, "state", nextState);
-                    //change to next state
-                    changeState(nextState);
+                    behave(ChangeModel.class, pProblem, "state", nextState);
                 } else {
                     currentState = null;
                 }
@@ -123,12 +120,22 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
                 //save action in plan
                 plan.add(action);
             }
-            //while there is a valid state to go to and did not reach the max iteration
+            //while there is a valid action to execute and did not reach the max iteration
         } while (action != null && currentState != null && iterations < MAX_ITERATIONS);
 
-        //print(printResults());
-
         return iterations < MAX_ITERATIONS ? FINISHED : FINISHED_MAX_ITERATIONS;
+    }
+
+    private void behave(Class<? extends Individual> pClass, Problem problem, Object... pParameters) {
+        behave(pClass, problem, CollectionsUtils.asStringMap(pParameters));
+    }
+
+    private void behave(Class<? extends Individual> pClass, Problem problem, Map<String, Object> pParameters) {
+        for (final Individual<M> b : behaviours) {
+            if (pClass.isAssignableFrom(b.getClass())) {
+                b.behave(this, problem, pParameters);
+            }
+        }
     }
 
     @Override
@@ -143,7 +150,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     }
 
     public AgentState getAgentIteratorState() {
-        return itState;
+        return executionState;
     }
 
     public long getMsecs() {
@@ -155,7 +162,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     }
 
     public boolean isFinished() {
-        return itState.equals(FINISHED) || itState.equals(FINISHED_MAX_ITERATIONS);
+        return executionState.equals(FINISHED) || executionState.equals(FINISHED_MAX_ITERATIONS);
     }
 
     public Plan getPlan() {
@@ -184,17 +191,5 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
 
     public State getCurrentState() {
         return currentState;
-    }
-
-    private void behave(Class<? extends Individual> pClass, Object... pParameters) {
-        behave(pClass, CollectionsUtils.asStringMap(pParameters));
-    }
-
-    private void behave(Class<? extends Individual> pClass, Map<String, Object> pParameters) {
-        for (final Individual<M> b : behaviours) {
-            if (pClass.isAssignableFrom(b.getClass())) {
-                b.behave(this, problem, pParameters);
-            }
-        }
     }
 }

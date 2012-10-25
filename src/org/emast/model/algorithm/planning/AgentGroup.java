@@ -50,35 +50,39 @@ public class AgentGroup<M extends MDP> implements PolicyGenerator<M>, PropertyCh
     public Policy run(Problem<M> pProblem, Object... pParameters) {
         Problem<M> problem = pProblem;
         M model = problem.getModel();
-        int iterations = 1;
+        Planner planner = null;
+        Policy policy;
+        int iterations = 0;
         //start main loop
         do {
             Log.info("\nITERATION " + iterations + ":\n");
+            //create policy
+            policy = policyGenerator.run(pProblem, pParameters);
+            //create new agents
             createAgents(model);
-            Planner planner = createPlanner(agents);
-            //run problem
-            planner.run(problem);
-            //wait to be awakened from a planner notification (when it finished running all agents)
-            try {
-                synchronized (this) {
-                    if (!planner.isFinished()) {
-                        wait();
-                    }
-                }
-            } catch (InterruptedException ex) {
-                Log.debug("Execution failed. Thread interrupted");
-                return null;
-            }
+            //create planner
+            planner = createAndRun(planner, policy, problem);
 
+            if (++iterations >= maxIterations) {
+                break;
+            }
+            //run change model behaviours
             behave(ChangeModel.class, problem);
-        } while (iterations++ < maxIterations);
-        //run problem again with the combined preserv. goals
-        //to get the policy
-        createAgents(model);
-        //create a new planner
-        Planner planner = createPlanner(agents);
-        //run problem
-        return planner.run(pProblem);
+        } while (true);
+
+        return policy;
+    }
+
+    private void wait(Planner pPlanner) {
+        try {
+            synchronized (this) {
+                if (!pPlanner.isFinished()) {
+                    wait();
+                }
+            }
+        } catch (InterruptedException ex) {
+            Log.debug("Execution failed. Thread interrupted");
+        }
     }
 
     @Override
@@ -88,8 +92,8 @@ public class AgentGroup<M extends MDP> implements PolicyGenerator<M>, PropertyCh
         }
     }
 
-    private Planner<M> createPlanner(List<Agent> pAgents) {
-        Planner<M> planner = new Planner<M>(policyGenerator, pAgents);
+    private Planner<M> createPlanner(Policy pPolicy, List<Agent> pAgents) {
+        Planner<M> planner = new Planner<M>(pPolicy, pAgents);
         //listen to changes of planner properties
         planner.getPropertyChangeSupport().addPropertyChangeListener(this);
 
@@ -112,5 +116,20 @@ public class AgentGroup<M extends MDP> implements PolicyGenerator<M>, PropertyCh
                 b.behave(agents, pProblem, pParameters);
             }
         }
+    }
+
+    private Planner createAndRun(Planner planner, Policy policy, Problem problem) {
+        if (planner != null) {
+            planner.getPropertyChangeSupport().removePropertyChangeListener(this);
+        }
+        //create planner to manage agents' execution
+        planner = createPlanner(policy, agents);
+        //run problem for each agent
+        planner.run(problem);
+        //wait to be awakened from the planner notification
+        //(when it finished running all agents)
+        wait(planner);
+
+        return planner;
     }
 }
