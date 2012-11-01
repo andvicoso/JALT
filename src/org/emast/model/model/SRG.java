@@ -9,13 +9,13 @@ import org.emast.model.propositional.Proposition;
  *
  * @author Anderson
  */
-public interface SRG extends MDP{
+public interface SRG extends MDP {
 
     void setPropositionFunction(PropositionFunction pf);
 
-    void setPropositions(Set<Proposition> props);
-
     PropositionFunction getPropositionFunction();
+
+    void setPropositions(Set<Proposition> props);
 
     Set<Proposition> getPropositions();
 

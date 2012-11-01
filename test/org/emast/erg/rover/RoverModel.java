@@ -18,7 +18,8 @@ public class RoverModel extends ERGGridModel {
     private static final double BAD_REWARD = -20;
 
     public RoverModel(final int pRows, final int pCols, final int pAgents) {
-        super(pRows, pCols, pAgents);
+        super(pRows, pCols);
+        setAgents(pAgents);
         //set propositions
         setPropositions(getDefaultPropositions());
         //set goals

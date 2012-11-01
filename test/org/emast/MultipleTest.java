@@ -13,16 +13,16 @@ import org.emast.util.FileUtils;
  */
 public class MultipleTest {
 
-    private static Algorithm createExecutor() {
+    private static Algorithm createAgentGroup() {
         return AgentGroupTest.createAlgorithm();
     }
 
     private static Algorithm[] createAlgorithms() {
-        return new Algorithm[]{new PPFERG(), createExecutor()};
+        return new Algorithm[]{new PPFERG(), createAgentGroup()};
     }
 
     private static Problem createProblem() {
-        return FileUtils.fromFile("problems/RoverModel/problem9.emast");
+        return FileUtils.fromFile(AgentGroupTest.CURRENT_PROBLEM);
     }
 
     public static void main(String[] args) {

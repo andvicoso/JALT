@@ -9,37 +9,29 @@ import org.emast.model.function.TransitionFunction;
 import org.emast.model.model.MDP;
 import org.emast.model.state.State;
 
-public abstract class MDPModel implements MDP, Serializable {
+public class MDPModel implements MDP, Serializable {
 
+    private TransitionFunction transitionFunction;
+    private RewardFunction rewardFunction;
     private Collection<State> states;
     private Collection<Action> actions;
     private int agents;
 
-    public MDPModel(final Collection<State> pStates,
-            final Collection<Action> pActions,
-            final int pAgents) {
-        states = pStates;
-        actions = pActions;
-        agents = pAgents;
+    public MDPModel() {
     }
 
-    public MDPModel(final MDPModel pModel) {
-        this(pModel.getStates(), pModel.getActions(), pModel.getAgents());
+    public MDPModel(TransitionFunction transitionFunction, RewardFunction rewardFunction,
+            Collection<State> states, Collection<Action> actions, int agents) {
+        this.transitionFunction = transitionFunction;
+        this.rewardFunction = rewardFunction;
+        this.states = states;
+        this.actions = actions;
+        this.agents = agents;
     }
 
     @Override
     public MDPModel copy() {
-        return new MDPModel(states, actions, agents) {
-            @Override
-            public TransitionFunction getTransitionFunction() {
-                return MDPModel.this.getTransitionFunction();
-            }
-
-            @Override
-            public RewardFunction getRewardFunction() {
-                return MDPModel.this.getRewardFunction();
-            }
-        };
+        return new MDPModel(transitionFunction, rewardFunction, states, actions, agents);
     }
 
     public Action getAction(final String pName) {
@@ -83,38 +75,30 @@ public abstract class MDPModel implements MDP, Serializable {
     }
 
     @Override
-    public abstract TransitionFunction getTransitionFunction();
+    public TransitionFunction getTransitionFunction() {
+        return transitionFunction;
+    }
 
     @Override
-    public abstract RewardFunction getRewardFunction();
+    public void setTransitionFunction(TransitionFunction transitionFunction) {
+        this.transitionFunction = transitionFunction;
+    }
 
-//    public void setActions(final Collection<Action> actions) {
-//        this.actions = actions;
-//    }
-//
-//    public void setAgents(int pNumOfAgents) {
-//        setAgents(ModelUtils.createList(Agent.class, pNumOfAgents));
-//    }
-//
-//    public void setAgents(final Collection<Agent> agents) {
-//        this.agents = agents;
-//    }
-//
-//    public void setStates(final Collection<State> states) {
-//        this.states = states;
-//    }
-//
-//    public void setStates(final State... states) {
-//        setStates(Arrays.asList(states));
-//    }
-//
-//    public void setAgents(final Agent... pAgents) {
-//        setAgents(Arrays.asList(pAgents));
-//    }
-//
-//    public void setActions(final Action... pActions) {
-//        setActions(Arrays.asList(pActions));
-//    }
+    @Override
+    public RewardFunction getRewardFunction() {
+        return rewardFunction;
+    }
+
+    @Override
+    public void setRewardFunction(RewardFunction rewardFunction) {
+        this.rewardFunction = rewardFunction;
+    }
+
+    @Override
+    public void setAgents(int agents) {
+        this.agents = agents;
+    }
+
     public Collection<State> getStates(final String... pStatesStrs) {
         final Collection<State> sts = new ArrayList<State>(pStatesStrs.length);
         for (final String strState : pStatesStrs) {
@@ -134,5 +118,15 @@ public abstract class MDPModel implements MDP, Serializable {
         sb.append("\nTransition function: ").append(getTransitionFunction());
 
         return sb.toString();
+    }
+
+    @Override
+    public void setActions(Collection<Action> pActions) {
+        actions = pActions;
+    }
+
+    @Override
+    public void setStates(Collection<State> states) {
+        this.states = states;
     }
 }

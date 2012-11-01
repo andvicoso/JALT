@@ -13,20 +13,14 @@ import org.emast.model.propositional.Proposition;
  */
 public class VotePropsChooser implements PropositionsChooser {
 
-    private final double badRewardThreshold;
-
-    public VotePropsChooser(double pBadRewardThreshold) {
-        badRewardThreshold = pBadRewardThreshold;
-    }
-
     @Override
     public Set<Proposition> choose(Collection<Map<Proposition, Double>> pReps) {
-        return combine(pReps).keySet();
+        return getVotes(pReps).keySet();
     }
 
     @Override
     public Proposition chooseOne(Collection<Map<Proposition, Double>> pReps) {
-        Map<Proposition, Integer> map = combine(pReps);
+        Map<Proposition, Integer> map = getVotes(pReps);
         Integer max = Collections.max(map.values());
 
         for (Map.Entry<Proposition, Integer> entry : map.entrySet()) {
@@ -41,16 +35,14 @@ public class VotePropsChooser implements PropositionsChooser {
         return map.keySet().iterator().next();
     }
 
-    protected Map<Proposition, Integer> combine(Collection<Map<Proposition, Double>> pReps) {
+    protected Map<Proposition, Integer> getVotes(Collection<Map<Proposition, Double>> pReps) {
         //combine reputations for propositions from agents
         Map<Proposition, Integer> map = new HashMap<Proposition, Integer>();
         for (Map<Proposition, Double> rep : pReps) {
             for (Proposition prop : rep.keySet()) {
-                if (rep.get(prop) <= badRewardThreshold) {
-                    int count = map.containsKey(prop) ? map.get(prop) : 0;
-                    count++;
-                    map.put(prop, count);
-                }
+                int count = map.containsKey(prop) ? map.get(prop) : 0;
+                count++;
+                map.put(prop, count);
             }
         }
         return map;

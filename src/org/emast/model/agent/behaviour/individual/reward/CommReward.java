@@ -18,8 +18,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class CommReward
-        implements PropReward, Messenger {
+public class CommReward implements PropReward, Messenger {
 
     private final MessageHistory history;
     private final Map<Proposition, Double> messagePropositionsReputation;

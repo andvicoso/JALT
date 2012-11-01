@@ -12,11 +12,21 @@ public interface MDP {
 
     Collection<State> getStates();
 
+    void setStates(Collection<State> states);
+
     Collection<Action> getActions();
+
+    void setActions(Collection<Action> actions);
 
     int getAgents();
 
+    void setAgents(int pAgents);
+    
     TransitionFunction getTransitionFunction();
 
     RewardFunction getRewardFunction();
+
+    void setTransitionFunction(TransitionFunction tf);
+
+    void setRewardFunction(RewardFunction rf);
 }

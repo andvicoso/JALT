@@ -19,7 +19,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class ERGGridModel extends GridModel implements ERG, BadRewarder {
+public class ERGModel extends MDPModel implements ERG, BadRewarder {
 
     private Expression goal;
     private Expression preservationGoal;
@@ -28,16 +28,14 @@ public class ERGGridModel extends GridModel implements ERG, BadRewarder {
     private Collection<BadReward> badRewards;
     private double otherwiseValue = -1d;
 
-    public ERGGridModel(final int pRows, final int pCols) {
-        super(pRows, pCols);
+    public ERGModel() {
     }
 
-    public ERGGridModel(Expression goal, Expression preservationGoal,
-            PropositionFunction pf, Set<Proposition> propositions,
-            Collection<BadReward> badRewards, int rows, int cols,
+    public ERGModel(Expression goal, Expression preservationGoal, PropositionFunction pf,
+            Set<Proposition> propositions, Collection<BadReward> badRewards,
             TransitionFunction transitionFunction, RewardFunction rewardFunction,
             Collection<State> states, Collection<Action> actions, int agents) {
-        super(rows, cols, transitionFunction, rewardFunction, states, actions, agents);
+        super(transitionFunction, rewardFunction, states, actions, agents);
         this.goal = goal;
         this.preservationGoal = preservationGoal;
         this.pf = pf;
@@ -46,9 +44,9 @@ public class ERGGridModel extends GridModel implements ERG, BadRewarder {
     }
 
     @Override
-    public ERGGridModel copy() {
-        return new ERGGridModel(goal, preservationGoal, pf, propositions, badRewards, getRows(), getCols(),
-                getTransitionFunction(), getRewardFunction(), getStates(), getActions(), getAgents());
+    public ERGModel copy() {
+        return new ERGModel(goal, preservationGoal, pf, propositions, badRewards, getTransitionFunction(),
+                getRewardFunction(), getStates(), getActions(), getAgents());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.emast.erg;
 
 import org.emast.model.algorithm.reachability.PPFERG;
+import org.emast.model.algorithm.reinforcement.ValueIterationAlgorithm;
 import org.emast.model.problem.Problem;
 import org.emast.model.test.Test;
 import org.emast.util.FileUtils;
@@ -17,10 +18,10 @@ public class AgentTest {
 //        Problem p = rpg.run();
 //
 //        return p;
-        return FileUtils.fromFile("problems/RoverModel/problem9.emast");
+        return FileUtils.fromFile(AgentGroupTest.CURRENT_PROBLEM);
     }
 
     public static void main(final String[] pArgs) {
-        new Test(createProblem(), new PPFERG()).run();
+        new Test(createProblem(), new ValueIterationAlgorithm()).run();
     }
 }

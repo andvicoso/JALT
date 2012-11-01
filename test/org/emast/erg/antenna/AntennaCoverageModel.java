@@ -20,7 +20,8 @@ public class AntennaCoverageModel extends ERGGridModel {
 
     public AntennaCoverageModel(final int pRows, final int pCols, final int pAgents,
             final int pAntennaSignalCityBlockRadius) {
-        super(pRows, pCols, pAgents);
+        super(pRows, pCols);
+        setAgents(pAgents);
         //set props
         String[] props = {"hole", "stone", "water", "exit", "up", "down", "antenna", "coverage"};
         setPropositions(CollectionsUtils.createSet(Proposition.class, props));

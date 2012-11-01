@@ -43,6 +43,5 @@ public class MeanRewardCombinator implements RewardCombinator {
         }
 
         return result;
-        //new TreeMap<Proposition, Double>(new ValueComparator(result));
     }
 }

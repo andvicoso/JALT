@@ -27,6 +27,8 @@ import org.emast.util.RandomProblemGenerator;
  */
 public class AgentGroupTest {
 
+    public static final String CURRENT_PROBLEM = "problems/RoverModel/82_problem.emast";
+
     public static void main(String[] args) {
         new Test(createProblem(), createAlgorithm()).run();
     }
@@ -46,7 +48,7 @@ public class AgentGroupTest {
         ProblemFactory factory = RoverProblemFactory.createDefaultFactory();
         RandomProblemGenerator rpg = new RandomProblemGenerator(factory);
 
-        return FileUtils.fromFile("problems/RoverModel/82_problem.emast");//
+        return FileUtils.fromFile(CURRENT_PROBLEM);
     }
 
     private static List<Individual> createIndividualBehaviours(double pBadRewardThreshold) {

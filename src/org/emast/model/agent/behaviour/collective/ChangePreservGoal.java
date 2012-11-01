@@ -53,9 +53,8 @@ public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
         for (Agent agent : pAgents) {
             List<PropReward> behaviours = CollectionsUtils.getElementsOfType(agent.getBehaviours(),
                     PropReward.class);
-            reps.addAll(getPropositions(behaviours));
+            reps.addAll(getPropositionsValues(behaviours));
         }
-        //TODO: Decide which propositions are giving a bad reward
         //choose "bad" propositions
         Collection<Proposition> props = chooser.choose(reps);
         //verify the need to change the preservation goal
@@ -117,7 +116,7 @@ public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
         return false;
     }
 
-    private Collection<Map<Proposition, Double>> getPropositions(List<PropReward> pBehaviours) {
+    private Collection<Map<Proposition, Double>> getPropositionsValues(List<PropReward> pBehaviours) {
         Collection<Map<Proposition, Double>> list = new ArrayList<Map<Proposition, Double>>();
 
         for (PropReward beh : pBehaviours) {
