@@ -1,10 +1,12 @@
 package org.emast.erg;
 
-import org.emast.model.algorithm.reachability.PPFERG;
+import org.emast.CurrentProblem;
 import org.emast.model.algorithm.reinforcement.ValueIterationAlgorithm;
+import org.emast.model.converter.Reinforcement;
+import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
+import org.emast.model.problem.ProblemFactory;
 import org.emast.model.test.Test;
-import org.emast.util.FileUtils;
 
 /**
  *
@@ -13,12 +15,14 @@ import org.emast.util.FileUtils;
 public class AgentTest {
 
     private static Problem createProblem() {
-        //ProblemFactory factory = new RoverProblemFactory(rows, cols, agents, obstacles);
-//        RandomProblemGenerator rpg = new RandomProblemGenerator(createFactory());
-//        Problem p = rpg.run();
-//
-//        return p;
-        return FileUtils.fromFile(AgentGroupTest.CURRENT_PROBLEM);
+        Problem p = CurrentProblem.create();
+        MDP model = p.getModel();
+
+        if (model instanceof Reinforcement) {
+            model = ((Reinforcement) model).toReinforcement();
+        }
+
+        return ProblemFactory.create(p, model);
     }
 
     public static void main(final String[] pArgs) {

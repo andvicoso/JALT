@@ -21,10 +21,13 @@ import org.emast.model.NamedObject;
  */
 public class CollectionsUtils {
 
+    private CollectionsUtils() {
+    }
+
     public static <S> Map<String, S> asStringMap(S[] pParameters) {
         assert pParameters.length % 2 == 0;
         final Map<String, S> map = new HashMap<String, S>();
-        for (int i = 0; i < pParameters.length; i+=2) {
+        for (int i = 0; i < pParameters.length; i += 2) {
             String key = pParameters[i].toString();
             S value = pParameters[i + 1];
             map.put(key, value);
@@ -41,7 +44,12 @@ public class CollectionsUtils {
         return map;
     }
 
-    private CollectionsUtils() {
+    public static Map createMap(Collection pKeys, double pValue) {
+        final Map map = new HashMap();
+        for (Object object : pKeys) {
+            map.put(object, pValue);
+        }
+        return map;
     }
 
     public static <E extends NamedObject> Set<E> createSet(Class<E> pClass, String[] pNames) {

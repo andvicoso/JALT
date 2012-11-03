@@ -2,8 +2,8 @@ package org.emast.model.model;
 
 import java.util.Collection;
 import org.emast.model.action.Action;
-import org.emast.model.function.RewardFunction;
-import org.emast.model.function.TransitionFunction;
+import org.emast.model.function.reward.RewardFunction;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.state.State;
 
 public interface MDP {

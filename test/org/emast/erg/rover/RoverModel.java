@@ -1,9 +1,10 @@
 package org.emast.erg.rover;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
-import org.emast.model.BadReward;
+import org.emast.model.converter.Reinforcement;
+import org.emast.model.converter.ReinforcementConverter;
+import org.emast.model.function.reward.RewardFunctionProposition;
+import org.emast.model.model.MDP;
 import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -13,9 +14,10 @@ import org.emast.util.CollectionsUtils;
  *
  * @author anderson
  */
-public class RoverModel extends ERGGridModel {
+public class RoverModel extends ERGGridModel implements Reinforcement {
 
     private static final double BAD_REWARD = -20;
+    private static final double OTHERWISE = -1;
 
     public RoverModel(final int pRows, final int pCols, final int pAgents) {
         super(pRows, pCols);
@@ -23,16 +25,25 @@ public class RoverModel extends ERGGridModel {
         //set propositions
         setPropositions(getDefaultPropositions());
         //set goals
-        setPreservationGoal(new Expression("!hole & !stone"));
-        setGoal(new Expression("exit"));
-        //set bad rewards
-        final List<BadReward> list = new ArrayList<BadReward>();
-        for (Proposition bdp : getBadRewardObstacles()) {
-            list.add(new BadReward(bdp, BAD_REWARD));
-        }
+        setPreservationGoal(createPreservationGoal());
+        setGoal(createFinalGoal());
+        //set bad reward function
+        setRewardFunction(new RewardFunctionProposition(this,
+                CollectionsUtils.createMap(getBadRewardObstacles(), BAD_REWARD), OTHERWISE));
+    }
 
-        setBadRewards(list);
-        setOtherwiseValue(-1);
+    @Override
+    public MDP toReinforcement() {
+        ReinforcementConverter conv = new ReinforcementConverter();
+        return conv.convert(this, -BAD_REWARD, BAD_REWARD, getBadRewardObstacles());
+    }
+
+    public static Expression createFinalGoal() {
+        return new Expression("exit");
+    }
+
+    public static Expression createPreservationGoal() {
+        return new Expression("!hole & !stone");
     }
 
     public static Set<Proposition> getBadRewardObstacles() {

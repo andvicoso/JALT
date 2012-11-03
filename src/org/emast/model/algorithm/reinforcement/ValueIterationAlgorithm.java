@@ -16,6 +16,7 @@ public class ValueIterationAlgorithm<M extends MDP> implements PolicyGenerator<M
     private int iterations;
     private double gama = 0.9d;
     private M model;
+    private static final int MAX_IT = 10;
 
     public ValueIterationAlgorithm() {
         values = new ArrayList<Map<State, Double>>();
@@ -52,7 +53,8 @@ public class ValueIterationAlgorithm<M extends MDP> implements PolicyGenerator<M
                     pi.put(state, action);
                 }
             }
-        } while (getError() > pProblem.getError());
+             System.out.println(printResults());
+        } while (iterations < MAX_IT);//getError() > pProblem.getError());
 
         return pi;
     }
@@ -80,7 +82,7 @@ public class ValueIterationAlgorithm<M extends MDP> implements PolicyGenerator<M
                         pState, stateLine, pAction);
                 // get the q value based on the last value (n - 1)
                 // if exists
-                if (pValues.get(stateLine) != null) {
+                if (trans != 0 && pValues.get(stateLine) != null) {
                     sum += trans * pValues.get(stateLine);
                 }
             }

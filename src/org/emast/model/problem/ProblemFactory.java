@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import org.emast.model.model.ERG;
+import org.emast.model.model.MDP;
 import org.emast.model.model.impl.MDPModel;
 import org.emast.model.state.State;
 
@@ -86,5 +87,12 @@ public abstract class ProblemFactory {
     public Problem create() {
         usedStates = new ArrayList<State>();
         return doCreate();
+    }
+    
+    public static Problem create(Problem pProblem, MDP pModel) {
+        Problem p = new Problem(pModel, pProblem.getInitialStates());
+        p.setError(pProblem.getError());
+
+        return p;
     }
 }

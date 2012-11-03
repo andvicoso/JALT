@@ -1,4 +1,4 @@
-package org.emast.model.function;
+package org.emast.model.function.reward;
 
 import org.emast.model.action.Action;
 import org.emast.model.state.State;

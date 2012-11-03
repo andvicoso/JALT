@@ -1,0 +1,63 @@
+# Problem that represents a grid with holes and walls.
+# The agent must find the path to treasure and avoid the obstacles.
+# 
+# Grid Caption:
+# T: Treasure
+# S: Start
+# H: Hole
+# W: Wall
+# 
+#----------
+#   Grid
+#----------
+#   1 2 3
+# 1 S H
+# 2   W 
+# 3     T
+#----------
+#
+discount: 0.9
+values: reward
+states: s11 s12 s13 s21 s22 s23 s31 s32 s33
+actions: n w e s
+propositions: treasure hole wall
+goal: treasure
+preserve: !hole && !wall
+start: s11
+
+T: e : s11 : s12 0.5
+T: s : s11 : s21 0.5
+
+T: s : s12 : s22 0.33
+T: w : s12 : s11 0.33
+T: e : s12 : s13 0.33
+
+T: w : s13 : s12 0.5
+T: s : s13 : s23 0.5
+
+T: n : s21 : s11 0.33
+T: e : s21 : s22 0.33
+T: s : s21 : s31 0.33
+
+T: n : s22 : s12 0.25
+T: w : s22 : s21 0.25
+T: e : s22 : s23 0.25
+T: s : s22 : s32 0.25
+
+T: n : s23 : s13 0.33
+T: w : s23 : s22 0.33
+T: s : s23 : s33 0.33
+
+T: n : s31 : s21 0.5
+T: e : s31 : s32 0.5
+
+T: w : s32 : s31 0.33
+T: n : s32 : s22 0.33
+T: e : s32 : s33 0.33
+
+T: n : s33 : s23 0.5
+T: w : s33 : s32 0.5
+
+P: s33 : treasure
+P: s12 : hole
+P: s22 : wall

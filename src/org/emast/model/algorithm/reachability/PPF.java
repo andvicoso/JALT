@@ -7,7 +7,7 @@ import org.emast.model.action.Action;
 import org.emast.model.agent.behaviour.individual.reward.PropRepReward;
 import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.exception.InvalidExpressionException;
-import org.emast.model.function.TransitionFunction;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.MDP;
 import org.emast.model.model.SRG;
 import org.emast.model.problem.Problem;

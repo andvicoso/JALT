@@ -1,15 +1,11 @@
 package org.emast.model.model.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
-import org.emast.model.BadReward;
-import org.emast.model.BadRewarder;
 import org.emast.model.action.Action;
-import org.emast.model.function.BadRewardFunction;
 import org.emast.model.function.PropositionFunction;
-import org.emast.model.function.RewardFunction;
-import org.emast.model.function.TransitionFunction;
+import org.emast.model.function.reward.RewardFunction;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -19,22 +15,19 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class ERGGridModel extends GridModel implements ERG, BadRewarder {
+public class ERGGridModel extends GridModel implements ERG {
 
     private Expression goal;
     private Expression preservationGoal;
     private PropositionFunction pf;
     private Set<Proposition> propositions;
-    private Collection<BadReward> badRewards;
-    private double otherwiseValue = -1d;
 
     public ERGGridModel(final int pRows, final int pCols) {
         super(pRows, pCols);
     }
 
     public ERGGridModel(Expression goal, Expression preservationGoal,
-            PropositionFunction pf, Set<Proposition> propositions,
-            Collection<BadReward> badRewards, int rows, int cols,
+            PropositionFunction pf, Set<Proposition> propositions, int rows, int cols,
             TransitionFunction transitionFunction, RewardFunction rewardFunction,
             Collection<State> states, Collection<Action> actions, int agents) {
         super(rows, cols, transitionFunction, rewardFunction, states, actions, agents);
@@ -42,28 +35,12 @@ public class ERGGridModel extends GridModel implements ERG, BadRewarder {
         this.preservationGoal = preservationGoal;
         this.pf = pf;
         this.propositions = propositions;
-        this.badRewards = badRewards;
     }
 
     @Override
     public ERGGridModel copy() {
-        return new ERGGridModel(goal, preservationGoal, pf, propositions, badRewards, getRows(), getCols(),
+        return new ERGGridModel(goal, preservationGoal, pf, propositions, getRows(), getCols(),
                 getTransitionFunction(), getRewardFunction(), getStates(), getActions(), getAgents());
-    }
-
-    @Override
-    public Collection<BadReward> getBadRewards() {
-        return badRewards;
-    }
-
-    @Override
-    public void setBadRewards(Collection<BadReward> badRewards) {
-        this.badRewards = badRewards;
-    }
-
-    @Override
-    public RewardFunction getRewardFunction() {
-        return new BadRewardFunction(this);
     }
 
     @Override
@@ -104,26 +81,6 @@ public class ERGGridModel extends GridModel implements ERG, BadRewarder {
     @Override
     public void setPropositions(Set<Proposition> propositions) {
         this.propositions = propositions;
-    }
-
-    @Override
-    public void setOtherwiseValue(double pOtherwiseValue) {
-        otherwiseValue = pOtherwiseValue;
-    }
-
-    @Override
-    public double getOtherwiseValue() {
-        return otherwiseValue;
-    }
-
-    @Override
-    public Collection<Proposition> getBadRewardProps() {
-        Collection<Proposition> badProps = new ArrayList<Proposition>();
-        for (BadReward br : badRewards) {
-            badProps.add(br.getBadRewardProp());
-        }
-
-        return badProps;
     }
 
     @Override

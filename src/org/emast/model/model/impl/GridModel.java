@@ -2,8 +2,9 @@ package org.emast.model.model.impl;
 
 import java.util.Collection;
 import org.emast.model.action.Action;
-import org.emast.model.function.RewardFunction;
-import org.emast.model.function.TransitionFunction;
+import org.emast.model.function.reward.RewardFunction;
+import org.emast.model.function.transition.GridTransitionFunction;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.Grid;
 import org.emast.model.state.State;
 import org.emast.util.GridUtils;
@@ -31,7 +32,7 @@ public class GridModel extends MDPModel implements Grid {
     public GridModel(int pRows, int pCols) {
         this.rows = pRows;
         this.cols = pCols;
-        setTransitionFunction(GridUtils.createTransitionFunction(this));
+        setTransitionFunction(new GridTransitionFunction(rows, cols));
         setStates(GridUtils.createStates(pRows, pCols));
         setActions(GridUtils.createGridMovementActions());
     }

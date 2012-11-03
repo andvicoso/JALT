@@ -1,14 +1,12 @@
 package org.emast.model.converter;
 
 import java.util.Set;
-import net.sourceforge.jeval.EvaluationException;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.model.Grid;
 import org.emast.model.model.MDP;
 import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.model.impl.ERGModel;
-import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 
@@ -18,11 +16,8 @@ import org.emast.model.propositional.Proposition;
  */
 public class ERGConverter {
 
-    public Problem<ERG> convert(final Problem<MDP> pProblem,
-            final Set<Proposition> pPropositions, final PropositionFunction pPropositionFunction,
-            final Expression pGoal, final Expression pPreservGoal)
-            throws EvaluationException {
-        final MDP pModel = pProblem.getModel();
+    public ERG convert(MDP pModel, Set<Proposition> pPropositions,
+            PropositionFunction pPropositionFunction, Expression pGoal, Expression pPreservGoal) {
         ERG model;
         if (pModel instanceof Grid) {
             final Grid grid = (Grid) pModel;
@@ -39,9 +34,6 @@ public class ERGConverter {
         model.setGoal(pGoal);
         model.setPreservationGoal(pPreservGoal);
 
-        final Problem<ERG> problem = new Problem<ERG>(model, pProblem.getInitialStates());
-        problem.setError(pProblem.getError());
-
-        return problem;
+        return model;
     }
 }

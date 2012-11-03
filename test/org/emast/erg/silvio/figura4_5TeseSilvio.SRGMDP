@@ -1,0 +1,20 @@
+discount: 0.9
+values: reward
+states: s0 s1 s2 s3 s4 s5
+actions: a04 a01 a15 a 20 a34 a35 a54
+propositions: goal
+goal: goal
+start: s0
+
+T: a04 : s0 : s4 0.33
+T: a04 : s0 : s1 0.33
+T: a01 : s0 : s3 0.33
+T: a15 : s1 : s2 0.5
+T: a15 : s1 : s5 0.5
+T: a20 : s2 : s0 1.0
+T: a35 : s3 : s5 0.5
+T: a34 : s3 : s4 0.5
+T: a54 : s5 : s4 0.5
+T: a54 : s5 : s2 0.5
+
+P: s4 : goal

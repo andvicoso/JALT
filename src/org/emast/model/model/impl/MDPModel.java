@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.emast.model.action.Action;
-import org.emast.model.function.RewardFunction;
-import org.emast.model.function.TransitionFunction;
+import org.emast.model.function.transition.TransitionFunction;
+import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.model.MDP;
 import org.emast.model.state.State;
 
@@ -15,7 +15,7 @@ public class MDPModel implements MDP, Serializable {
     private RewardFunction rewardFunction;
     private Collection<State> states;
     private Collection<Action> actions;
-    private int agents;
+    private int agents = 1;
 
     public MDPModel() {
     }

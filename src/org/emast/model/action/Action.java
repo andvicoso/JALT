@@ -19,4 +19,8 @@ public class Action extends NamedObject implements Serializable {
     public Action(final String pName) {
         super(pName);
     }
+
+    public static boolean isValid(Action pAction1, Action pAction2) {
+        return pAction1.equals(pAction2) || pAction1.equals(Action.ANY) || pAction2.equals(Action.ANY);
+    }
 }

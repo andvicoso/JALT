@@ -2,7 +2,7 @@ package org.emast.erg;
 
 import java.util.Arrays;
 import java.util.List;
-import org.emast.erg.rover.RoverProblemFactory;
+import org.emast.CurrentProblem;
 import org.emast.model.agent.behaviour.Collective;
 import org.emast.model.agent.behaviour.Individual;
 import org.emast.model.agent.behaviour.collective.ChangePreservGoal;
@@ -15,11 +15,7 @@ import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.planning.propositionschooser.CombinePropsRewardChooser;
 import org.emast.model.planning.propositionschooser.PropositionsChooser;
 import org.emast.model.planning.rewardcombinator.MeanRewardCombinator;
-import org.emast.model.problem.Problem;
-import org.emast.model.problem.ProblemFactory;
 import org.emast.model.test.Test;
-import org.emast.util.FileUtils;
-import org.emast.util.RandomProblemGenerator;
 
 /**
  *
@@ -27,10 +23,8 @@ import org.emast.util.RandomProblemGenerator;
  */
 public class AgentGroupTest {
 
-    public static final String CURRENT_PROBLEM = "problems/RoverModel/82_problem.emast";
-
     public static void main(String[] args) {
-        new Test(createProblem(), createAlgorithm()).run();
+        new Test(CurrentProblem.create(), createAlgorithm()).run();
     }
 
     public static Algorithm createAlgorithm() {
@@ -42,13 +36,6 @@ public class AgentGroupTest {
         List<Individual> agentBehaviours = createIndividualBehaviours(badRewardValue);
 
         return new AgentGroup(pg, behaviours, agentBehaviours, maxIterations);//new Planner(pg, factory.createAgents(agents));//
-    }
-
-    public static Problem createProblem() {
-        ProblemFactory factory = RoverProblemFactory.createDefaultFactory();
-        RandomProblemGenerator rpg = new RandomProblemGenerator(factory);
-
-        return FileUtils.fromFile(CURRENT_PROBLEM);
     }
 
     private static List<Individual> createIndividualBehaviours(double pBadRewardThreshold) {

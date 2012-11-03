@@ -1,5 +1,6 @@
 package org.emast.model.converter;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,12 +9,11 @@ import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.function.PropositionFunction;
-import org.emast.model.function.RewardFunction;
-import org.emast.model.function.TransitionFunction;
+import org.emast.model.function.reward.RewardFunction;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.model.MDP;
 import org.emast.model.model.impl.MDPModel;
-import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
@@ -24,13 +24,14 @@ import org.emast.model.state.State;
  */
 public class ReinforcementConverter {
 
-    public Problem<MDP> convert(final Problem<? extends ERG> pProblem,
-            double pGoodReward, double pBadReward, final Proposition... pBadRewardPropositions) {
-        final ERG erg = (ERG) pProblem.getModel();
-        final MDPModel mdp = (MDPModel) erg.copy();
+    public MDP convert(ERG erg, double pGoodReward, double pBadReward,
+            Proposition... pBadRewardPropositions) {
+        return convert(erg, pGoodReward, pBadReward, Arrays.asList(pBadRewardPropositions));
+    }
 
-        final Problem<MDP> problem = new Problem<MDP>(mdp, pProblem.getInitialStates());
-        problem.setError(pProblem.getError());
+    public MDP convert(ERG erg, double pGoodReward, double pBadReward,
+            Collection<Proposition> pBadRewardPropositions) {
+        final MDPModel mdp = (MDPModel) erg.copy();
 
         try {
             convertTransitionFunction(mdp, erg);
@@ -39,11 +40,11 @@ public class ReinforcementConverter {
             Log.error(ex.getMessage());
         }
 
-        return problem;
+        return mdp;
     }
 
     private void convertRewardFunction(final MDPModel pMdp, final ERG pErg,
-            final double pGoodReward, final double pBadReward, final Proposition[] pBadRewardStates)
+            final double pGoodReward, final double pBadReward, final Collection<Proposition> pBadRewardStates)
             throws EvaluationException, InvalidExpressionException {
         PropositionFunction pf = pErg.getPropositionFunction();
         final RewardFunction rf = pMdp.getRewardFunction();
@@ -71,7 +72,8 @@ public class ReinforcementConverter {
         pMdp.setRewardFunction(nrf);
     }
 
-    private void convertTransitionFunction(final MDPModel pMdp, final ERG pErg) throws InvalidExpressionException {
+    private void convertTransitionFunction(final MDPModel pMdp, final ERG pErg)
+            throws InvalidExpressionException {
         //get preserved states
         final Collection<State> blockingStates = getStatesThatSatisfies(pErg, pErg.getPreservationGoal().negate());
         //get final states

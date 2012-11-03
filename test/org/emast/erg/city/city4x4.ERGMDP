@@ -1,0 +1,105 @@
+# Problem that represents a grid with holes, walls, semaphores and bridges.
+# The agent must find the path to exit and avoid the obstacles.
+#
+# Basic Grid Caption:
+# 0-9: Initial agent x position
+# h: hole
+# w: wall
+# s: semaphore
+# b: bridge
+# e: exit
+# @author anderson
+#
+# ------------
+# Default Grid
+# ------------
+#    1 2 3 4
+#  1       e
+#  2 b w h
+#  3 0 h w
+#  4     s
+discount: 0.9
+values: reward
+states: s11 s12 s13 s14 s21 s22 s23 s24 s31 s32 s33 s34 s41 s42 s43 s44
+actions: n w e s
+propositions: exit hole wall bridge semaphore
+goal: exit
+preserve: !semaphore && !bridge && !hole && !wall
+start: s31
+
+#line 1
+T: e : s11 : s12 0.5
+T: s : s11 : s21 0.5
+
+T: s : s12 : s22 0.33
+T: w : s12 : s11 0.33
+T: e : s12 : s13 0.33
+
+T: s : s13 : s23 0.33
+T: w : s13 : s12 0.33
+T: e : s13 : s14 0.33
+
+T: w : s14 : s13 0.5
+T: s : s14 : s24 0.5
+
+#line 2
+T: n : s21 : s11 0.33
+T: e : s21 : s22 0.33
+T: s : s21 : s31 0.33
+
+T: n : s22 : s12 0.25
+T: w : s22 : s21 0.25
+T: e : s22 : s23 0.25
+T: s : s22 : s32 0.25
+
+T: n : s23 : s13 0.25
+T: w : s23 : s22 0.25
+T: e : s23 : s24 0.25
+T: s : s23 : s33 0.25
+
+T: n : s24 : s14 0.33
+T: w : s24 : s23 0.33
+T: s : s24 : s34 0.33
+
+#line 3
+T: n : s31 : s21 0.33
+T: e : s31 : s32 0.33
+T: s : s31 : s41 0.33
+
+T: n : s32 : s22 0.25
+T: w : s32 : s31 0.25
+T: e : s32 : s33 0.25
+T: s : s32 : s42 0.25
+
+T: n : s33 : s23 0.25
+T: w : s33 : s32 0.25
+T: e : s33 : s34 0.25
+T: s : s33 : s43 0.25
+
+T: n : s34 : s24 0.33
+T: w : s34 : s33 0.33
+T: s : s34 : s44 0.33
+
+#line 4
+T: n : s41 : s31 0.5
+T: e : s41 : s42 0.5
+
+T: n : s42 : s32 0.33
+T: w : s42 : s41 0.33
+T: e : s42 : s43 0.33
+
+T: n : s43 : s33 0.33
+T: w : s43 : s42 0.33
+T: e : s43 : s44 0.33
+
+T: n : s44 : s34 0.5
+T: w : s44 : s43 0.5
+
+#propositions
+P: s14 : exit
+P: s33 : wall
+P: s22 : wall
+P: s23 : hole
+P: s32 : hole
+P: s21 : bridge
+P: s43 : semaphore

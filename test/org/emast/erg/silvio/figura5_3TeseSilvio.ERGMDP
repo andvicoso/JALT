@@ -1,0 +1,24 @@
+discount: 0.95
+values: reward
+states: s0 s1 s2 s3 s4 s5 s6
+propositions: r g
+actions: a b c
+goal: g
+preserve: r
+start: s0
+
+T: a : s0 : s1 0.33
+T: a : s0 : s2 0.33
+T: b : s0 : s3 0.33
+T: c : s1 : s4 0.5
+T: b : s1 : s2 0.5
+T: c : s2 : s5 1.0
+T: a : s3 : s2 0.5
+T: a : s3 : s6 0.5
+T: a : s4 : s5 1.0
+T: b : s6 : s5 1.0
+
+P: s5 : g
+P: s1 : r
+P: s2 : r
+P: s0 : r
