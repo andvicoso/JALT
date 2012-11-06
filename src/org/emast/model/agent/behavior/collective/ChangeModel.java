@@ -1,6 +1,6 @@
-package org.emast.model.agent.behaviour.collective;
+package org.emast.model.agent.behavior.collective;
 
-import org.emast.model.agent.behaviour.*;
+import org.emast.model.agent.behavior.*;
 import org.emast.model.model.MDP;
 
 /**

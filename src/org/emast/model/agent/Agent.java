@@ -7,9 +7,9 @@ import java.util.Map;
 import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
 import static org.emast.model.agent.AgentState.*;
-import org.emast.model.agent.behaviour.Individual;
-import org.emast.model.agent.behaviour.individual.ChangeModel;
-import org.emast.model.agent.behaviour.individual.reward.RewardBehaviour;
+import org.emast.model.agent.behavior.Individual;
+import org.emast.model.agent.behavior.individual.ChangeModel;
+import org.emast.model.agent.behavior.individual.reward.RewardBehavior;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -36,20 +36,20 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     private Plan plan;
     private AgentState executionState;
     private Policy policy;
-    private List<Individual<M>> behaviours;
+    private List<Individual<M>> behaviors;
 
     public Agent(int pNumber) {
         this(pNumber, Collections.EMPTY_LIST);
     }
 
-    public Agent(int pNumber, List<Individual<M>> pBehaviours) {
+    public Agent(int pNumber, List<Individual<M>> pBehaviors) {
         number = pNumber;
-        behaviours = pBehaviours;
+        behaviors = pBehaviors;
         executionState = AgentState.INITIAL;
     }
 
-    public List<Individual<M>> getBehaviours() {
-        return behaviours;
+    public List<Individual<M>> getBehaviors() {
+        return behaviors;
     }
 
     @Override
@@ -98,7 +98,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
             //if has somewhere to go to
             if (action != null) {
                 //get the states that the action points to
-                Collection<State> nextStates = model.getTransitionFunction().getFinalStates(
+                Collection<State> nextStates = model.getTransitionFunction().getBestReachableStates(
                         model.getStates(), currentState, action);
                 //is there a state pointed by the action?
                 if (nextStates != null && !nextStates.isEmpty()) {
@@ -108,9 +108,9 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
                     changeState(nextState);
                     //add reward to total reward
                     addReward(nextState, reward);
-                    //run add reward behaviours
-                    behave(RewardBehaviour.class, pProblem, "state", nextState, "reward", reward);
-                    //run change model behaviours
+                    //run add reward behaviors
+                    behave(RewardBehavior.class, pProblem, "state", nextState, "reward", reward);
+                    //run change model behaviors
                     behave(ChangeModel.class, pProblem, "state", nextState);
                 } else {
                     currentState = null;
@@ -131,7 +131,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     }
 
     private void behave(Class<? extends Individual> pClass, Problem problem, Map<String, Object> pParameters) {
-        for (final Individual<M> b : behaviours) {
+        for (final Individual<M> b : behaviors) {
             if (pClass.isAssignableFrom(b.getClass())) {
                 b.behave(this, problem, pParameters);
             }

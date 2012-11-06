@@ -1,4 +1,4 @@
-package org.emast.model.agent.behaviour.individual.reward;
+package org.emast.model.agent.behavior.individual.reward;
 
 import java.util.Collection;
 import java.util.HashMap;

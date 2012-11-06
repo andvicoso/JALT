@@ -37,7 +37,7 @@ public class GridTest extends Test {
         return map;
     }
 
-    private static Problem createProblem() {
+    public static Problem createProblem() {
         return new Problem(createModel(), createInitialStates());
     }
 

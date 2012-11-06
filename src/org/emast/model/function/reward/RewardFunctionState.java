@@ -20,7 +20,7 @@ public class RewardFunctionState<M extends MDP> extends DefaultRewardFunction<M,
     public double getValue(final State pState, final Action pAction) {
         for (State cond : getRewards().keySet()) {
             //any state that leads to a bad proposition gives a getBadReward()
-            final Collection<State> nextStates = getModel().getTransitionFunction().getFinalStates(
+            final Collection<State> nextStates = getModel().getTransitionFunction().getBestReachableStates(
                     getModel().getStates(), pState, pAction);
             if (nextStates.contains(cond)) {
                 return getRewards().get(cond);

@@ -1,1 +1,0 @@
-This directory contains files examples used to test the toolbox algorithms.

@@ -3,11 +3,11 @@ package org.emast.erg;
 import java.util.Arrays;
 import java.util.List;
 import org.emast.CurrentProblem;
-import org.emast.model.agent.behaviour.Collective;
-import org.emast.model.agent.behaviour.Individual;
-import org.emast.model.agent.behaviour.collective.ChangePreservGoal;
-import org.emast.model.agent.behaviour.individual.reward.CommReward;
-import org.emast.model.agent.behaviour.individual.reward.PropRepReward;
+import org.emast.model.agent.behavior.Collective;
+import org.emast.model.agent.behavior.Individual;
+import org.emast.model.agent.behavior.collective.ChangePreservGoal;
+import org.emast.model.agent.behavior.individual.reward.CommReward;
+import org.emast.model.agent.behavior.individual.reward.PropRepReward;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.planning.AgentGroup;
 import org.emast.model.algorithm.planning.PolicyGenerator;
@@ -32,23 +32,23 @@ public class AgentGroupTest {
         double badRewardValue = -20;
 
         PolicyGenerator pg = new PPFERG();
-        List<Collective> behaviours = createCollectiveBehaviours(pg, badRewardValue);
-        List<Individual> agentBehaviours = createIndividualBehaviours(badRewardValue);
+        List<Collective> behaviors = createCollectiveBehaviors(pg, badRewardValue);
+        List<Individual> agentBehaviors = createIndividualBehaviors(badRewardValue);
 
-        return new AgentGroup(pg, behaviours, agentBehaviours, maxIterations);//new Planner(pg, factory.createAgents(agents));//
+        return new AgentGroup(pg, behaviors, agentBehaviors, maxIterations);//new Planner(pg, factory.createAgents(agents));//
     }
 
-    private static List<Individual> createIndividualBehaviours(double pBadRewardThreshold) {
+    private static List<Individual> createIndividualBehaviors(double pBadRewardThreshold) {
         double badMsgValue = -20;
         double messageCost = -1;
 
-        Individual propRepRewardBehaviour = new PropRepReward(pBadRewardThreshold);
-        Individual commRewardBehaviour = new CommReward(messageCost, badMsgValue, false);
+        Individual propRepRewardBehavior = new PropRepReward(pBadRewardThreshold);
+        Individual commRewardBehavior = new CommReward(messageCost, badMsgValue, false);
 
-        return Arrays.asList(propRepRewardBehaviour, commRewardBehaviour);
+        return Arrays.asList(propRepRewardBehavior);//, commRewardBehavior);
     }
 
-    private static List<Collective> createCollectiveBehaviours(PolicyGenerator pg, double badRewardValue) {
+    private static List<Collective> createCollectiveBehaviors(PolicyGenerator pg, double badRewardValue) {
         boolean acceptOnePath = true;
         PropositionsChooser chooser = new CombinePropsRewardChooser(new MeanRewardCombinator(), badRewardValue);
         Collective change = new ChangePreservGoal(pg, chooser, acceptOnePath);

@@ -24,7 +24,7 @@ public class GridTransitionFunction extends TransitionFunction {
         return getTransitions(GridUtils.getRow(pState), GridUtils.getCol(pState));
     }
 
-    private Map<State, Action> getTransitions(int pRow, int pCol) {
+    public Map<State, Action> getTransitions(int pRow, int pCol) {
         final Map<State, Action> possibleMovs = new HashMap<State, Action>(4);
         final Action south = new Action("south");
         final Action east = new Action("east");
@@ -32,16 +32,16 @@ public class GridTransitionFunction extends TransitionFunction {
         final Action north = new Action("north");
 
         if (pRow + 1 < rows) {
-            possibleMovs.put(GridUtils.createGridState((pRow + 1), (pCol)), south);
+            possibleMovs.put(GridUtils.createGridState((pRow + 1), pCol), south);
         }
         if (pCol + 1 < cols) {
-            possibleMovs.put(GridUtils.createGridState((pRow), (pCol + 1)), east);
+            possibleMovs.put(GridUtils.createGridState(pRow, (pCol + 1)), east);
         }
         if (pRow - 1 >= 0) {
-            possibleMovs.put(GridUtils.createGridState((pRow - 1), (pCol)), north);
+            possibleMovs.put(GridUtils.createGridState((pRow - 1), pCol), north);
         }
         if (pCol - 1 >= 0) {
-            possibleMovs.put(GridUtils.createGridState((pRow), (pCol - 1)), west);
+            possibleMovs.put(GridUtils.createGridState(pRow, (pCol - 1)), west);
         }
 
         return possibleMovs;
@@ -62,5 +62,13 @@ public class GridTransitionFunction extends TransitionFunction {
         }
 
         return 0;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getCols() {
+        return cols;
     }
 }

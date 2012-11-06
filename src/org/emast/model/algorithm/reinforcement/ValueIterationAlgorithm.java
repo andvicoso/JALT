@@ -53,7 +53,7 @@ public class ValueIterationAlgorithm<M extends MDP> implements PolicyGenerator<M
                     pi.put(state, action);
                 }
             }
-             System.out.println(printResults());
+            System.out.println(printResults());
         } while (iterations < MAX_IT);//getError() > pProblem.getError());
 
         return pi;
@@ -77,13 +77,14 @@ public class ValueIterationAlgorithm<M extends MDP> implements PolicyGenerator<M
         double sum = 0;
 
         if (pValues != null) {
-            for (final State stateLine : pModel.getStates()) {
-                final double trans = pModel.getTransitionFunction().getValue(
-                        pState, stateLine, pAction);
-                // get the q value based on the last value (n - 1)
-                // if exists
-                if (trans != 0 && pValues.get(stateLine) != null) {
-                    sum += trans * pValues.get(stateLine);
+            Map<State, Double> rv = pModel.getTransitionFunction().getReachableStatesValues(
+                    pModel.getStates(), pState, pAction);
+
+            for (Map.Entry<State, Double> entry : rv.entrySet()) {
+                State state = entry.getKey();
+                Double value = entry.getValue();
+                if (pValues.containsKey(state)) {
+                    sum += value * pValues.get(state);
                 }
             }
         }

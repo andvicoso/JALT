@@ -1,4 +1,4 @@
-package org.emast.model.agent.behaviour.collective;
+package org.emast.model.agent.behavior.collective;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import org.emast.infra.log.Log;
 import org.emast.model.agent.Agent;
-import org.emast.model.agent.behaviour.Collective;
-import org.emast.model.agent.behaviour.individual.reward.PropReward;
+import org.emast.model.agent.behavior.Collective;
+import org.emast.model.agent.behavior.individual.reward.PropReward;
 import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
@@ -51,9 +51,9 @@ public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
         Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
         //get results for each agent
         for (Agent agent : pAgents) {
-            List<PropReward> behaviours = CollectionsUtils.getElementsOfType(agent.getBehaviours(),
+            List<PropReward> behaviors = CollectionsUtils.getElementsOfType(agent.getBehaviors(),
                     PropReward.class);
-            reps.addAll(getPropositionsValues(behaviours));
+            reps.addAll(getPropositionsValues(behaviors));
         }
         //choose "bad" propositions
         Collection<Proposition> props = chooser.choose(reps);
@@ -116,10 +116,10 @@ public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
         return false;
     }
 
-    private Collection<Map<Proposition, Double>> getPropositionsValues(List<PropReward> pBehaviours) {
+    private Collection<Map<Proposition, Double>> getPropositionsValues(List<PropReward> pBehaviors) {
         Collection<Map<Proposition, Double>> list = new ArrayList<Map<Proposition, Double>>();
 
-        for (PropReward beh : pBehaviours) {
+        for (PropReward beh : pBehaviors) {
             Map<Proposition, Double> map = beh.getResult();
             list.add(map);
         }

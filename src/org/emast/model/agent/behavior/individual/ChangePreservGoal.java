@@ -1,4 +1,4 @@
-package org.emast.model.agent.behaviour.individual;
+package org.emast.model.agent.behavior.individual;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import org.emast.infra.log.Log;
 import org.emast.model.agent.Agent;
-import org.emast.model.agent.behaviour.Individual;
-import org.emast.model.agent.behaviour.individual.reward.PropReward;
+import org.emast.model.agent.behavior.Individual;
+import org.emast.model.agent.behavior.individual.reward.PropReward;
 import org.emast.model.algorithm.planning.PolicyGenerator;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
@@ -105,9 +105,9 @@ public class ChangePreservGoal implements Individual<ERG>, ChangeModel<ERG> {
         Collection<Proposition> props = pModel.getPropositionFunction().getPropositionsForState(pState);
 
         if (props != null) {
-            List<PropReward> behaviours = CollectionsUtils.getElementsOfType(pAgent.getBehaviours(),
+            List<PropReward> behaviors = CollectionsUtils.getElementsOfType(pAgent.getBehaviors(),
                     PropReward.class);
-            Set<Proposition> badProps = getPropositions(behaviours);
+            Set<Proposition> badProps = getPropositions(behaviors);
             //if have one bad property, change preservation goal
             for (final Proposition prop : badProps) {
                 if (props.contains(prop)) {
@@ -119,10 +119,10 @@ public class ChangePreservGoal implements Individual<ERG>, ChangeModel<ERG> {
         return false;
     }
 
-    private Set<Proposition> getPropositions(List<PropReward> pBehaviours) {
+    private Set<Proposition> getPropositions(List<PropReward> pBehaviors) {
         Collection<Map<Proposition, Double>> list = new ArrayList<Map<Proposition, Double>>();
 
-        for (PropReward beh : pBehaviours) {
+        for (PropReward beh : pBehaviors) {
             Map<Proposition, Double> map = beh.getResult();
             list.add(map);
         }

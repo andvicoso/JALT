@@ -3,6 +3,7 @@ package org.emast.mdp;
 import java.util.Arrays;
 import org.emast.model.action.Action;
 import org.emast.model.function.reward.RewardFunction;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.impl.MDPModel;
 import org.emast.model.state.State;
 
@@ -22,11 +23,22 @@ public class HighLowModel extends MDPModel {
         Action low = new Action("low");
         setActions(Arrays.asList(high, low));
 
+        final TransitionFunction tf = new TransitionFunction() {
+            @Override
+            public double getValue(State pState, State pFinalState, Action pAction) {
+                return 0.33;
+            }
+        };
+
+        setTransitionFunction(tf);
+
         final RewardFunction rf = new RewardFunction() {
             @Override
             public double getValue(State pState, Action pAction) {
                 return 0.0;
             }
         };
+
+        setRewardFunction(rf);
     }
 }

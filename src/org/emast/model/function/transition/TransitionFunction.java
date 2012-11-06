@@ -49,7 +49,7 @@ public abstract class TransitionFunction implements Serializable {
         return getReachableStatesValues(pModelStates, pState, pAction).keySet();
     }
 
-    public Collection<State> getFinalStates(final Collection<State> pModelStates,
+    public Collection<State> getBestReachableStates(final Collection<State> pModelStates,
             final State pState, final Action pAction) {
         Collection<State> ret;
         Map<State, Double> stsv = getReachableStatesValues(pModelStates, pState, pAction);

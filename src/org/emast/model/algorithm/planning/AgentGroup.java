@@ -6,9 +6,9 @@ import java.util.*;
 import org.emast.infra.log.Log;
 import org.emast.model.agent.Agent;
 import org.emast.model.agent.AgentFactory;
-import org.emast.model.agent.behaviour.Collective;
-import org.emast.model.agent.behaviour.Individual;
-import org.emast.model.agent.behaviour.collective.ChangeModel;
+import org.emast.model.agent.behavior.Collective;
+import org.emast.model.agent.behavior.Individual;
+import org.emast.model.agent.behavior.collective.ChangeModel;
 import org.emast.model.model.MDP;
 import org.emast.model.planning.Planner;
 import org.emast.model.problem.Problem;
@@ -23,18 +23,18 @@ public class AgentGroup<M extends MDP> implements PolicyGenerator<M>, PropertyCh
 
     private final PolicyGenerator<M> policyGenerator;
     private final AgentFactory agentFactory;
-    private final List<Individual<M>> agentBehaviours;
-    private final List<Collective<M>> behaviours;
+    private final List<Individual<M>> agentBehaviors;
+    private final List<Collective<M>> behaviors;
     private final int maxIterations;
     private List<Agent> agents;
 
     public AgentGroup(PolicyGenerator<M> pPolicyGenerator,
-            List<Collective<M>> pBehaviours, List<Individual<M>> pAgentBehaviours, int pMaxIterations) {
+            List<Collective<M>> pBehaviors, List<Individual<M>> pAgentBehaviors, int pMaxIterations) {
         maxIterations = pMaxIterations;
         policyGenerator = pPolicyGenerator;
         agentFactory = new AgentFactory();
-        behaviours = pBehaviours;
-        agentBehaviours = pAgentBehaviours;
+        behaviors = pBehaviors;
+        agentBehaviors = pAgentBehaviors;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class AgentGroup<M extends MDP> implements PolicyGenerator<M>, PropertyCh
             if (++iterations >= maxIterations) {
                 break;
             }
-            //run change model behaviours
+            //run change model behaviors
             behave(ChangeModel.class, problem);
         } while (true);
 
@@ -101,7 +101,7 @@ public class AgentGroup<M extends MDP> implements PolicyGenerator<M>, PropertyCh
     }
 
     private void createAgents(M model) {
-        agents = agentFactory.createAgents(model.getAgents(), agentBehaviours);
+        agents = agentFactory.createAgents(model.getAgents(), agentBehaviors);
     }
 
     private void behave(Class<? extends Collective> pClass,
@@ -111,7 +111,7 @@ public class AgentGroup<M extends MDP> implements PolicyGenerator<M>, PropertyCh
 
     private void behave(Class<? extends Collective> pClass,
             Problem<M> pProblem, Map<String, Object> pParameters) {
-        for (final Collective b : behaviours) {
+        for (final Collective b : behaviors) {
             if (pClass.isAssignableFrom(b.getClass())) {
                 b.behave(agents, pProblem, pParameters);
             }
