@@ -1,6 +1,6 @@
 package org.emast;
 
-import org.emast.erg.AgentGroupTest;
+import org.emast.erg.EnsembleTest;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.test.Test;
@@ -12,7 +12,7 @@ import org.emast.model.test.Test;
 public class MultipleTest {
 
     private static Algorithm createAgentGroup() {
-        return AgentGroupTest.createAlgorithm();
+        return EnsembleTest.createAlgorithm();
     }
 
     private static Algorithm[] createAlgorithms() {

@@ -9,8 +9,8 @@ import org.emast.model.agent.behavior.collective.ChangePreservGoal;
 import org.emast.model.agent.behavior.individual.reward.CommReward;
 import org.emast.model.agent.behavior.individual.reward.PropRepReward;
 import org.emast.model.algorithm.Algorithm;
-import org.emast.model.algorithm.planning.AgentGroup;
-import org.emast.model.algorithm.planning.PolicyGenerator;
+import org.emast.model.algorithm.ensemble.AgentEnsemble;
+import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.planning.propositionschooser.CombinePropsRewardChooser;
 import org.emast.model.planning.propositionschooser.PropositionsChooser;
@@ -21,7 +21,7 @@ import org.emast.model.test.Test;
  *
  * @author Anderson
  */
-public class AgentGroupTest {
+public class EnsembleTest {
 
     public static void main(String[] args) {
         new Test(CurrentProblem.create(), createAlgorithm()).run();
@@ -35,7 +35,7 @@ public class AgentGroupTest {
         List<Collective> behaviors = createCollectiveBehaviors(pg, badRewardValue);
         List<Individual> agentBehaviors = createIndividualBehaviors(badRewardValue);
 
-        return new AgentGroup(pg, behaviors, agentBehaviors, maxIterations);//new Planner(pg, factory.createAgents(agents));//
+        return new AgentEnsemble(pg, behaviors, agentBehaviors, maxIterations);//new Planner(pg, factory.createAgents(agents));//
     }
 
     private static List<Individual> createIndividualBehaviors(double pBadRewardThreshold) {

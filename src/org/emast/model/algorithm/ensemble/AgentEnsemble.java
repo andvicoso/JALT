@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.planning;
+package org.emast.model.algorithm.ensemble;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -9,6 +9,7 @@ import org.emast.model.agent.AgentFactory;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.Individual;
 import org.emast.model.agent.behavior.collective.ChangeModel;
+import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.model.MDP;
 import org.emast.model.planning.Planner;
 import org.emast.model.problem.Problem;
@@ -19,7 +20,7 @@ import org.emast.util.CollectionsUtils;
  *
  * @author Anderson
  */
-public class AgentGroup<M extends MDP> implements PolicyGenerator<M>, PropertyChangeListener {
+public class AgentEnsemble<M extends MDP> implements PolicyGenerator<M>, PropertyChangeListener {
 
     private final PolicyGenerator<M> policyGenerator;
     private final AgentFactory agentFactory;
@@ -28,8 +29,8 @@ public class AgentGroup<M extends MDP> implements PolicyGenerator<M>, PropertyCh
     private final int maxIterations;
     private List<Agent> agents;
 
-    public AgentGroup(PolicyGenerator<M> pPolicyGenerator,
-            List<Collective<M>> pBehaviors, List<Individual<M>> pAgentBehaviors, int pMaxIterations) {
+    public AgentEnsemble(PolicyGenerator<M> pPolicyGenerator, List<Collective<M>> pBehaviors,
+            List<Individual<M>> pAgentBehaviors, int pMaxIterations) {
         maxIterations = pMaxIterations;
         policyGenerator = pPolicyGenerator;
         agentFactory = new AgentFactory();

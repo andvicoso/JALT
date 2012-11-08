@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.emast.model.action.Action;
 import org.emast.model.agent.behavior.individual.reward.PropRepReward;
-import org.emast.model.algorithm.planning.PolicyGenerator;
+import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.MDP;

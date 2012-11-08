@@ -8,7 +8,7 @@ import org.emast.infra.log.Log;
 import org.emast.model.agent.Agent;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.individual.reward.PropReward;
-import org.emast.model.algorithm.planning.PolicyGenerator;
+import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.PreservationGoalFactory;

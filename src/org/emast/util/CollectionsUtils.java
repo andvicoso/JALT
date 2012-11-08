@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import org.emast.model.NamedObject;
 
@@ -20,6 +21,8 @@ import org.emast.model.NamedObject;
  * @author Anderson
  */
 public class CollectionsUtils {
+
+    private static final Random random = new Random();
 
     private CollectionsUtils() {
     }
@@ -240,5 +243,24 @@ public class CollectionsUtils {
         }
 
         return result;
+    }
+
+    public static <O> O getRandom(final Collection<O> pObjects) {
+        int r = Math.abs(random.nextInt() % pObjects.size());
+        O obj = null;
+
+        if (pObjects instanceof List) {
+            obj = ((List<O>) pObjects).get(r);
+        } else {
+            int i = 0;
+            for (O o : pObjects) {
+                obj = o;
+                if (i++ == r) {
+                    break;
+                }
+            }
+        }
+
+        return obj;
     }
 }

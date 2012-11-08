@@ -22,14 +22,12 @@ public class RewardFunctionProposition<M extends ERG> extends DefaultRewardFunct
     public double getValue(final State pState, final Action pAction) {
         for (Proposition condition : getRewards().keySet()) {
             final PropositionFunction pf = getModel().getPropositionFunction();
-            final Collection<State> badStates = pf.getStatesWithProposition(condition);
+            final Collection<State> rewardStates = pf.getStatesWithProposition(condition);
             //any state that leads to a bad proposition gives a getBadReward()
-            final Collection<State> nextStates = getModel().getTransitionFunction().getBestReachableStates(
+            final State nextState = getModel().getTransitionFunction().getBestReachableState(
                     getModel().getStates(), pState, pAction);
-            for (final State state : nextStates) {
-                if (badStates.contains(state)) {
-                    return getRewards().get(condition);
-                }
+            if (rewardStates.contains(nextState)) {
+                return getRewards().get(condition);
             }
         }
 

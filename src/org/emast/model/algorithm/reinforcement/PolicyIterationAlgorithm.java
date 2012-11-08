@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.planning.PolicyGenerator;
+import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;

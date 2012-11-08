@@ -1,7 +1,7 @@
 package org.emast.model.planning;
 
 import org.emast.model.agent.Agent;
-import org.emast.model.algorithm.planning.PolicyGenerator;
+import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Plan;

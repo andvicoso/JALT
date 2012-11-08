@@ -1,12 +1,10 @@
 package org.emast.model.problem;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import org.emast.model.model.ERG;
 import org.emast.model.model.MDP;
-import org.emast.model.model.impl.MDPModel;
 import org.emast.model.state.State;
 
 /**
@@ -21,7 +19,7 @@ public abstract class ProblemFactory {
     public ProblemFactory() {
     }
 
-    protected State getRandomEmptyState(final MDPModel pModel) {
+    protected State getRandomEmptyState(final MDP pModel) {
         State st;
         do {
             st = getRandomState(pModel);
@@ -32,26 +30,7 @@ public abstract class ProblemFactory {
         return st;
     }
 
-    protected static <O> O getRandom(final Collection<O> pObjects) {
-        int r = Math.abs(random.nextInt() % pObjects.size());
-        O obj = null;
-
-        if (pObjects instanceof List) {
-            obj = ((List<O>) pObjects).get(r);
-        } else {
-            int i = 0;
-            for (O o : pObjects) {
-                obj = o;
-                if (i++ == r) {
-                    break;
-                }
-            }
-        }
-
-        return obj;
-    }
-
-    public static <M extends MDPModel & ERG> State getRandomEmptyPropState(final M pModel) {
+    public static <M extends MDP & ERG> State getRandomEmptyPropState(final M pModel) {
         State st;
 
         do {
@@ -61,7 +40,7 @@ public abstract class ProblemFactory {
         return st;
     }
 
-    public static List<State> getRandomStates(final MDPModel pModel, int pNum) {
+    public static List<State> getRandomStates(final MDP pModel, int pNum) {
         final List<State> states = new ArrayList<State>();
         for (int i = 0; i < pNum; i++) {
             states.add(getRandomState(pModel));
@@ -69,7 +48,7 @@ public abstract class ProblemFactory {
         return states;
     }
 
-    public List<State> getRandomEmptyStates(final MDPModel pModel, int pNum) {
+    public List<State> getRandomEmptyStates(final MDP pModel, int pNum) {
         final List<State> states = new ArrayList<State>();
         for (int i = 0; i < pNum; i++) {
             states.add(getRandomEmptyState(pModel));
@@ -77,7 +56,7 @@ public abstract class ProblemFactory {
         return states;
     }
 
-    protected static State getRandomState(final MDPModel pModel) {
+    public static State getRandomState(final MDP pModel) {
         final int index = random.nextInt(pModel.getStates().size());
         return (State) pModel.getStates().toArray()[index];
     }
@@ -88,7 +67,7 @@ public abstract class ProblemFactory {
         usedStates = new ArrayList<State>();
         return doCreate();
     }
-    
+
     public static Problem create(Problem pProblem, MDP pModel) {
         Problem p = new Problem(pModel, pProblem.getInitialStates());
         p.setError(pProblem.getError());

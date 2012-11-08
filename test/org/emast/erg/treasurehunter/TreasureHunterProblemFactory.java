@@ -41,7 +41,7 @@ public class TreasureHunterProblemFactory
         final List<Proposition> props = Arrays.asList(wall, hole);
         //spread obstacles over the grid
         for (int i = 0; i < numberOfObstacles; i++) {
-            final Proposition p = getRandom(props);
+            final Proposition p = CollectionsUtils.getRandom(props);
             pf.add(getRandomEmptyState(model), p);
         }
         //spread goal over the grid

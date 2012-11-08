@@ -48,7 +48,7 @@ public class RoverProblemFactory extends ProblemFactory {
         final Set<Proposition> obstacles = RoverModel.getObstacles();
         //spread obstacles all over the grid
         for (int i = 0; i < numberOfObstacles; i++) {
-            final Proposition p = getRandom(obstacles);
+            final Proposition p = CollectionsUtils.getRandom(obstacles);
             pf.add(getRandomEmptyState(model), p);
         }
         //put final goal over the grid

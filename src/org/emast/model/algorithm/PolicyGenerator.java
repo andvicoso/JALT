@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.planning;
+package org.emast.model.algorithm;
 
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.model.MDP;

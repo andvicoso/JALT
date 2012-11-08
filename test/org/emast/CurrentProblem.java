@@ -13,14 +13,14 @@ import org.emast.util.RandomProblemGenerator;
 public class CurrentProblem {
 
     public static Problem createFromFile() {
-        String CURRENT_PROBLEM = "problems/RoverModel/59_problem.emast";
+        String CURRENT_PROBLEM = "problems/RoverModel/16_problem.emast";
         Problem p = FileUtils.fromFile(CURRENT_PROBLEM);
 
         return p;
     }
 
     public static Problem create() {
-        return createRandom();
+        return createFromFile();
     }
 
     public static Problem createRandom() {

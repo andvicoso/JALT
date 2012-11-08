@@ -74,7 +74,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         final PropositionFunction pf = new PropositionFunction();
         //spread obstacles over the grid
         for (int i = 0; i < numberOfObstacles; i++) {
-            pf.add(getRandomEmptyState(model), getRandom(obstacles));
+            pf.add(getRandomEmptyState(model), CollectionsUtils.getRandom(obstacles));
         }
         //distribute antennas over the grid
         for (int i = 0; i < numberOfAntennas; i++) {
@@ -87,8 +87,8 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
 
         final Set<State> sts = pf.getStatesWithProposition(coverage);
         //put true(up) and fake(down) goals over the grid
-        pf.add(getRandom(sts), up, exit);
-        pf.add(getRandom(sts), down, exit);
+        pf.add(CollectionsUtils.getRandom(sts), up, exit);
+        pf.add(CollectionsUtils.getRandom(sts), down, exit);
         //create initial states
         final List<State> initStates = getRandomEmptyStates(model, agents);
 
@@ -107,7 +107,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
             }
         }
 
-        return getRandom(coverage);
+        return CollectionsUtils.getRandom(coverage);
     }
 
     /**

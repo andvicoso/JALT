@@ -1,6 +1,5 @@
 package org.emast.model.agent;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -97,13 +96,12 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
             action = getAction();
             //if has somewhere to go to
             if (action != null) {
-                //get the states that the action points to
-                Collection<State> nextStates = model.getTransitionFunction().getBestReachableStates(
+                //get the state that the action points to
+                State nextState = model.getTransitionFunction().getBestReachableState(
                         model.getStates(), currentState, action);
                 //is there a state pointed by the action?
-                if (nextStates != null && !nextStates.isEmpty()) {
+                if (nextState != null) {
                     double reward = model.getRewardFunction().getValue(currentState, action);
-                    State nextState = nextStates.iterator().next();//TODO:
                     //go to next state
                     changeState(nextState);
                     //add reward to total reward

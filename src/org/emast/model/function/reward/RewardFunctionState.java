@@ -1,7 +1,7 @@
 package org.emast.model.function.reward;
 
-import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import org.emast.model.action.Action;
 import org.emast.model.model.MDP;
 import org.emast.model.state.State;
@@ -18,13 +18,12 @@ public class RewardFunctionState<M extends MDP> extends DefaultRewardFunction<M,
 
     @Override
     public double getValue(final State pState, final Action pAction) {
-        for (State cond : getRewards().keySet()) {
-            //any state that leads to a bad proposition gives a getBadReward()
-            final Collection<State> nextStates = getModel().getTransitionFunction().getBestReachableStates(
-                    getModel().getStates(), pState, pAction);
-            if (nextStates.contains(cond)) {
-                return getRewards().get(cond);
-            }
+        Set<State> rewardStates = getRewards().keySet();
+        //any state that leads to a bad proposition gives a getBadReward()
+        State nextState = getModel().getTransitionFunction().getBestReachableState(
+                getModel().getStates(), pState, pAction);
+        if (rewardStates.contains(nextState) && getRewards().containsKey(nextState)) {
+            return getRewards().get(nextState);
         }
 
         return getOtherwiseValue();
