@@ -28,17 +28,20 @@ public class Test implements Runnable {
         print(problem.toString());
         print("\nExecution:");
 
+        long testInitMsecs = System.currentTimeMillis();
         for (Algorithm algorithm : algorithms) {
+             print("\n------------------------------");
+            String algorithmName = algorithm.getClass().getSimpleName();
             print("\nAlgorithm: ");
-            print(algorithm.getClass().getSimpleName());
+            print(algorithmName);
             println();
             //execute
             long initMsecs = System.currentTimeMillis();
             Object result = algorithm.run(problem);
-            msecs = System.currentTimeMillis() - initMsecs;
+            long diff = System.currentTimeMillis() - initMsecs;
             //print time
             print("\nTime: ");
-            print(toTimeString(msecs));
+            print(toTimeString(diff));
             //print results
             print(algorithm.printResults());
             //if a solution was found...
@@ -47,6 +50,10 @@ public class Test implements Runnable {
                 print(problem.toString(result));
             }
         }
+        msecs = System.currentTimeMillis() - testInitMsecs;
+        //print time
+        print("\nTotal Test Time: ");
+        print(toTimeString(msecs));
     }
 
     public static String toTimeString(final long pMsecs) {

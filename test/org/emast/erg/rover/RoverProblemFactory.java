@@ -30,11 +30,11 @@ public class RoverProblemFactory extends ProblemFactory {
     }
 
     public static ProblemFactory createDefaultFactory() {
-        int rows = 10;
-        int cols = 10;
+        int rows = 5;
+        int cols = 5;
         int size = rows * cols;
-        int obstacles = (int) (0.3 * size);
-        int agents = (int) (0.15 * size);
+        int obstacles = (int) Math.ceil(0.3 * size);
+        int agents = (int) Math.ceil(0.15 * size);
 
         return new RoverProblemFactory(rows, cols, agents, obstacles);
     }

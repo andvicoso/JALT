@@ -1,7 +1,6 @@
 package org.emast.model.algorithm.iteration.rl;
 
 import java.util.Collection;
-import java.util.Map;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.IterationAlgorithm;
 import org.emast.model.function.transition.TransitionFunction;
@@ -38,30 +37,34 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
             lastq = new QTable(q);
             //get initial state
             State state = pProblem.getInitialStates().get(0);
+            Action action;
             //environment iteration loop
             do {
                 //get random action
-                Action action = tf.getAction(model.getActions(), state);
-                //get reward
-                double reward = model.getRewardFunction().getValue(state, action);
-                //go to next state
-                State nextState = tf.getBestReachableState(model.getStates(), state, action);
-                //get current q value
-                double cq = q.get(state, action);
-                //get new q value
-                double value = reward + (getGama() * getMax(model, nextState)) - cq;
-                double newq = cq + alpha * value;
-                //save q
-                q.put(state, action, newq);
-                state = nextState;
+                action = tf.getAction(model.getActions(), state);
+                if (action != null) {
+                    //get reward
+                    double reward = model.getRewardFunction().getValue(state, action);
+                    //go to next state
+                    State nextState = tf.getBestReachableState(model.getStates(), state, action);
+                    if (nextState != null) {
+                        //get current q value
+                        double cq = q.get(state, action);
+                        //get new q value
+                        double value = reward + (getGama() * getMax(model, nextState)) - cq;
+                        double newq = cq + alpha * value;
+                        //save q
+                        q.put(state, action, newq);
+                    }
+                    state = nextState;
+                }
                 //while there is a valid state to go to
-            } while (state != null && !pProblem.getFinalStates().contains(state));
-
+            } while (action != null && state != null && !pProblem.getFinalStates().contains(state));
             System.out.println(printResults());
-            System.out.println(new GridPrinter().toTable(q.getStateValue(), 3, 3));
+            System.out.println(new GridPrinter().toTable(q.getStateValue(), 5, 5));
             System.out.println(pProblem.toString(q.getPolicy()));
             //while  did not reach the max iteration
-        } while (getError(lastq) > pProblem.getError());//iterations < MAX_ITERATIONS
+        } while (getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError());//iterations < MAX_ITERATIONS
 
         return q.getPolicy();
     }
@@ -78,45 +81,19 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
             }
         }
 
+        if (max == null) {
+            max = 0d;
+        }
+
         return max;
     }
 
     @Override
     public String printResults() {
-        String lvs = q.toString();
-        StringBuilder sb = new StringBuilder();
-        sb.append("\nIterations: ").append(iterations);
-        sb.append("\nGama: ").append(gama);
-        sb.append("\nLast values:\n").append(lvs);
+        StringBuilder sb = new StringBuilder(super.printResults());
+        sb.append("\nLast values:\n").append(q.toString());
 
 
         return sb.toString();
-    }
-
-    private double getError(QTable lastq) {
-        double maxDif = -Double.MAX_VALUE;
-
-        Map<State, Double> lastv = lastq.getStateValue();
-        Map<State, Double> v = q.getStateValue();
-
-        if (iterations == 0) {
-            maxDif = Double.MAX_VALUE;
-        } else {
-            for (State state : lastv.keySet()) {
-                Double val1 = lastv.get(state);
-                Double val2 = v.get(state);
-
-                if (val1 == null || val2 == null) {
-                    break;
-                }
-
-                double dif = Math.abs(val2 - val1);
-                if (dif > maxDif) {
-                    maxDif = dif;
-                }
-            }
-        }
-
-        return maxDif;
     }
 }

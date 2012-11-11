@@ -1,6 +1,5 @@
 package org.emast.model.algorithm;
 
-import org.emast.model.algorithm.Algorithm;
 import org.emast.model.model.MDP;
 import org.emast.model.solution.Policy;
 

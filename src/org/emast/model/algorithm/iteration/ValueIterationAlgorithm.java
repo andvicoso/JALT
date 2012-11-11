@@ -46,9 +46,11 @@ public class ValueIterationAlgorithm<M extends MDP> extends IterationAlgorithm<M
                     pi.put(state, action);
                 }
             }
-            System.out.println(printResults());
+//            System.out.println(printResults());
+//            System.out.println(new GridPrinter().toTable(v, 3, 3));
+//            System.out.println(pProblem.toString(pi));
             lastv = v;
-        } while (getError() > pProblem.getError());
+        } while (getError(lastv, v) > pProblem.getError());
 
         return pi;
     }
@@ -96,36 +98,10 @@ public class ValueIterationAlgorithm<M extends MDP> extends IterationAlgorithm<M
             lvs = lastv.toString();
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("\nIterations: ").append(iterations);
-        sb.append("\nGama: ").append(gama);
+        StringBuilder sb = new StringBuilder(super.toString());
         sb.append("\nLast values:\n").append(lvs);
 
 
         return sb.toString();
-    }
-
-    private double getError() {
-        double maxDif = -Double.MAX_VALUE;
-
-        if (iterations == 0) {
-            maxDif = Double.MAX_VALUE;
-        } else {
-            for (State state : lastv.keySet()) {
-                Double val1 = lastv.get(state);
-                Double val2 = v.get(state);
-
-                if (val1 == null || val2 == null) {
-                    break;
-                }
-
-                double dif = Math.abs(val2 - val1);
-                if (dif > maxDif) {
-                    maxDif = dif;
-                }
-            }
-        }
-
-        return maxDif;
     }
 }

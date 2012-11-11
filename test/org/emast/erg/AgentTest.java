@@ -1,7 +1,9 @@
 package org.emast.erg;
 
 import org.emast.CurrentProblem;
-import org.emast.model.algorithm.reinforcement.ValueIterationAlgorithm;
+import org.emast.model.algorithm.iteration.ValueIterationAlgorithm;
+import org.emast.model.algorithm.iteration.rl.QLearning;
+import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.converter.Reinforcement;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -18,14 +20,14 @@ public class AgentTest {
         Problem p = CurrentProblem.create();
         MDP model = p.getModel();
 
-        if (model instanceof Reinforcement) {
-            model = ((Reinforcement) model).toReinforcement();
-        }
+//        if (model instanceof Reinforcement) {
+//            model = ((Reinforcement) model).toReinforcement();
+//        }
 
         return ProblemFactory.create(p, model);
     }
 
     public static void main(final String[] pArgs) {
-        new Test(createProblem(), new ValueIterationAlgorithm()).run();
+        new Test(createProblem(), new PPFERG()).run();//new QLearning(), new ValueIterationAlgorithm()
     }
 }

@@ -39,16 +39,26 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         numberOfObstacles = pNumberOfObstacles;
         antennaSignalCityBlockRadius = pAntennaSignalCityBlockRadius;
     }
-
+//        double antennasRatio = 0.025;
+//        double obstaclesRatio = 0.2;
+//        double agentsRatio = 0.02;
+//        int rows = 10;
+//        int cols = rows;
+//        int agents = (int) (rows * cols * agentsRatio);
+//        int obstacles = (int) (rows * cols * obstaclesRatio);
+//        int antennas = (int) (rows * cols * antennasRatio);
+//        int antennaRadius = 3;
+    
+    
     public static ProblemFactory createDefaultFactory() {
         double antennasRatio = 0.025;
         double obstaclesRatio = 0.2;
         double agentsRatio = 0.02;
-        int rows = 10;
+        int rows = 5;
         int cols = rows;
-        int agents = (int) (rows * cols * agentsRatio);
-        int obstacles = (int) (rows * cols * obstaclesRatio);
-        int antennas = (int) (rows * cols * antennasRatio);
+        int agents = (int) Math.ceil(rows * cols * agentsRatio);
+        int obstacles = (int) Math.ceil(rows * cols * obstaclesRatio);
+        int antennas = (int) Math.ceil(rows * cols * antennasRatio);
         int antennaRadius = 3;
 
         return new AntennaCoverageProblemFactory(rows, cols,
