@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.reinforcement;
+package org.emast.model.algorithm.iteration;
 
 import java.util.Collections;
 import java.util.HashMap;
