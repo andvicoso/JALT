@@ -4,7 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
 import org.emast.infra.log.Log;
-import org.emast.model.agent.Agent;
+import org.emast.model.agent.AgentIteration;
 import org.emast.model.agent.AgentFactory;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.Individual;
@@ -27,7 +27,7 @@ public class AgentEnsemble<M extends MDP> implements PolicyGenerator<M>, Propert
     private final List<Individual<M>> agentBehaviors;
     private final List<Collective<M>> behaviors;
     private final int maxIterations;
-    private List<Agent> agents;
+    private List<AgentIteration> agents;
 
     public AgentEnsemble(PolicyGenerator<M> pPolicyGenerator, List<Collective<M>> pBehaviors,
             List<Individual<M>> pAgentBehaviors, int pMaxIterations) {
@@ -41,7 +41,7 @@ public class AgentEnsemble<M extends MDP> implements PolicyGenerator<M>, Propert
     @Override
     public String printResults() {
         final StringBuilder sb = new StringBuilder();
-        for (Agent agent : agents) {
+        for (AgentIteration agent : agents) {
             sb.append(agent.printResults());
         }
         return sb.toString();
@@ -62,7 +62,14 @@ public class AgentEnsemble<M extends MDP> implements PolicyGenerator<M>, Propert
             //create new agents
             createAgents(model);
             //create planner
-            planner = createAndRun(planner, policy, problem);
+            if (planner == null) {
+                planner = createPlanner(policy);
+            }
+            //run planner (that runs the problem for each agent)
+            planner.run(problem);
+            //wait to be awakened from the planner notification
+            //(when it finished running all agents)
+            wait(planner);
 
             if (++iterations >= maxIterations) {
                 break;
@@ -93,14 +100,6 @@ public class AgentEnsemble<M extends MDP> implements PolicyGenerator<M>, Propert
         }
     }
 
-    private Planner<M> createPlanner(Policy pPolicy, List<Agent> pAgents) {
-        Planner<M> planner = new Planner<M>(pPolicy, pAgents);
-        //listen to changes of planner properties
-        planner.getPropertyChangeSupport().addPropertyChangeListener(this);
-
-        return planner;
-    }
-
     private void createAgents(M model) {
         agents = agentFactory.createAgents(model.getAgents(), agentBehaviors);
     }
@@ -119,17 +118,10 @@ public class AgentEnsemble<M extends MDP> implements PolicyGenerator<M>, Propert
         }
     }
 
-    private Planner createAndRun(Planner planner, Policy policy, Problem problem) {
-        if (planner != null) {
-            planner.getPropertyChangeSupport().removePropertyChangeListener(this);
-        }
-        //create planner to manage agents' execution
-        planner = createPlanner(policy, agents);
-        //run problem for each agent
-        planner.run(problem);
-        //wait to be awakened from the planner notification
-        //(when it finished running all agents)
-        wait(planner);
+    private Planner createPlanner(Policy policy) {
+        Planner planner = new Planner<M>(policy, agents);
+        //listen to changes of planner properties
+        planner.getPropertyChangeSupport().addPropertyChangeListener(this);
 
         return planner;
     }

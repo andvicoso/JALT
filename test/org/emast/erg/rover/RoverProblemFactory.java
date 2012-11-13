@@ -3,7 +3,9 @@ package org.emast.erg.rover;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.emast.model.converter.ReinforcementConverter;
 import org.emast.model.function.PropositionFunction;
+import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.problem.ProblemFactory;
 import org.emast.model.propositional.Proposition;
@@ -40,7 +42,7 @@ public class RoverProblemFactory extends ProblemFactory {
     }
 
     @Override
-    public Problem doCreate() {
+    public Problem<ERG> doCreate() {
         //create model
         final RoverModel model = new RoverModel(rows, cols, agents);
         //create proposition function
@@ -54,10 +56,13 @@ public class RoverProblemFactory extends ProblemFactory {
         //put final goal over the grid
         pf.add(getRandomEmptyState(model), new Proposition("exit"));
         model.setPropositionFunction(pf);
+        //create reward function 
+        model.setRewardFunction(ReinforcementConverter.convertRewardFunction(model, RoverModel.BAD_REWARD,
+                RoverModel.getBadRewardObstacles()));
         //create initial states
         final List<State> initStates = getRandomEmptyStates(model, agents);
         final Map<Integer, State> map = CollectionsUtils.asIndexMap(initStates);
 
-        return new Problem(model, map);
+        return new Problem<ERG>(model, map);
     }
 }

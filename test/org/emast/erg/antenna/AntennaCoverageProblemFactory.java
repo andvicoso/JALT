@@ -1,7 +1,9 @@
 package org.emast.erg.antenna;
 
 import java.util.*;
+import org.emast.model.converter.ReinforcementConverter;
 import org.emast.model.function.PropositionFunction;
+import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.problem.ProblemFactory;
 import org.emast.model.propositional.Proposition;
@@ -39,17 +41,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         numberOfObstacles = pNumberOfObstacles;
         antennaSignalCityBlockRadius = pAntennaSignalCityBlockRadius;
     }
-//        double antennasRatio = 0.025;
-//        double obstaclesRatio = 0.2;
-//        double agentsRatio = 0.02;
-//        int rows = 10;
-//        int cols = rows;
-//        int agents = (int) (rows * cols * agentsRatio);
-//        int obstacles = (int) (rows * cols * obstaclesRatio);
-//        int antennas = (int) (rows * cols * antennasRatio);
-//        int antennaRadius = 3;
-    
-    
+
     public static ProblemFactory createDefaultFactory() {
         double antennasRatio = 0.025;
         double obstaclesRatio = 0.2;
@@ -91,18 +83,21 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
             pf.add(getRandomEmptyState(model), antenna);
         }
         model.setPropositionFunction(pf);
-
-        createAntennaCoverage(model.getStates(), pf, antenna, coverage, antennaSignalCityBlockRadius,
-                model.getPropositions());
-
+        //position antenna coverage propositions
+        createAntennaCoverage(model.getStates(), pf, antenna, coverage, antennaSignalCityBlockRadius);
+        //put up && exit and down && exit over some antenna coverage
         final Set<State> sts = pf.getStatesWithProposition(coverage);
         //put true(up) and fake(down) goals over the grid
         pf.add(CollectionsUtils.getRandom(sts), up, exit);
         pf.add(CollectionsUtils.getRandom(sts), down, exit);
+        //create reward function 
+        model.setRewardFunction(ReinforcementConverter.convertRewardFunction(model,
+                AntennaCoverageModel.BAD_REWARD,
+                AntennaCoverageModel.getBadRewardObstacles()));
         //create initial states
         final List<State> initStates = getRandomEmptyStates(model, agents);
 
-        return new Problem(model, CollectionsUtils.asIndexMap(initStates));
+        return new Problem<ERG>(model, CollectionsUtils.asIndexMap(initStates));
     }
 
     public State getRandomCoverageState(final AntennaCoverageModel model, final List<State> pInitialStates) {
@@ -121,7 +116,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
     }
 
     /**
-     * Create antennas' coverages radius around them.
+     * Create the coverage of the antennas radius around them.
      *
      * @param pf
      * @param states
@@ -131,7 +126,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
      */
     public static void createAntennaCoverage(Collection<State> pModelStates,
             PropositionFunction pf, Proposition antenna, Proposition coverage,
-            int pAntennaSignalRadius, Set<Proposition> pProps) {
+            int pAntennaSignalRadius) {
         //create antennas' coverages
         final Collection<State> antennaStates = pf.getStatesWithProposition(antenna);
         for (final State state : pModelStates) {

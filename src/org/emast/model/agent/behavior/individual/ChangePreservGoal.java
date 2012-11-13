@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.emast.infra.log.Log;
-import org.emast.model.agent.Agent;
+import org.emast.model.agent.AgentIteration;
 import org.emast.model.agent.behavior.Individual;
 import org.emast.model.agent.behavior.individual.reward.PropReward;
 import org.emast.model.algorithm.PolicyGenerator;
@@ -40,7 +40,7 @@ public class ChangePreservGoal implements Individual<ERG>, ChangeModel<ERG> {
     }
 
     @Override
-    public void behave(Agent pAgent, Problem<ERG> pProblem, Map<String, Object> pParameters) {
+    public void behave(AgentIteration pAgent, Problem<ERG> pProblem, Map<String, Object> pParameters) {
         ERG pModel = pProblem.getModel();
         State pState = (State) pParameters.get("state");
         //verify the need to change the preservation goal
@@ -68,7 +68,7 @@ public class ChangePreservGoal implements Individual<ERG>, ChangeModel<ERG> {
         return new Problem<ERG>(cloneModel, Collections.singletonMap(pAgent, pState));
     }
 
-    protected Policy changePreservationGoal(Agent pAgent, ERG pModel, State pState)
+    protected Policy changePreservationGoal(AgentIteration pAgent, ERG pModel, State pState)
             throws InvalidExpressionException {
         int number = pAgent.getNumber();
         //save the goal
@@ -101,7 +101,7 @@ public class ChangePreservGoal implements Individual<ERG>, ChangeModel<ERG> {
         return null;
     }
 
-    protected boolean mustChangePreservationGoal(Agent pAgent, ERG pModel, State pState) {
+    protected boolean mustChangePreservationGoal(AgentIteration pAgent, ERG pModel, State pState) {
         Collection<Proposition> props = pModel.getPropositionFunction().getPropositionsForState(pState);
 
         if (props != null) {

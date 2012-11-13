@@ -20,6 +20,20 @@ public abstract class TransitionFunction implements Serializable {
     public abstract double getValue(final State pState, final State pFinalState,
             final Action pAction);
 
+    public Map<Action, Double> getActionValues(final Collection<Action> pModelActions,
+            final State pState) {
+        Map<Action, Double> map = new HashMap<Action, Double>();
+        Collection<Action> possibleActions = getActionsFrom(pModelActions, pState);
+
+        for (final Action action : possibleActions) {
+            final Double value = getValue(pState, State.ANY, action);
+            if (value != null && value > 0) {
+                map.put(action, value);
+            }
+        }
+        return map;
+    }
+
     public Map<State, Double> getReachableStatesValues(final Collection<State> pModelStates,
             final State pState, final Action pAction) {
         final Map<State, Double> map = new HashMap<State, Double>();
@@ -47,6 +61,18 @@ public abstract class TransitionFunction implements Serializable {
     public Set<State> getReachableStates(final Collection<State> pModelStates,
             final State pState, final Action pAction) {
         return getReachableStatesValues(pModelStates, pState, pAction).keySet();
+    }
+
+    public Action getAction(final Collection<Action> pModelActions,
+            final State pState) {
+        Map<Action, Double> actionsValues = getActionValues(pModelActions, pState);
+        return CollectionsUtils.draw(actionsValues);
+    }
+
+    public State getNextState(final Collection<Action> pModelActions, final Collection<State> pModelStates,
+            final State pState) {
+        Action action = getAction(pModelActions, pState);
+        return action != null ? getBestReachableState(pModelStates, pState, action) : null;
     }
 
     public State getBestReachableState(final Collection<State> pModelStates,

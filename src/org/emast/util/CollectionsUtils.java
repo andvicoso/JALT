@@ -24,6 +24,28 @@ public class CollectionsUtils {
 
     private static final Random random = new Random();
 
+    public static <M> M draw(Map<M, Double> pValues) {
+        if (!pValues.isEmpty()) {
+            double sum = 0;
+            List<Double> limits = new ArrayList<Double>(pValues.size());
+            List<M> vars = new ArrayList<M>(pValues.size());
+
+            for (M m : pValues.keySet()) {
+                sum += pValues.get(m);
+                limits.add(sum);
+                vars.add(m);
+            }
+
+            double n = random.nextDouble() % sum;
+            for (Double l : limits) {
+                if (n < l) {
+                    return vars.get(limits.indexOf(l));
+                }
+            }
+        }
+        return null;
+    }
+
     private CollectionsUtils() {
     }
 

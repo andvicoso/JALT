@@ -1,6 +1,6 @@
 package org.emast.model.planning;
 
-import org.emast.model.agent.Agent;
+import org.emast.model.agent.AgentIteration;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -21,7 +21,7 @@ public class ValidPathFinder {
 
         for (int i = 0; i < model.getAgents(); i++) {
             //create a new simple agent iterator
-            final Agent agent = new Agent(i);
+            final AgentIteration agent = new AgentIteration(i);
             //find the plan for the newly created agent
             agent.run(pProblem, policy);
             //get the resulting plan
@@ -38,7 +38,7 @@ public class ValidPathFinder {
 
     public static boolean exist(Problem pProblem, Policy pPolicy, int pAgent) {
         //create a new simple agent iterator
-        final Agent agent = new Agent(pAgent);
+        final AgentIteration agent = new AgentIteration(pAgent);
         //find the plan for the newly created problem
         //with the preservation goal changed
         agent.run(pProblem, pPolicy);

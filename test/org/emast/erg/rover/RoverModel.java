@@ -1,10 +1,7 @@
 package org.emast.erg.rover;
 
 import java.util.Set;
-import org.emast.model.converter.Reinforcement;
-import org.emast.model.converter.ReinforcementConverter;
 import org.emast.model.function.reward.RewardFunctionProposition;
-import org.emast.model.model.MDP;
 import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -14,9 +11,9 @@ import org.emast.util.CollectionsUtils;
  *
  * @author anderson
  */
-public class RoverModel extends ERGGridModel implements Reinforcement {
+public class RoverModel extends ERGGridModel {
 
-    private static final double BAD_REWARD = -20;
+    public static final double BAD_REWARD = -20;
     private static final double OTHERWISE = -1;
 
     public RoverModel(final int pRows, final int pCols, final int pAgents) {
@@ -30,12 +27,6 @@ public class RoverModel extends ERGGridModel implements Reinforcement {
         //set bad reward function
         setRewardFunction(new RewardFunctionProposition(this,
                 CollectionsUtils.createMap(getBadRewardObstacles(), BAD_REWARD), OTHERWISE));
-    }
-
-    @Override
-    public MDP toReinforcement() {
-        ReinforcementConverter conv = new ReinforcementConverter();
-        return conv.convert(this, -BAD_REWARD, BAD_REWARD, getBadRewardObstacles());
     }
 
     public static Expression createFinalGoal() {

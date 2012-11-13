@@ -35,7 +35,7 @@ public class QTable {
 
         for (int i = 0; i < states.size(); i++) {
             for (int j = 0; j < actions.size(); j++) {
-                values[i][j] = 0d;
+                values[i][j] = -Double.MAX_VALUE;
             }
         }
     }
@@ -127,7 +127,7 @@ public class QTable {
             j = 1;
             for (Action action : actions) {
                 Double value = get(state, action);
-                table[i][j] = String.format("%1$.4f", value);
+                table[i][j] = String.format("%.4e", value);
                 j++;
             }
             i++;

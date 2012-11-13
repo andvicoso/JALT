@@ -1,6 +1,5 @@
 package org.emast.model.algorithm.iteration.rl;
 
-import java.util.Collection;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.IterationAlgorithm;
 import org.emast.model.function.transition.TransitionFunction;
@@ -8,13 +7,12 @@ import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
-import org.emast.util.GridPrinter;
 
 /**
  *
  * @author Anderson
  */
-public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
+public class SARSA<M extends MDP> extends IterationAlgorithm<M> {
 
     private QTable q;
     /**
@@ -48,10 +46,12 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
                     //go to next state
                     State nextState = tf.getBestReachableState(model.getStates(), state, action);
                     if (nextState != null) {
+                        //get next action
+                        Action nextAction = tf.getAction(model.getActions(), nextState);
                         //get current q value
                         double cq = q.get(state, action);
                         //get new q value
-                        double value = reward + (getGama() * getMax(model, nextState)) - cq;
+                        double value = reward + (getGama() * q.get(nextState, nextAction)) - cq;
                         double newq = cq + alpha * value;
                         //save q
                         q.put(state, action, newq);
@@ -64,34 +64,16 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
 //            System.out.println(new GridPrinter().toTable(q.getStateValue(), 5, 5));
 //            System.out.println(pProblem.toString(q.getPolicy()));
             //while  did not reach the max iteration
-        } while (iterations < 100);//getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError()
+        } while (iterations < MAX_ITERATIONS);//getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError()
 
         return q.getPolicy();
-    }
-
-    protected double getMax(MDP pModel, State pState) {
-        Double max = null;
-
-        Collection<Action> actions = pModel.getTransitionFunction().getActionsFrom(pModel.getActions(), pState);
-        // search for the Q v for each state
-        for (Action action : actions) {
-            Double value = q.get(pState, action);
-            if (max == null || value > max) {
-                max = value;
-            }
-        }
-
-        if (max == null) {
-            max = 0d;
-        }
-
-        return max;
     }
 
     @Override
     public String printResults() {
         StringBuilder sb = new StringBuilder(super.printResults());
         sb.append("\nLast values:\n").append(q.toString());
+
 
         return sb.toString();
     }

@@ -1,10 +1,7 @@
 package org.emast.erg.antenna;
 
 import java.util.Set;
-import org.emast.model.converter.Reinforcement;
-import org.emast.model.converter.ReinforcementConverter;
 import org.emast.model.function.reward.RewardFunctionProposition;
-import org.emast.model.model.MDP;
 import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -19,9 +16,9 @@ import org.emast.util.CollectionsUtils;
  *
  * @author anderson
  */
-public class AntennaCoverageModel extends ERGGridModel implements Reinforcement {
+public class AntennaCoverageModel extends ERGGridModel {
 
-    private static final int BAD_REWARD = -30;
+    public static final int BAD_REWARD = -30;
     private static final double OTHERWISE = -1;
 
     public AntennaCoverageModel(final int pRows, final int pCols, final int pAgents,
@@ -38,12 +35,6 @@ public class AntennaCoverageModel extends ERGGridModel implements Reinforcement 
         //set bad reward function
         setRewardFunction(new RewardFunctionProposition(this,
                 CollectionsUtils.createMap(getBadRewardObstacles(), BAD_REWARD), OTHERWISE));
-    }
-
-    @Override
-    public MDP toReinforcement() {
-        ReinforcementConverter conv = new ReinforcementConverter();
-        return conv.convert(this, -BAD_REWARD, BAD_REWARD, getBadRewardObstacles());
     }
 
     public static Set<Proposition> getBadRewardObstacles() {

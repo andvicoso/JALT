@@ -30,7 +30,7 @@ public class Test implements Runnable {
 
         long testInitMsecs = System.currentTimeMillis();
         for (Algorithm algorithm : algorithms) {
-             print("\n------------------------------");
+            print("\n------------------------------");
             String algorithmName = algorithm.getClass().getSimpleName();
             print("\nAlgorithm: ");
             print(algorithmName);
@@ -71,4 +71,5 @@ public class Test implements Runnable {
     protected void println() {
         print("\n");
     }
+
 }

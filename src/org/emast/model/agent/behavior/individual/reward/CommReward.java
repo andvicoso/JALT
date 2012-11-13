@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.emast.infra.log.Log;
-import org.emast.model.agent.Agent;
+import org.emast.model.agent.AgentIteration;
 import org.emast.model.comm.Message;
 import org.emast.model.comm.MessageHistory;
 import org.emast.model.comm.MessageManager;
@@ -64,7 +64,7 @@ public class CommReward implements PropReward, Messenger {
     @Override
     public void sendMessage(final Message pMsg) {
         Log.info("sent broadcast: " + pMsg);
-        Agent agent = (Agent) pMsg.getAttachment("agent");
+        AgentIteration agent = (AgentIteration) pMsg.getAttachment("agent");
         agent.addReward(null, messageCost);
         messageManager.broadcast(this, pMsg);
     }
@@ -84,7 +84,7 @@ public class CommReward implements PropReward, Messenger {
     }
 
     @Override
-    public void behave(Agent pAgent, Problem<ERG> pProblem, Map<String, Object> pParameters) {
+    public void behave(AgentIteration pAgent, Problem<ERG> pProblem, Map<String, Object> pParameters) {
         State pNextState = (State) pParameters.get("state");
         Double pReward = (Double) pParameters.get("reward");
         ERG pModel = pProblem.getModel();

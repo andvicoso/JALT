@@ -11,12 +11,12 @@ import org.emast.model.model.MDP;
  */
 public class AgentFactory<M extends MDP> {
 
-    public List<Agent> createAgents(int pAgents, List<Individual> pBehaviors) {
-        final List<Agent> agents = new ArrayList<Agent>();
+    public List<AgentIteration> createAgents(int pAgents, List<Individual> pBehaviors) {
+        final List<AgentIteration> agents = new ArrayList<AgentIteration>();
         //for each agent, create an agent planner
         for (int i = 0; i < pAgents; i++) {
             //create an agent iterator for each agent
-            final Agent ap = new Agent(i, pBehaviors);
+            final AgentIteration ap = new AgentIteration(i, pBehaviors);
             //save them
             agents.add(ap);
         }

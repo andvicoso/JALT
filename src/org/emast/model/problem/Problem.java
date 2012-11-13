@@ -1,7 +1,9 @@
 package org.emast.model.problem;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import org.emast.model.model.MDP;
 import org.emast.model.model.impl.GridModel;
 import org.emast.model.state.State;
@@ -12,15 +14,21 @@ import org.emast.util.Utils;
  *
  * @author Anderson
  */
-public class Problem<M extends MDP> implements Serializable{
+public class Problem<M extends MDP> implements Serializable {
 
-    private double error = 0.009;
+    private double error = 0.000;
     private Map<Integer, State> initialStates;
+    private Set<State> finalStates;
     private M model;
 
     public Problem(M model, Map<Integer, State> initialStates) {
-        this.model = model;
-        this.initialStates = initialStates;
+        this(model, initialStates, Collections.EMPTY_SET);
+    }
+
+    public Problem(M pModel, Map<Integer, State> pInitialStates, Set<State> pFinalStates) {
+        this.model = pModel;
+        this.initialStates = pInitialStates;
+        this.finalStates = pFinalStates;
     }
 
     public Map<Integer, State> getInitialStates() {
@@ -72,5 +80,13 @@ public class Problem<M extends MDP> implements Serializable{
         }
 
         return sb.toString();
+    }
+
+    public Set<State> getFinalStates() {
+        return finalStates;
+    }
+
+    public void setFinalStates(Set<State> finalStates) {
+        this.finalStates = finalStates;
     }
 }

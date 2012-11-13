@@ -22,14 +22,14 @@ import org.emast.util.Utils;
  *
  * @author Anderson
  */
-public class Agent<M extends MDP> implements Algorithm<M, Plan> {
+public class AgentIteration<M extends MDP> implements Algorithm<M, Plan> {
 
     private static final int MAX_ITERATIONS = 1000;
     private double totalReward;
     /**
      * Number that identifies the agent in the problem
      */
-    private int number;
+    private int agent;
     private long msecs;
     private State currentState;
     private Plan plan;
@@ -37,12 +37,12 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     private Policy policy;
     private List<Individual<M>> behaviors;
 
-    public Agent(int pNumber) {
+    public AgentIteration(int pNumber) {
         this(pNumber, Collections.EMPTY_LIST);
     }
 
-    public Agent(int pNumber, List<Individual<M>> pBehaviors) {
-        number = pNumber;
+    public AgentIteration(int pAgent, List<Individual<M>> pBehaviors) {
+        agent = pAgent;
         behaviors = pBehaviors;
         executionState = AgentState.INITIAL;
     }
@@ -168,7 +168,7 @@ public class Agent<M extends MDP> implements Algorithm<M, Plan> {
     }
 
     public int getNumber() {
-        return number;
+        return agent;
     }
 
     public Policy getPolicy() {

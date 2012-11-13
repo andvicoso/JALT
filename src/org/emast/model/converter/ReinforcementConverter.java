@@ -1,12 +1,10 @@
 package org.emast.model.converter;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import net.sourceforge.jeval.EvaluationException;
 import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
 import org.emast.model.exception.InvalidExpressionException;
@@ -15,8 +13,11 @@ import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.GridTransitionFunction;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
+import org.emast.model.model.Grid;
 import org.emast.model.model.MDP;
+import org.emast.model.model.impl.GridModel;
 import org.emast.model.model.impl.MDPModel;
+import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
@@ -28,32 +29,41 @@ import org.emast.util.GridUtils;
  */
 public class ReinforcementConverter {
 
-    public MDP convert(ERG erg, double pGoodReward, double pBadReward,
-            Proposition... pBadRewardPropositions) {
-        return convert(erg, pGoodReward, pBadReward, Arrays.asList(pBadRewardPropositions));
-    }
+    public static Problem<MDP> convert(Problem<ERG> pProblem) {
+        ERG erg = pProblem.getModel();
+        MDP mdp;
 
-    public MDP convert(ERG erg, double pGoodReward, double pBadReward,
-            Collection<Proposition> pBadRewardPropositions) {
-        final MDPModel mdp = (MDPModel) erg.copy();
+        if (erg instanceof Grid) {
+            final Grid grid = (Grid) erg;
+            mdp = new GridModel(grid.getRows(), grid.getCols());
+        } else {
+            mdp = new MDPModel();
+            mdp.setAgents(erg.getAgents());
+            mdp.setStates(erg.getStates());
+            mdp.setTransitionFunction(erg.getTransitionFunction());
+        }
 
+        mdp.setActions(erg.getActions());
+        mdp.setRewardFunction(erg.getRewardFunction());
+
+        Problem<MDP> p = null;
         try {
-            convertTransitionFunction(mdp, erg);
-            convertRewardFunction(mdp, erg, pGoodReward, pBadReward, pBadRewardPropositions);
+            mdp.setTransitionFunction(convertTransitionFunction(erg, mdp));
+
+            Set<State> finalGoalStates = getStatesThatSatisfies(erg, erg.getGoal());
+            p = new Problem<MDP>(mdp, pProblem.getInitialStates(), finalGoalStates);
         } catch (Exception ex) {
             Log.error(ex.getMessage());
         }
 
-        return mdp;
+        return p;
     }
 
-    private void convertRewardFunction(final MDPModel pMdp, final ERG pErg,
-            final double pGoodReward, final double pBadReward, final Collection<Proposition> pBadRewardStates)
-            throws EvaluationException, InvalidExpressionException {
+    public static RewardFunction convertRewardFunction(final ERG pErg,
+            final double pBadReward, Collection<Proposition> pBadRewardStates) {
         PropositionFunction pf = pErg.getPropositionFunction();
-        final RewardFunction rf = pMdp.getRewardFunction();
+        final RewardFunction rf = pErg.getRewardFunction();
         final Set<State> allObstacles = new HashSet<State>();
-        final Collection<State> finalGoalStates = getStatesThatSatisfies(pErg, pErg.getGoal());
 
         for (Proposition obstacle : pBadRewardStates) {
             Set<State> obsStates = pf.getStatesWithProposition(obstacle);
@@ -63,12 +73,10 @@ public class ReinforcementConverter {
         final RewardFunction nrf = new RewardFunction() {
             @Override
             public double getValue(State pState, Action pAction) {
-                TransitionFunction tf = pMdp.getTransitionFunction();
-                Set<State> reachable = tf.getReachableStates(pMdp.getStates(), pState, pAction);
+                TransitionFunction tf = pErg.getTransitionFunction();
+                Set<State> reachable = tf.getReachableStates(pErg.getStates(), pState, pAction);
 
-                if (!Collections.disjoint(reachable, finalGoalStates)) {
-                    return pGoodReward;
-                } else if (!Collections.disjoint(reachable, allObstacles)) {
+                if (!Collections.disjoint(reachable, allObstacles)) {
                     return pBadReward;
                 } else {
                     return rf.getValue(pState, pAction);
@@ -76,19 +84,19 @@ public class ReinforcementConverter {
             }
         };
 
-        pMdp.setRewardFunction(nrf);
+        return nrf;
     }
 
-    private void convertTransitionFunction(final MDPModel pMdp, final ERG pErg)
+    private static TransitionFunction convertTransitionFunction(final ERG erg, MDP mdp)
             throws InvalidExpressionException {
         //get preserved states
         final Collection<State> preservationStates =
-                getStatesThatSatisfies(pErg, pErg.getPreservationGoal().negate());
+                getStatesThatSatisfies(erg, erg.getPreservationGoal().negate());
         //get final states
         final Collection<State> finalStates =
-                getStatesThatSatisfies(pErg, pErg.getGoal());
+                getStatesThatSatisfies(erg, erg.getGoal());
 
-        final TransitionFunction tf = pErg.getTransitionFunction();
+        final TransitionFunction tf = mdp.getTransitionFunction();
 
         final TransitionFunction ntf = new TransitionFunction() {
             @Override
@@ -98,7 +106,7 @@ public class ReinforcementConverter {
                         || preservationStates.contains(pState)) {
                     return 0;
                 } else if (pFinalState.equals(State.ANY)) {
-                    Collection<State> reachable = tf.getReachableStates(pErg.getStates(), pState, pAction);
+                    Collection<State> reachable = tf.getReachableStates(erg.getStates(), pState, pAction);
                     if (!Collections.disjoint(reachable, preservationStates)) {
                         return 0.0;
                     }
@@ -125,10 +133,10 @@ public class ReinforcementConverter {
             }
         };
 
-        pMdp.setTransitionFunction(ntf);
+        return ntf;
     }
 
-    private Collection<State> getStatesThatSatisfies(ERG pErg, Expression pExp) throws InvalidExpressionException {
+    private static Set<State> getStatesThatSatisfies(ERG pErg, Expression pExp) throws InvalidExpressionException {
         return pErg.getPropositionFunction().intension(pErg.getStates(), pErg.getPropositions(), pExp);
     }
 }
