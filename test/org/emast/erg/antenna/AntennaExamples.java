@@ -8,7 +8,8 @@ import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
-import org.emast.util.GridUtils;
+import org.emast.util.grid.GridUtils;
+import org.emast.util.grid.distancemeasure.CityBlock;
 
 /**
  *
@@ -20,7 +21,7 @@ public class AntennaExamples {
     }
 
     public Problem getICAPS2013() {
-        final AntennaCoverageModel model = new AntennaCoverageModel(5, 5, 2, 3);
+        final AntennaCoverageModel model = new AntennaCoverageModel(5, 5, 2);
         final PropositionFunction pf = new PropositionFunction();
 
         final Proposition hole = new Proposition("hole");
@@ -33,7 +34,7 @@ public class AntennaExamples {
         //spread obstacles over the grid
         pf.add(GridUtils.createGridState(1, 0), hole);
         pf.add(GridUtils.createGridState(1, 1), hole);
-        pf.add(GridUtils.createGridState(2, 1), water);
+        //pf.add(GridUtils.createGridState(2, 1), water);
         pf.add(GridUtils.createGridState(0, 3), water);
         pf.add(GridUtils.createGridState(2, 4), stone);
         pf.add(GridUtils.createGridState(3, 1), stone);
@@ -41,12 +42,12 @@ public class AntennaExamples {
         pf.add(GridUtils.createGridState(0, 4), up);
         //distribute antennas over the grid
         pf.add(GridUtils.createGridState(2, 0), antenna);
-        pf.add(GridUtils.createGridState(3, 3), antenna);
+        //pf.add(GridUtils.createGridState(3, 3), antenna);
         pf.add(GridUtils.createGridState(0, 3), antenna);
 
         model.setPropositionFunction(pf);
 
-        AntennaCoverageProblemFactory.createAntennaCoverage(model.getStates(), pf, antenna, coverage, 3);
+        AntennaCoverageProblemFactory.createAntennaCoverage(model.getStates(), pf, antenna, coverage, 2, new CityBlock());
 
         final Map<Integer, State> initialStates = new HashMap<Integer, State>();
         initialStates.put(0, GridUtils.createGridState(4, 0));

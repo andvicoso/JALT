@@ -96,7 +96,7 @@ public class GridPrinter {
 
     public void fillWithActions(String[][] pGrid, Policy pPolicy) {
         for (State state : pPolicy.getStates()) {
-            Action action = pPolicy.get(state);
+            Action action = pPolicy.getBest(state);
             int row = GridUtils.getRow(state) + 1;
             int col = GridUtils.getCol(state) + 1;
 

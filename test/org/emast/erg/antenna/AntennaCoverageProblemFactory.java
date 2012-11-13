@@ -9,7 +9,8 @@ import org.emast.model.problem.ProblemFactory;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
-import org.emast.util.GridUtils;
+import org.emast.util.grid.distancemeasure.DistanceMeasure;
+import org.emast.util.grid.distancemeasure.Euclidean;
 
 /**
  *
@@ -23,6 +24,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
     private final int numberOfAntennas;
     private final int numberOfObstacles;
     private final int antennaSignalCityBlockRadius;
+    private DistanceMeasure DEFAULT_DM = new Euclidean();
 
     public AntennaCoverageProblemFactory(final int pRows,
             final int pCols, final int pAgents,
@@ -59,8 +61,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
 
     @Override
     public Problem doCreate() {
-        final AntennaCoverageModel model = new AntennaCoverageModel(rows, cols, agents,
-                antennaSignalCityBlockRadius);
+        final AntennaCoverageModel model = new AntennaCoverageModel(rows, cols, agents);
 
         final Proposition hole = new Proposition("hole");
         final Proposition stone = new Proposition("stone");
@@ -84,7 +85,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         }
         model.setPropositionFunction(pf);
         //position antenna coverage propositions
-        createAntennaCoverage(model.getStates(), pf, antenna, coverage, antennaSignalCityBlockRadius);
+        createAntennaCoverage(model.getStates(), pf, antenna, coverage, antennaSignalCityBlockRadius, DEFAULT_DM);
         //put up && exit and down && exit over some antenna coverage
         final Set<State> sts = pf.getStatesWithProposition(coverage);
         //put true(up) and fake(down) goals over the grid
@@ -126,12 +127,12 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
      */
     public static void createAntennaCoverage(Collection<State> pModelStates,
             PropositionFunction pf, Proposition antenna, Proposition coverage,
-            int pAntennaSignalRadius) {
+            int pAntennaSignalRadius, DistanceMeasure dm) {
         //create antennas' coverages
         final Collection<State> antennaStates = pf.getStatesWithProposition(antenna);
         for (final State state : pModelStates) {
             for (final State stateAntenna : antennaStates) {
-                if (GridUtils.getCityBlockDistance(state, stateAntenna) <= pAntennaSignalRadius) {
+                if (dm.getDistance(state, stateAntenna) <= pAntennaSignalRadius) {
                     pf.add(state, coverage);
                 }
             }

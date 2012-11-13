@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.emast.infra.log.Log;
-import org.emast.model.agent.AgentIteration;
+import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Proposition;
@@ -25,7 +25,7 @@ public class PropRepReward implements PropReward {
     }
 
     @Override
-    public void behave(AgentIteration pAgent, Problem<ERG> pProblem, Map<String, Object> pParameters) {
+    public void behave(ERGAgentIterator pAgent, Problem<ERG> pProblem, Map<String, Object> pParameters) {
         State pNextState = (State) pParameters.get("state");
         Double pReward = (Double) pParameters.get("reward");
         //save proposition reputation based on the state and reward received

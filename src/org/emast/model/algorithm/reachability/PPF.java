@@ -28,6 +28,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
     protected M model;
     private double gama = 0.9;
     protected int iterations = 0;
+    protected static final Double INITIAL_VALUE = 1d;
 
     @Override
     public Policy run(Problem<M> pProblem, Object... pParameters) {
@@ -41,8 +42,8 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
         final Collection<State> intension = intension(model.getGoal());
         // initialize pi and values
         for (final State state : intension) {
-            pi.put(state, Action.TRIVIAL_ACTION);
-            values.put(state, 1.d);
+            values.put(state, INITIAL_VALUE);
+            pi.put(state, Action.TRIVIAL_ACTION, INITIAL_VALUE);
         }
 
         do {
@@ -68,25 +69,24 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 
         for (final State state : ModelUtils.getStates(pPrune)) {
             final Set<Action> pruneActions = ModelUtils.getActions(pPrune);
-            final Map<Double, Action> q = new HashMap<Double, Action>();
+            final Map<Action, Double> q = new HashMap<Action, Double>();
             // search for the Qs values for state
             for (final Action action : pruneActions) {
                 double sum = 0;
-                for (final State stateLine : tf.getReachableStates(model.getStates(), state, action)) {
-                    final Double trans = tf.getValue(state, stateLine, action);
-                    if (trans != null && pValues.get(stateLine) != null) {
-                        sum += trans * pValues.get(stateLine);
+                for (final State rechableState : tf.getReachableStates(model.getStates(), state, action)) {
+                    final Double trans = tf.getValue(state, rechableState, action);
+                    if (trans != null && pValues.get(rechableState) != null) {
+                        sum += trans * pValues.get(rechableState);
                     }
                 }
-                q.put(gama * sum, action);
+                q.put(action, gama * sum);
             }
             //if found something
             if (q.size() > 0) {
                 // get the max value for q
-                final Double max = Collections.max(q.keySet());
-                final Action tActions = q.get(max);
+                final Double max = Collections.max(q.values());
                 pValues.put(state, max);
-                pi.put(state, tActions);
+                pi.put(state, q);
             }
         }
 

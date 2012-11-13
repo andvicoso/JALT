@@ -8,7 +8,6 @@ import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
-import org.emast.util.grid.GridPrinter;
 
 /**
  *
@@ -18,9 +17,9 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
 
     private QTable q;
     /**
-     * The learning rate. The learning rate determines to what extent the newly acquired information will
-     * override the old information. A factor of 0 will make the agent not learn anything, while a factor of 1
-     * would make the agent consider only the most recent information.
+     * The learning rate. The learning rate determines to what extent the newly acquired information will override the
+     * old information. A factor of 0 will make the agent not learn anything, while a factor of 1 would make the agent
+     * consider only the most recent information.
      */
     private double alpha = 0.5;
 
@@ -30,32 +29,28 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
         //set initial q
         q = new QTable(model.getStates(), model.getActions());
         TransitionFunction tf = model.getTransitionFunction();
-        QTable lastq;
+        //QTable lastq;
         //start the main loop
         do {
             iterations++;
-            lastq = new QTable(q);
+            //lastq = new QTable(q);
             //get initial state
             State state = pProblem.getInitialStates().get(0);
             Action action;
             //environment iteration loop
             do {
                 //get random action
-                action = tf.getAction(model.getActions(), state);
+                action = getAction(state);
                 if (action != null) {
                     //get reward
                     double reward = model.getRewardFunction().getValue(state, action);
-                    //go to next state
+                    //get next state
                     State nextState = tf.getBestReachableState(model.getStates(), state, action);
+
                     if (nextState != null) {
-                        //get current q value
-                        double cq = q.get(state, action);
-                        //get new q value
-                        double value = reward + (getGama() * getMax(model, nextState)) - cq;
-                        double newq = cq + alpha * value;
-                        //save q
-                        q.put(state, action, newq);
+                        updateQTable(state, action, reward, nextState);
                     }
+                    //go to next state
                     state = nextState;
                 }
                 //while there is a valid state to go to
@@ -94,5 +89,23 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
         sb.append("\nLast values:\n").append(q.toString());
 
         return sb.toString();
+    }
+
+    private void updateQTable(State state, Action action, double reward, State nextState) {
+        //get current q value
+        double cq = q.get(state, action);
+        //get new q value
+        double value = reward + (getGama() * getMax(model, nextState)) - cq;
+        double newq = cq + alpha * value;
+        //save q
+        q.put(state, action, newq);
+    }
+
+    protected Action getAction(State state) {
+        return model.getTransitionFunction().getAction(model.getActions(), state);
+    }
+
+    public QTable getQTable() {
+        return q;
     }
 }

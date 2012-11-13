@@ -2,7 +2,7 @@ package org.emast.model.agent.behavior;
 
 import java.util.List;
 import java.util.Map;
-import org.emast.model.agent.AgentIteration;
+import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 
@@ -12,5 +12,5 @@ import org.emast.model.problem.Problem;
  */
 public interface Collective<M extends MDP> extends Behavior {
 
-    void behave(List<AgentIteration> pAgents, Problem<M> pProblem, Map<String, Object> pParameters);
+    void behave(List<ERGAgentIterator> pAgents, Problem<M> pProblem, Map<String, Object> pParameters);
 }

@@ -12,7 +12,7 @@ import org.emast.model.model.impl.GridModel;
 import org.emast.model.problem.Problem;
 import org.emast.model.state.State;
 import org.emast.model.test.Test;
-import org.emast.util.GridUtils;
+import org.emast.util.grid.GridUtils;
 
 /**
  *

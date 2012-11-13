@@ -15,7 +15,6 @@ public class PPFERG<M extends ERG> extends PPF<M> {
      * will find all the paths for all valid states.
      */
     private final boolean stopWhenOneAgentFindPath;
-    private static final Double INITIAL_VALUE = 1d;
 
     /**
      *
@@ -52,7 +51,7 @@ public class PPFERG<M extends ERG> extends PPF<M> {
 
         for (final State state : goalsIntension) {
             values.put(state, INITIAL_VALUE);
-            pi.put(state, Action.TRIVIAL_ACTION);
+            pi.put(state, Action.TRIVIAL_ACTION, INITIAL_VALUE);
         }
 
         do {

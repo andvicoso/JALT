@@ -21,8 +21,7 @@ public class AntennaCoverageModel extends ERGGridModel {
     public static final int BAD_REWARD = -30;
     private static final double OTHERWISE = -1;
 
-    public AntennaCoverageModel(final int pRows, final int pCols, final int pAgents,
-            final int pAntennaSignalCityBlockRadius) {
+    public AntennaCoverageModel(final int pRows, final int pCols, final int pAgents) {
         super(pRows, pCols);
         setAgents(pAgents);
         //set props

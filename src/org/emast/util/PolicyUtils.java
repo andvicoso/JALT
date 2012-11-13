@@ -29,7 +29,7 @@ public class PolicyUtils {
         for (final State state : pModel.getStates()) {
             final int randPosition = rand.nextInt(pModel.getActions().size());
             Action action = actions[randPosition];
-            policy.put(state, action);
+            policy.put(state, action, 0d);
         }
 
         return policy;

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.emast.infra.log.Log;
 import org.emast.model.Chooser;
-import org.emast.model.agent.AgentIteration;
+import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.individual.reward.PropReward;
 import org.emast.model.algorithm.PolicyGenerator;
@@ -47,10 +47,10 @@ public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
     }
 
     @Override
-    public void behave(List<AgentIteration> pAgents, Problem<ERG> pProblem, Map<String, Object> pParameters) {
+    public void behave(List<ERGAgentIterator> pAgents, Problem<ERG> pProblem, Map<String, Object> pParameters) {
         Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();
         //get results for each agent
-        for (AgentIteration agent : pAgents) {
+        for (ERGAgentIterator agent : pAgents) {
             List<PropReward> behaviors = CollectionsUtils.getElementsOfType(agent.getBehaviors(),
                     PropReward.class);
             reps.addAll(getPropositionsValues(behaviors));

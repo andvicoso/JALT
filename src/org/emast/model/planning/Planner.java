@@ -1,8 +1,9 @@
 package org.emast.model.planning;
 
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.List;
-import org.emast.model.agent.AgentIteration;
+import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -12,31 +13,36 @@ import org.emast.model.solution.Policy;
  *
  * @author anderson
  */
-public class Planner<M extends MDP> implements Algorithm<M, List<AgentIteration>> {
+public class Planner<M extends MDP> implements Algorithm<M, List<ERGAgentIterator>> {
 
     public static final String FINISHED_PROP = "FINISHED";
     public static final String FINISHED_ALL_PROP = "FINISHED_ALL";
-    private final List<AgentIteration> agents;
+    private final List<ERGAgentIterator> agentIterators;
+    private final List<Boolean> finished;
     private final Policy policy;
     private final PropertyChangeSupport pcs;
 
-    public Planner(Policy pPolicy, List<AgentIteration> pAgents) {
-        agents = pAgents;
+    public Planner(Policy pPolicy, List<ERGAgentIterator> pAgents) {
+        agentIterators = pAgents;
         policy = pPolicy;
         pcs = new PropertyChangeSupport(this);
+        finished = new ArrayList<Boolean>(agentIterators.size());
+        for (int i = 0; i < agentIterators.size(); i++) {
+            finished.add(Boolean.FALSE);
+        }
     }
 
     @Override
-    public List<AgentIteration> run(final Problem<M> pProblem, Object... pParameters) {
+    public List<ERGAgentIterator> run(final Problem<M> pProblem, Object... pParameters) {
         //execute them all
-        for (final AgentIteration agent : agents) {
-            createThread(agent, pProblem).start();
+        for (final ERGAgentIterator agentIterator : agentIterators) {
+            agentIterator.run(pProblem, policy);//createThread(agentIterator, pProblem).start();
         }
 
-        return agents;
+        return agentIterators;
     }
 
-    private Thread createThread(final AgentIteration agent, final Problem<M> pProblem) {
+    private Thread createThread(final ERGAgentIterator agent, final Problem<M> pProblem) {
         //get new thread name
         String threadName = agent.getClass().getSimpleName()
                 + "-" + agent.getAgent()
@@ -57,14 +63,16 @@ public class Planner<M extends MDP> implements Algorithm<M, List<AgentIteration>
     @Override
     public String printResults() {
         final StringBuilder sb = new StringBuilder();
-        for (AgentIteration agent : agents) {
+        for (ERGAgentIterator agent : agentIterators) {
             sb.append(agent.printResults());
         }
         return sb.toString();
     }
 
-    protected void finished(final AgentIteration agent) {
+    protected void finished(final ERGAgentIterator agent) {
         pcs.firePropertyChange(FINISHED_PROP, 0, 0);
+        finished.add(agent.getAgent(), true);
+
         if (isFinished()) {
             finished();
         }
@@ -72,8 +80,8 @@ public class Planner<M extends MDP> implements Algorithm<M, List<AgentIteration>
 
     public boolean isFinished() {
         boolean ret = true;
-        for (AgentIteration agent : agents) {
-            ret &= agent.isFinished();
+        for (ERGAgentIterator agent : agentIterators) {
+            ret &= finished.get(agent.getAgent()) != null;
         }
 
         return ret;
@@ -84,8 +92,8 @@ public class Planner<M extends MDP> implements Algorithm<M, List<AgentIteration>
         System.out.println(printResults());
     }
 
-    public List<AgentIteration> getAgents() {
-        return agents;
+    public List<ERGAgentIterator> getAgents() {
+        return agentIterators;
     }
 
     public PropertyChangeSupport getPropertyChangeSupport() {

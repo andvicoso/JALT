@@ -35,7 +35,7 @@ public class QTable {
 
         for (int i = 0; i < states.size(); i++) {
             for (int j = 0; j < actions.size(); j++) {
-                values[i][j] = -Double.MAX_VALUE;
+                values[i][j] = 0d;
             }
         }
     }
@@ -94,17 +94,9 @@ public class QTable {
         final Policy policy = new Policy();
 
         for (State state : states) {
-            Double max = null;
-            Action best = null;
             for (Action action : actions) {
                 double value = get(state, action);
-                if (max == null || value >= max) {
-                    max = value;
-                    best = action;
-                }
-            }
-            if (best != null) {
-                policy.put(state, best);
+                policy.put(state, action, value);
             }
         }
 
@@ -127,7 +119,7 @@ public class QTable {
             j = 1;
             for (Action action : actions) {
                 Double value = get(state, action);
-                table[i][j] = String.format("%.4e", value);
+                table[i][j] = String.format("%.4g", value);
                 j++;
             }
             i++;

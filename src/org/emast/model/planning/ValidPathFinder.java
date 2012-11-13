@@ -1,6 +1,7 @@
 package org.emast.model.planning;
 
-import org.emast.model.agent.AgentIteration;
+import org.emast.model.agent.ERGAgentIterator;
+import org.emast.model.agent.AgentIterator;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -13,17 +14,17 @@ import org.emast.model.solution.Policy;
  */
 public class ValidPathFinder {
 
-    public static <M extends MDP> boolean exist(Problem<M> pProblem, PolicyGenerator<M> pPolicyGenerator,
+    public static <M extends MDP> boolean exist(Problem<M> pProblem, Policy pPolicy,
             boolean pAcceptOne) {
         boolean ret = true;
-        Policy policy = pPolicyGenerator.run(pProblem);
         MDP model = pProblem.getModel();
 
         for (int i = 0; i < model.getAgents(); i++) {
             //create a new simple agent iterator
-            final AgentIteration agent = new AgentIteration(i);
+            final AgentIterator agent = new AgentIterator<M>(i);
+            agent.setDebug(false);
             //find the plan for the newly created agent
-            agent.run(pProblem, policy);
+            agent.run(pProblem, pPolicy);
             //get the resulting plan
             final Plan plan = agent.getPlan();
             //save in ret if a plan was generated
@@ -36,9 +37,14 @@ public class ValidPathFinder {
         return ret;
     }
 
+    public static <M extends MDP> boolean exist(Problem<M> pProblem, PolicyGenerator<M> pPolicyGenerator,
+            boolean pAcceptOne) {
+        return exist(pProblem, pPolicyGenerator.run(pProblem), pAcceptOne);
+    }
+
     public static boolean exist(Problem pProblem, Policy pPolicy, int pAgent) {
         //create a new simple agent iterator
-        final AgentIteration agent = new AgentIteration(pAgent);
+        final ERGAgentIterator agent = new ERGAgentIterator(pAgent);
         //find the plan for the newly created problem
         //with the preservation goal changed
         agent.run(pProblem, pPolicy);

@@ -9,12 +9,12 @@ import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.util.grid.GridPrinter;
 
-public class ValueIterationAlgorithm<M extends MDP> extends IterationAlgorithm<M> {
+public class ValueIteration<M extends MDP> extends IterationAlgorithm<M> {
 
     private Map<State, Double> lastv;
     private Map<State, Double> v;
 
-    public ValueIterationAlgorithm() {
+    public ValueIteration() {
         lastv = Collections.EMPTY_MAP;
         v = Collections.EMPTY_MAP;
     }
@@ -34,16 +34,15 @@ public class ValueIterationAlgorithm<M extends MDP> extends IterationAlgorithm<M
             pi = new Policy();
             //for each state
             for (State state : model.getStates()) {
-                Map<Double, Action> q = getQ(model, state);
+                Map<Action, Double> q = getQ(model, state);
                 //if found some action and value
                 if (!q.isEmpty()) {
                     // get the max value for q
-                    Double max = Collections.max(q.keySet());
-                    Action action = q.get(max);
-                    // save the max value and position in the policy
+                    Double max = Collections.max(q.values());
+                    // save the max value
                     v.put(state, max);
                     //add to the policy
-                    pi.put(state, action);
+                    pi.put(state, q);
                 }
             }
 //            System.out.println(printResults());
@@ -55,14 +54,14 @@ public class ValueIterationAlgorithm<M extends MDP> extends IterationAlgorithm<M
         return pi;
     }
 
-    private Map<Double, Action> getQ(MDP pModel, State pState) {
-        Map<Double, Action> q = new HashMap<Double, Action>();
+    private Map<Action, Double> getQ(MDP pModel, State pState) {
+        Map<Action, Double> q = new HashMap<Action, Double>();
         Collection<Action> actions = pModel.getTransitionFunction().getActionsFrom(pModel.getActions(), pState);
         // search for the Q v for each state
         for (Action action : actions) {
             double reward = pModel.getRewardFunction().getValue(pState, action);
             double value = reward + getGama() * getSum(pModel, pState, action);
-            q.put(value, action);
+            q.put(action, value);
         }
         return q;
     }

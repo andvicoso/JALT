@@ -11,7 +11,7 @@ import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.util.PolicyUtils;
 
-public class PolicyIterationAlgorithm implements PolicyGenerator<MDP> {
+public class PolicyIteration implements PolicyGenerator<MDP> {
 
     private double gama = 0.9d;
     private int iterations = 0;
@@ -46,11 +46,11 @@ public class PolicyIterationAlgorithm implements PolicyGenerator<MDP> {
                 }
                 // save the max value and position in the policy
                 final Double max = Collections.max(q.keySet());
-                final Double current = getSum(model, values, state, pi.get(state));
+                final Double current = getSum(model, values, state, pi.getBest(state));
                 // save the max value and position in the policy
                 if (max > current && !pi.get(state).equals(q.get(max))) {
                     values.put(state, max);
-                    pi.put(state, q.get(max));
+                    //pi.put(state, q);
                     changed = true;
                 }
             }
@@ -63,8 +63,8 @@ public class PolicyIterationAlgorithm implements PolicyGenerator<MDP> {
     private Map<State, Double> evaluatePolicy(MDP pModel, Policy policy) {
         final Map<State, Double> values = new HashMap<State, Double>();
         for (final State state : policy.getStates()) {
-            Double x = pModel.getRewardFunction().getValue(state, policy.get(state));
-            x += getGama() * getSum(pModel, values, state, policy.get(state));
+            Double x = pModel.getRewardFunction().getValue(state, policy.getBest(state));
+            x += getGama() * getSum(pModel, values, state, policy.getBest(state));
 
             values.put(state, x);
         }
