@@ -7,7 +7,7 @@ import org.emast.model.function.transition.GridTransitionFunction;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.Grid;
 import org.emast.model.state.State;
-import org.emast.util.GridUtils;
+import org.emast.util.grid.GridUtils;
 
 /**
  *

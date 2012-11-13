@@ -7,7 +7,7 @@ import java.util.Set;
 import org.emast.model.model.MDP;
 import org.emast.model.model.impl.GridModel;
 import org.emast.model.state.State;
-import org.emast.util.GridPrinter;
+import org.emast.util.grid.GridPrinter;
 import org.emast.util.Utils;
 
 /**

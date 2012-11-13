@@ -8,7 +8,7 @@ import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.state.State;
-import org.emast.util.GridUtils;
+import org.emast.util.grid.GridUtils;
 
 /**
  *

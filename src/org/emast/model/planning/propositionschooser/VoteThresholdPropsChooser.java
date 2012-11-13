@@ -17,6 +17,7 @@ public class VoteThresholdPropsChooser extends VotePropsChooser {
         badRewardThreshold = pBadRewardThreshold;
     }
 
+    @Override
     protected Map<Proposition, Integer> getVotes(Collection<Map<Proposition, Double>> pReps) {
         //combine reputations for propositions from agents
         Map<Proposition, Integer> map = new HashMap<Proposition, Integer>();

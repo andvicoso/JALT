@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.emast.model.action.Action;
 import org.emast.model.state.State;
-import org.emast.util.GridUtils;
+import org.emast.util.grid.GridUtils;
 
 /**
  *

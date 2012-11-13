@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.emast.infra.log.Log;
+import org.emast.model.Chooser;
 import org.emast.model.agent.AgentIteration;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.individual.reward.PropReward;
@@ -13,7 +14,6 @@ import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.PreservationGoalFactory;
 import org.emast.model.planning.ValidPathFinder;
-import org.emast.model.planning.propositionschooser.PropositionsChooser;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -27,7 +27,7 @@ import org.emast.util.CollectionsUtils;
 public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
 
     private final PolicyGenerator<ERG> algorithm;
-    private final PropositionsChooser chooser;
+    private final Chooser<Proposition> chooser;
     private final boolean acceptOnePath;
     private final PreservationGoalFactory factory;
 
@@ -38,7 +38,7 @@ public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
      * @param pAcceptOnePath Indicates if the algorithm should accept at least one 
      * valid path to the final goal for one agent
      */
-    public ChangePreservGoal(PolicyGenerator<ERG> pAlgorithm, PropositionsChooser pChooser,
+    public ChangePreservGoal(PolicyGenerator<ERG> pAlgorithm, Chooser<Proposition> pChooser,
             boolean pAcceptOnePath) {
         algorithm = pAlgorithm;
         chooser = pChooser;

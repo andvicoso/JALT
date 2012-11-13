@@ -4,13 +4,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.emast.model.Combinator;
 import org.emast.model.propositional.Proposition;
 
 /**
  *
  * @author Anderson
  */
-public class MeanRewardCombinator implements RewardCombinator {
+public class MeanRewardCombinator implements Combinator<Proposition> {
 
     @Override
     public Map<Proposition, Double> combine(final Collection<Map<Proposition, Double>> pReputations) {

@@ -1,4 +1,4 @@
-package org.emast.util;
+package org.emast.util.grid;
 
 import java.util.Collection;
 import java.util.Collections;

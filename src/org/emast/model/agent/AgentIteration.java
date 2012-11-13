@@ -72,8 +72,8 @@ public class AgentIteration<M extends MDP> implements Algorithm<M, Plan> {
      * @param pReward
      */
     private void changeState(State pNextState) {
-        currentState = pNextState;
         print("changed state from " + currentState + " to " + pNextState);
+        currentState = pNextState;
     }
 
     public void addReward(State pNextState, double pReward) {
@@ -87,7 +87,7 @@ public class AgentIteration<M extends MDP> implements Algorithm<M, Plan> {
         Action action;
         int iterations = 0;
         //get the number's initial state
-        currentState = pProblem.getInitialStates().get(getNumber());
+        currentState = pProblem.getInitialStates().get(getAgent());
         //create a plan for number
         plan = new Plan();
         //main loop
@@ -139,7 +139,7 @@ public class AgentIteration<M extends MDP> implements Algorithm<M, Plan> {
     @Override
     public String printResults() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\nAgent ").append(getNumber()).append(": ");
+        sb.append("\nAgent ").append(getAgent()).append(": ");
         sb.append("\n- Time: ").append(Utils.toTimeString(msecs)).append(" (").append(msecs).append(" ms)");
         sb.append("\n- Plan: ").append(getPlan());
         sb.append("\n- Reward: ").append(getTotalReward());
@@ -167,7 +167,7 @@ public class AgentIteration<M extends MDP> implements Algorithm<M, Plan> {
         return plan;
     }
 
-    public int getNumber() {
+    public int getAgent() {
         return agent;
     }
 
@@ -180,7 +180,7 @@ public class AgentIteration<M extends MDP> implements Algorithm<M, Plan> {
     }
 
     private void print(String pMsg) {
-        Log.info("Agent " + getNumber() + ": " + pMsg);
+        Log.info("Agent " + getAgent() + ": " + pMsg);
     }
 
     public double getTotalReward() {

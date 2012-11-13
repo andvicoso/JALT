@@ -1,4 +1,4 @@
-package org.emast.util;
+package org.emast.util.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,9 +56,5 @@ public class GridUtils {
 
     public static int getCol(final State pState) {
         return Integer.parseInt(pState.getName().split(GRID_STATE_SEP)[1]);
-    }
-
-    public static int getCityBlockDistance(final State pS1, final State pS2) {
-        return Math.abs(getRow(pS1) - getRow(pS2)) + Math.abs(getCol(pS1) - getCol(pS2));
     }
 }

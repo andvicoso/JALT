@@ -5,13 +5,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import org.emast.model.Chooser;
 import org.emast.model.propositional.Proposition;
 
 /**
  *
  * @author Anderson
  */
-public class VotePropsChooser implements PropositionsChooser {
+public class VotePropsChooser implements Chooser<Proposition> {
 
     @Override
     public Set<Proposition> choose(Collection<Map<Proposition, Double>> pReps) {

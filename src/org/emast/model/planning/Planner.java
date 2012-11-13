@@ -39,7 +39,7 @@ public class Planner<M extends MDP> implements Algorithm<M, List<AgentIteration>
     private Thread createThread(final AgentIteration agent, final Problem<M> pProblem) {
         //get new thread name
         String threadName = agent.getClass().getSimpleName()
-                + "-" + agent.getNumber()
+                + "-" + agent.getAgent()
                 + "-" + pProblem.getClass().getSimpleName();
         //create and run an thread for the agent execution 
         Thread t = new Thread(new Runnable() {

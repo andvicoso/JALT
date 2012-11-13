@@ -8,7 +8,7 @@ import java.util.Map;
 import org.emast.model.action.Action;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
-import org.emast.util.GridPrinter;
+import org.emast.util.grid.GridPrinter;
 
 /**
  *

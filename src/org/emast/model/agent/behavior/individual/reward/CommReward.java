@@ -91,7 +91,7 @@ public class CommReward implements PropReward, Messenger {
         //verify the need to send message for listeners
         if (mustSendMessage(pModel, pNextState, pReward)) {
             //create the message to be sent
-            final Message msg = new Message(pAgent.getNumber());
+            final Message msg = new Message(pAgent.getAgent());
             //attach important information
             msg.attach("agent", pAgent);
             msg.attach("model", pModel);

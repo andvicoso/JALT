@@ -5,19 +5,20 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.emast.model.planning.rewardcombinator.RewardCombinator;
+import org.emast.model.Chooser;
+import org.emast.model.Combinator;
 import org.emast.model.propositional.Proposition;
 
 /**
  *
  * @author Anderson
  */
-public class CombinePropsRewardChooser implements PropositionsChooser {
+public class CombinePropsRewardChooser implements Chooser<Proposition> {
 
     private final double badRewardThreshold;
-    private final RewardCombinator combinator;
+    private final Combinator<Proposition> combinator;
 
-    public CombinePropsRewardChooser(RewardCombinator pCombinator, double pBadRewardThreshold) {
+    public CombinePropsRewardChooser(Combinator<Proposition> pCombinator, double pBadRewardThreshold) {
         combinator = pCombinator;
         badRewardThreshold = pBadRewardThreshold;
     }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.emast.infra.log.Log;
+import org.emast.model.Chooser;
 import org.emast.model.agent.AgentIteration;
 import org.emast.model.agent.behavior.Individual;
 import org.emast.model.agent.behavior.individual.reward.PropReward;
@@ -15,7 +16,6 @@ import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.PreservationGoalFactory;
 import org.emast.model.planning.ValidPathFinder;
-import org.emast.model.planning.propositionschooser.PropositionsChooser;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -30,10 +30,10 @@ import org.emast.util.CollectionsUtils;
 public class ChangePreservGoal implements Individual<ERG>, ChangeModel<ERG> {
 
     private final PolicyGenerator<ERG> algorithm;
-    private final PropositionsChooser chooser;
+    private final Chooser<Proposition> chooser;
     private final PreservationGoalFactory factory;
 
-    public ChangePreservGoal(PolicyGenerator<ERG> pAlgorithm, PropositionsChooser pChooser) {
+    public ChangePreservGoal(PolicyGenerator<ERG> pAlgorithm, Chooser<Proposition> pChooser) {
         algorithm = pAlgorithm;
         chooser = pChooser;
         factory = new PreservationGoalFactory();
@@ -70,7 +70,7 @@ public class ChangePreservGoal implements Individual<ERG>, ChangeModel<ERG> {
 
     protected Policy changePreservationGoal(AgentIteration pAgent, ERG pModel, State pState)
             throws InvalidExpressionException {
-        int number = pAgent.getNumber();
+        int number = pAgent.getAgent();
         //save the goal
         Expression finalGoal = pModel.getGoal();
         //save the original preservation goal
