@@ -14,6 +14,10 @@ public class GridTransitionFunction extends TransitionFunction {
 
     private final int rows;
     private final int cols;
+    private static final Action south = new Action("south");
+    private static final Action east = new Action("east");
+    private static final Action west = new Action("west");
+    private static final Action north = new Action("north");
 
     public GridTransitionFunction(int pRows, int pCols) {
         rows = pRows;
@@ -26,10 +30,6 @@ public class GridTransitionFunction extends TransitionFunction {
 
     public Map<State, Action> getTransitions(int pRow, int pCol) {
         final Map<State, Action> possibleMovs = new HashMap<State, Action>(4);
-        final Action south = new Action("south");
-        final Action east = new Action("east");
-        final Action west = new Action("west");
-        final Action north = new Action("north");
 
         if (pRow + 1 < rows) {
             possibleMovs.put(GridUtils.createGridState((pRow + 1), pCol), south);

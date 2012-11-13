@@ -17,11 +17,56 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
 
     private QTable q;
     /**
-     * The learning rate. The learning rate determines to what extent the newly acquired information will override the
-     * old information. A factor of 0 will make the agent not learn anything, while a factor of 1 would make the agent
-     * consider only the most recent information.
+     * The learning rate. The learning rate determines to what extent the newly acquired information will
+     * override the old information. A factor of 0 will make the agent not learn anything, while a factor of 1
+     * would make the agent consider only the most recent information.
      */
     private double alpha = 0.5;
+
+    protected double getMax(MDP pModel, State pState) {
+        Double max = null;
+
+        Collection<Action> actions = pModel.getTransitionFunction().getActionsFrom(pModel.getActions(), pState);
+        // search for the Q v for each state
+        for (Action action : actions) {
+            Double value = q.get(pState, action);
+            if (max == null || value > max) {
+                max = value;
+            }
+        }
+
+        if (max == null) {
+            max = 0d;
+        }
+
+        return max;
+    }
+
+    @Override
+    public String printResults() {
+        StringBuilder sb = new StringBuilder(super.printResults());
+        sb.append("\nLast values:\n").append(q.toString());
+
+        return sb.toString();
+    }
+
+    protected void updateQTable(State state, Action action, double reward, State nextState) {
+        //get current q value
+        double cq = q.get(state, action);
+        //get new q value
+        double value = reward + (getGama() * getMax(model, nextState)) - cq;
+        double newq = cq + alpha * value;
+        //save q
+        q.put(state, action, newq);
+    }
+
+    protected Action getAction(State state) {
+        return model.getTransitionFunction().getAction(model.getActions(), state);
+    }
+
+    public QTable getQTable() {
+        return q;
+    }
 
     @Override
     public Policy run(Problem<M> pProblem, Object... pParameters) {
@@ -62,50 +107,5 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
         } while (iterations < 100);//getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError()
 
         return q.getPolicy();
-    }
-
-    protected double getMax(MDP pModel, State pState) {
-        Double max = null;
-
-        Collection<Action> actions = pModel.getTransitionFunction().getActionsFrom(pModel.getActions(), pState);
-        // search for the Q v for each state
-        for (Action action : actions) {
-            Double value = q.get(pState, action);
-            if (max == null || value > max) {
-                max = value;
-            }
-        }
-
-        if (max == null) {
-            max = 0d;
-        }
-
-        return max;
-    }
-
-    @Override
-    public String printResults() {
-        StringBuilder sb = new StringBuilder(super.printResults());
-        sb.append("\nLast values:\n").append(q.toString());
-
-        return sb.toString();
-    }
-
-    private void updateQTable(State state, Action action, double reward, State nextState) {
-        //get current q value
-        double cq = q.get(state, action);
-        //get new q value
-        double value = reward + (getGama() * getMax(model, nextState)) - cq;
-        double newq = cq + alpha * value;
-        //save q
-        q.put(state, action, newq);
-    }
-
-    protected Action getAction(State state) {
-        return model.getTransitionFunction().getAction(model.getActions(), state);
-    }
-
-    public QTable getQTable() {
-        return q;
     }
 }

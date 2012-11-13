@@ -1,8 +1,6 @@
 package org.emast.erg;
 
 import org.emast.CurrentProblem;
-import org.emast.model.algorithm.iteration.rl.QLearning;
-import org.emast.model.converter.ReinforcementConverter;
 import org.emast.model.problem.Problem;
 import org.emast.model.test.Test;
 

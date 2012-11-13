@@ -74,7 +74,6 @@ public class SARSA<M extends MDP> extends IterationAlgorithm<M> {
         StringBuilder sb = new StringBuilder(super.printResults());
         sb.append("\nLast values:\n").append(q.toString());
 
-
         return sb.toString();
     }
 }

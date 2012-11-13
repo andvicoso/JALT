@@ -40,12 +40,12 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
     }
 
     @Override
-    protected void doRun(Problem<M> pProblem) {
+    public Plan run(Problem<M> pProblem, Object... pParameters) {
         M model = pProblem.getModel();
         propTable = new PropTable(model.getStates(), model.getPropositions());
         qTable = new QTable(model.getStates(), model.getActions());
         Action action;
-        
+
         for (int i = 0; i < 10; i++) {
             iterations = 0;
             //get the number's initial state
@@ -88,6 +88,7 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
         print(propTable.getPropValue().toString());
         print(qTable.toString());
 
+        return plan;
     }
 
     protected double getMax(MDP pModel, State pState) {

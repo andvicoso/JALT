@@ -11,6 +11,4 @@ import java.util.Set;
 public interface Chooser<T> {
 
     Set<T> choose(Collection<Map<T, Double>> pValues);
-
-    T chooseOne(Collection<Map<T, Double>> pValues);
 }

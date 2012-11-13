@@ -68,10 +68,9 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
         final TransitionFunction tf = model.getTransitionFunction();
 
         for (final State state : ModelUtils.getStates(pPrune)) {
-            final Set<Action> pruneActions = ModelUtils.getActions(pPrune);
             final Map<Action, Double> q = new HashMap<Action, Double>();
             // search for the Qs values for state
-            for (final Action action : pruneActions) {
+            for (final Action action : getActions(pPrune, state)) {
                 double sum = 0;
                 for (final State rechableState : tf.getReachableStates(model.getStates(), state, action)) {
                     final Double trans = tf.getValue(state, rechableState, action);
@@ -181,5 +180,16 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
         sb.append("\nGama: ").append(gama);
 
         return sb.toString();
+    }
+
+    private Collection<Action> getActions(Collection<Transition> pPrune, State state) {
+        Collection<Action> actions = new ArrayList<Action>();
+        for (Transition t : pPrune) {
+            if (t.getState().equals(state)) {
+                actions.add(t.getAction());
+            }
+        }
+
+        return actions;
     }
 }

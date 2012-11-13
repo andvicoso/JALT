@@ -2,14 +2,17 @@ package org.emast.model.algorithm.ensemble;
 
 import java.util.*;
 import org.emast.infra.log.Log;
-import org.emast.model.action.Action;
+import org.emast.model.Chooser;
+import org.emast.model.Combinator;
 import org.emast.model.agent.ERGQLearning;
+import org.emast.model.algorithm.DefaultAlgorithm;
 import org.emast.model.algorithm.PolicyGenerator;
-import org.emast.model.algorithm.iteration.rl.QTable;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.PreservationGoalFactory;
 import org.emast.model.planning.ValidPathFinder;
+import org.emast.model.planning.propositionschooser.MinValueChooser;
+import org.emast.model.planning.rewardcombinator.MeanRewardCombinator;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -20,7 +23,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class AgentEnsemble implements PolicyGenerator<ERG> {
+public class AgentEnsemble extends DefaultAlgorithm<ERG, Policy> implements PolicyGenerator<ERG> {
 
     private final PolicyGenerator<ERG> policyGenerator;
     private List<ERGQLearning> agentIterators;
@@ -40,61 +43,25 @@ public class AgentEnsemble implements PolicyGenerator<ERG> {
 
     @Override
     public Policy run(Problem<ERG> pProblem, Object... pParameters) {
-        Problem<ERG> problem = pProblem;
-        ERG model = problem.getModel();
         Policy policy;
         int iterations = 0;
+        Problem<ERG> problem = pProblem;
+        ERG model = problem.getModel();
+        agentIterators = new ArrayList<ERGQLearning>(model.getAgents());
         //start main loop
         do {
             Log.info("\nITERATION " + iterations++ + ":\n");
-            //create policy
-            policy = policyGenerator.run(pProblem, pParameters);
+            //create initial policy
+            policy = policyGenerator.run(pProblem);
 
             for (int i = 0; i < model.getAgents(); i++) {
                 final ERGQLearning agentIterator = new ERGQLearning();
                 agentIterators.add(agentIterator);
                 agentIterator.run(pProblem, policy);
             }
-
-            //wait to be awakened from the planner notification
-            //(when it finished running all agents)
-            //wait(planner);
         } while (changePreservGoal(pProblem));
 
         return policy;
-    }
-
-    public Set<Proposition> choose(QTable q, ERG model) {
-        //combine reputations for propositions from agents
-        Map<Proposition, Double> combined = combine(q, model);
-        Log.info("Combined prop values: " + combined);
-        //get "bad" propositions
-        final Set<Proposition> set = new HashSet<Proposition>();
-        for (Proposition prop : combined.keySet()) {
-            if (combined.get(prop) <= -10) {
-                set.add(prop);
-            }
-        }
-        return set;
-    }
-
-    public Map<Proposition, Double> combine(QTable q, ERG model) {
-        Map<Proposition, Integer> count = new HashMap<Proposition, Integer>(model.getPropositions().size());
-        Map<Proposition, Double> result = new HashMap<Proposition, Double>(model.getPropositions().size());
-        final Collection<State> states = model.getStates();
-        final Collection<Action> actions = model.getActions();
-
-        for (final State state : states) {
-            for (final Action action : actions) {
-                double value = q.get(state, action);
-                State nextState = model.getTransitionFunction().getBestReachableState(states, state, action);
-                Set<Proposition> props = model.getPropositionFunction().getPropositionsForState(nextState);
-                
-                if()
-            }
-        }
-
-        return result;
     }
 
     protected boolean changePreservationGoal(Problem<ERG> pProblem, Collection<Proposition> pProps) {
@@ -151,23 +118,15 @@ public class AgentEnsemble implements PolicyGenerator<ERG> {
     }
 
     private boolean changePreservGoal(Problem<ERG> pProblem) {
-        final Collection<State> states = pProblem.getModel().getStates();
-        final Collection<Action> actions = pProblem.getModel().getActions();
-        QTable q = new QTable(states, actions);
-
-        for (final State state : states) {
-            for (final Action action : actions) {
-                double sum = 0;
-                //get results for each agent
-                for (ERGQLearning agent : agentIterators) {
-                    sum += agent.getQTable().get(state, action);
-                }
-                q.put(state, action, sum / agentIterators.size());
-            }
+        Combinator comb = new MeanRewardCombinator();
+        Chooser chooser = new MinValueChooser(comb);//new CombinePropsRewardChooser(comb, -10);
+        Collection<Map<Proposition, Double>> values = new ArrayList<Map<Proposition, Double>>(agentIterators.size());
+        //get results for each agent
+        for (ERGQLearning agent : agentIterators) {
+            values.add(agent.getPropsValues());
         }
-
         //choose "bad" propositions
-        Collection<Proposition> props = choose(q, pProblem.getModel());
+        Collection<Proposition> props = chooser.choose(values);
         //verify the need to change the preservation goal
         return !props.isEmpty() && changePreservationGoal(pProblem, props);
     }

@@ -1,11 +1,14 @@
 package org.emast.model.algorithm.iteration;
 
 import java.util.Map;
+import org.emast.model.algorithm.DefaultAlgorithm;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.model.MDP;
+import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 
-public abstract class IterationAlgorithm<M extends MDP> implements PolicyGenerator<M> {
+public abstract class IterationAlgorithm<M extends MDP> extends DefaultAlgorithm<M, Policy>
+        implements PolicyGenerator<M> {
 
     public static final int MAX_ITERATIONS = 10;
     /**

@@ -19,23 +19,6 @@ public class VotePropsChooser implements Chooser<Proposition> {
         return getVotes(pReps).keySet();
     }
 
-    @Override
-    public Proposition chooseOne(Collection<Map<Proposition, Double>> pReps) {
-        Map<Proposition, Integer> map = getVotes(pReps);
-        Integer max = Collections.max(map.values());
-
-        for (Map.Entry<Proposition, Integer> entry : map.entrySet()) {
-            Proposition prop = entry.getKey();
-            Integer integer = entry.getValue();
-
-            if (max.equals(integer)) {
-                return prop;
-            }
-        }
-        //never should get here!
-        return map.keySet().iterator().next();
-    }
-
     protected Map<Proposition, Integer> getVotes(Collection<Map<Proposition, Double>> pReps) {
         //combine reputations for propositions from agents
         Map<Proposition, Integer> map = new HashMap<Proposition, Integer>();
