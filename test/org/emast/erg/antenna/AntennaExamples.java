@@ -17,11 +17,14 @@ import org.emast.util.grid.distancemeasure.CityBlock;
  */
 public class AntennaExamples {
 
+    private static final int ANTENNA_SIGNAL = 2;
+    private static final int AGENTS = 1;
+
     public AntennaExamples() {
     }
 
     public Problem getICAPS2013() {
-        final AntennaCoverageModel model = new AntennaCoverageModel(5, 5, 2);
+        final AntennaCoverageModel model = new AntennaCoverageModel(5, 5, AGENTS);
         final PropositionFunction pf = new PropositionFunction();
 
         final Proposition hole = new Proposition("hole");
@@ -47,15 +50,15 @@ public class AntennaExamples {
 
         model.setPropositionFunction(pf);
 
-        AntennaCoverageProblemFactory.createAntennaCoverage(model.getStates(), pf, antenna, coverage, 2, new CityBlock());
+        AntennaCoverageProblemFactory.createAntennaCoverage(model.getStates(), pf,
+                antenna, coverage, ANTENNA_SIGNAL, new CityBlock());
 
         final Map<Integer, State> initialStates = new HashMap<Integer, State>();
         initialStates.put(0, GridUtils.createGridState(4, 0));
-        initialStates.put(1, GridUtils.createGridState(0, 0));
+        //initialStates.put(1, GridUtils.createGridState(0, 0));
 
         model.setRewardFunction(ReinforcementConverter.convertRewardFunction(model,
-                AntennaCoverageModel.BAD_REWARD,
-                AntennaCoverageModel.getBadRewardObstacles()));
+                AntennaCoverageModel.BAD_REWARD, AntennaCoverageModel.getBadRewardObstacles()));
 
         return new Problem<ERG>(model, initialStates);
     }
