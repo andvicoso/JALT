@@ -76,4 +76,11 @@ public class ERGQLearning extends QLearning<ERG> {
             propCount.put(p, count + 1);
         }
     }
+
+    @Override
+    public String printResults() {
+        return super.printResults();
+    }
+    
+    
 }

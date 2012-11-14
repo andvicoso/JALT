@@ -1,6 +1,8 @@
 package org.emast.erg;
 
 import org.emast.CurrentProblem;
+import org.emast.model.algorithm.ensemble.AgentEnsemble;
+import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.test.Test;
 
@@ -17,6 +19,6 @@ public class AgentTest {
     }
 
     public static void main(final String[] pArgs) {
-        new Test(createProblem(), EnsembleTest.createAlgorithm()).run();// new ValueIterationAlgorithm(), new QLearning()
+        new Test(createProblem(), new AgentEnsemble(new PPFERG())).run();// new ValueIterationAlgorithm(), 
     }
 }

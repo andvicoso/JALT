@@ -47,9 +47,9 @@ public class AgentEnsemble extends DefaultAlgorithm<ERG, Policy> implements Poli
         int iterations = 0;
         Problem<ERG> problem = pProblem;
         ERG model = problem.getModel();
-        agentIterators = new ArrayList<ERGQLearning>(model.getAgents());
         //start main loop
         do {
+            agentIterators = new ArrayList<ERGQLearning>(model.getAgents());
             Log.info("\nITERATION " + iterations++ + ":\n");
             //create initial policy
             policy = policyGenerator.run(pProblem);

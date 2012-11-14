@@ -74,11 +74,11 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
         //set initial q
         q = new QTable(model.getStates(), model.getActions());
         TransitionFunction tf = model.getTransitionFunction();
-        //QTable lastq;
+        QTable lastq;
         //start the main loop
         do {
             iterations++;
-            //lastq = new QTable(q);
+            lastq = new QTable(q);
             //get initial state
             State state = pProblem.getInitialStates().get(0);
             Action action;
@@ -104,7 +104,7 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
 //            System.out.println(new GridPrinter().toTable(q.getStateValue(), 5, 5));
 //            System.out.println(pProblem.toString(q.getPolicy()));
             //while  did not reach the max iteration
-        } while (iterations < 100);//getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError()
+        } while (getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError());//iterations < 100);//
 
         return q.getPolicy();
     }

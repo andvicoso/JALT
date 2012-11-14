@@ -16,7 +16,7 @@ import org.emast.util.Utils;
  */
 public class Problem<M extends MDP> implements Serializable {
 
-    private double error = 0.000;
+    private double error = 0.009;
     private Map<Integer, State> initialStates;
     private Set<State> finalStates;
     private M model;
