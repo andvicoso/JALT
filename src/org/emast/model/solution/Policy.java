@@ -33,7 +33,8 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
         Map<Action, Double> map = get(state);
         if (map != null && !map.isEmpty()) {
             Double max = Collections.max(map.values());
-            return CollectionsUtils.getKeysForValue(map, max).iterator().next();
+            Collection<Action> bestActions = CollectionsUtils.getKeysForValue(map, max);
+            return CollectionsUtils.getRandom(bestActions);
         }
         return null;
     }

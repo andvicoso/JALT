@@ -12,7 +12,8 @@ import org.emast.model.solution.Policy;
  *
  * @author Anderson
  */
-public class AgentEnsembleICAPSSP extends DefaultAlgorithm<ERG, Policy> implements PolicyGenerator<ERG> {
+public class AgentEnsembleICAPSSP extends DefaultAlgorithm<ERG, Policy>
+        implements PolicyGenerator<ERG> {
 
     private final PolicyGenerator<ERG> policyGenerator;
     private List<ERGQLearning> agentIterators;
@@ -36,18 +37,18 @@ public class AgentEnsembleICAPSSP extends DefaultAlgorithm<ERG, Policy> implemen
         //start main loop
         agentIterators = new ArrayList<ERGQLearning>(model.getAgents());
         //create initial policy
-        double init = System.currentTimeMillis();
+//        double init = System.currentTimeMillis();
         Policy policy = policyGenerator.run(pProblem);
-        double end = System.currentTimeMillis();
-        System.out.println("ppferg time: " + (end - init));
+//        double end = System.currentTimeMillis();
+//        System.out.println("ppferg time: " + (end - init));
 
         for (int i = 0; i < model.getAgents(); i++) {
             final ERGQLearning agentIterator = new ERGQLearning();
             agentIterators.add(agentIterator);
-            init = System.currentTimeMillis();
+//            init = System.currentTimeMillis();
             agentIterator.run(pProblem, policy);
-            end = System.currentTimeMillis();
-            System.out.println("ERGQLearning time: " + (end - init));
+//            end = System.currentTimeMillis();
+//            System.out.println("ERGQLearning time: " + (end - init));
         }
 
         return policy;

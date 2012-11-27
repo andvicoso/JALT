@@ -61,7 +61,8 @@ public class ReinforcementConverter {
 
     public static RewardFunction convertRewardFunction(final ERG pErg,
             final double pBadReward, Collection<Proposition> pBadRewardStates) {
-        PropositionFunction pf = pErg.getPropositionFunction();
+        final TransitionFunction tf = pErg.getTransitionFunction();
+        final PropositionFunction pf = pErg.getPropositionFunction();
         final RewardFunction rf = pErg.getRewardFunction();
         final Set<State> allObstacles = new HashSet<State>();
 
@@ -69,11 +70,10 @@ public class ReinforcementConverter {
             Set<State> obsStates = pf.getStatesWithProposition(obstacle);
             allObstacles.addAll(obsStates);
         }
-
+        
         final RewardFunction nrf = new RewardFunction() {
             @Override
             public double getValue(State pState, Action pAction) {
-                TransitionFunction tf = pErg.getTransitionFunction();
                 Set<State> reachable = tf.getReachableStates(pErg.getStates(), pState, pAction);
 
                 if (!Collections.disjoint(reachable, allObstacles)) {

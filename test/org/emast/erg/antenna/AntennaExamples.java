@@ -1,7 +1,9 @@
 package org.emast.erg.antenna;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.emast.model.converter.ReinforcementConverter;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.model.ERG;
@@ -57,9 +59,13 @@ public class AntennaExamples {
         initialStates.put(0, GridUtils.createGridState(4, 0));
         //initialStates.put(1, GridUtils.createGridState(0, 0));
 
+        final Set<State> finalStates = new HashSet<State>();
+        finalStates.add(GridUtils.createGridState(0, 4));
+
+
         model.setRewardFunction(ReinforcementConverter.convertRewardFunction(model,
                 AntennaCoverageModel.BAD_REWARD, AntennaCoverageModel.getBadRewardObstacles()));
 
-        return new Problem<ERG>(model, initialStates);
+        return new Problem<ERG>(model, initialStates, finalStates);
     }
 }
