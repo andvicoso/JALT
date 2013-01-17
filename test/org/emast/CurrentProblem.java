@@ -2,7 +2,6 @@ package org.emast;
 
 import org.emast.erg.antenna.AntennaCoverageProblemFactory;
 import org.emast.erg.antenna.AntennaExamples;
-import org.emast.erg.rover.RoverProblemFactory;
 import org.emast.model.problem.Problem;
 import org.emast.model.problem.ProblemFactory;
 import org.emast.util.FileUtils;
@@ -24,7 +23,7 @@ public class CurrentProblem {
     }
 
     public static Problem create() {
-        return new AntennaExamples().getICAPS2013();
+        return new AntennaExamples().getAAAI2013NoInitialPreserv();
     }
 
     public static Problem createRandom() {

@@ -27,7 +27,7 @@ import org.emast.util.grid.GridUtils;
  *
  * @author Anderson
  */
-public class ReinforcementConverter {
+public class ToRL {
 
     public static Problem<MDP> convert(Problem<ERG> pProblem) {
         ERG erg = pProblem.getModel();
@@ -70,17 +70,15 @@ public class ReinforcementConverter {
             Set<State> obsStates = pf.getStatesWithProposition(obstacle);
             allObstacles.addAll(obsStates);
         }
-        
+
         final RewardFunction nrf = new RewardFunction() {
             @Override
             public double getValue(State pState, Action pAction) {
                 Set<State> reachable = tf.getReachableStates(pErg.getStates(), pState, pAction);
-
-                if (!Collections.disjoint(reachable, allObstacles)) {
-                    return pBadReward;
-                } else {
-                    return rf.getValue(pState, pAction);
-                }
+                boolean canReachObstacle = !Collections.disjoint(reachable, allObstacles);
+                return canReachObstacle
+                        ? pBadReward
+                        : rf.getValue(pState, pAction);
             }
         };
 

@@ -23,7 +23,7 @@ public class MinValueChooser implements Chooser<Proposition> {
     @Override
     public Set<Proposition> choose(Collection<Map<Proposition, Double>> pReps) {
         Proposition ret = null;
-        //combine reputations for propositions from agents
+        //combine values for propositions from collection
         Map<Proposition, Double> map = combinator.combine(pReps);
         Double min = Collections.min(map.values());
 

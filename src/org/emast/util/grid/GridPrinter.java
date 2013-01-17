@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import org.emast.model.action.Action;
+import org.emast.model.function.reward.RewardFunction;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.model.Grid;
 import org.emast.model.model.MDP;
@@ -22,7 +24,6 @@ public class GridPrinter {
 
     public <M extends MDP & Grid> String print(M pModel) {
         String[][] grid = getGrid(pModel, Collections.EMPTY_MAP);
-
         return toTable(grid);
     }
 
@@ -187,5 +188,53 @@ public class GridPrinter {
         }
 
         return toTable(grid2);
+    }
+
+    public String print(RewardFunction rf, MDP mdp) {
+        int i = 0;
+        final String[][] grid = new String[mdp.getStates().size() + 1][mdp.getActions().size() + 1];
+        grid[0][0] = " ";
+
+        for (State state : mdp.getStates()) {
+            int j = 0;
+            i++;
+            grid[i][0] = state.getName();
+
+            for (Action action : mdp.getActions()) {
+                j++;
+                grid[0][j] = action.getName();
+                grid[i][j] = rf.getValue(state, action) + "";
+            }
+        }
+
+        return toTable(grid);
+    }
+
+    public String print(TransitionFunction tf, MDP mdp) {
+        int i = 0;
+        final String[][] grid = new String[mdp.getStates().size() + 1][mdp.getActions().size() + 1];
+        grid[0][0] = " ";
+
+        for (State state : mdp.getStates()) {
+            int j = 0;
+            i++;
+            grid[i][0] = state.getName();
+
+            for (Action action : mdp.getActions()) {
+                j++;
+                grid[0][j] = action.getName();
+                State best = tf.getBestReachableState(mdp.getStates(), state, action);
+                String value = " ";
+
+                if (best != null) {
+                    value = String.format("%1$.2f", tf.getValue(state, best, action));
+                    value = best.getName() + " " + value;
+                }
+                
+                grid[i][j] = value;
+            }
+        }
+
+        return toTable(grid);
     }
 }

@@ -1,7 +1,7 @@
 package org.emast.erg.antenna;
 
 import java.util.*;
-import org.emast.model.converter.ReinforcementConverter;
+import org.emast.model.converter.ToRL;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
@@ -85,14 +85,14 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         }
         model.setPropositionFunction(pf);
         //position antenna coverage propositions
-        createAntennaCoverage(model.getStates(), pf, antenna, coverage, antennaSignalCityBlockRadius, DEFAULT_DM);
+        setAntennaCoverage(model.getStates(), pf, antenna, coverage, antennaSignalCityBlockRadius, DEFAULT_DM);
         //put up && exit and down && exit over some antenna coverage
         final Set<State> sts = pf.getStatesWithProposition(coverage);
         //put true(up) and fake(down) goals over the grid
         pf.add(CollectionsUtils.getRandom(sts), up, exit);
         pf.add(CollectionsUtils.getRandom(sts), down, exit);
         //create reward function 
-        model.setRewardFunction(ReinforcementConverter.convertRewardFunction(model,
+        model.setRewardFunction(ToRL.convertRewardFunction(model,
                 AntennaCoverageModel.BAD_REWARD,
                 AntennaCoverageModel.getBadRewardObstacles()));
         //create initial states
@@ -125,7 +125,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
      * @param coverage
      * @param pAntennaSignalRadius
      */
-    public static void createAntennaCoverage(Collection<State> pModelStates,
+    public static void setAntennaCoverage(Collection<State> pModelStates,
             PropositionFunction pf, Proposition antenna, Proposition coverage,
             int pAntennaSignalRadius, DistanceMeasure dm) {
         //create antennas' coverages

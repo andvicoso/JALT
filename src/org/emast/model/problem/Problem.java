@@ -7,8 +7,8 @@ import java.util.Set;
 import org.emast.model.model.MDP;
 import org.emast.model.model.impl.GridModel;
 import org.emast.model.state.State;
-import org.emast.util.grid.GridPrinter;
 import org.emast.util.Utils;
+import org.emast.util.grid.GridPrinter;
 
 /**
  *
@@ -71,7 +71,7 @@ public class Problem<M extends MDP> implements Serializable {
     public String toString(Object pResult) {
         final StringBuilder sb = new StringBuilder();
         final String resultName = pResult.getClass().getSimpleName();
-        sb.append("\n").append(resultName).append(": ").append(pResult);
+        sb.append("\n").append(resultName).append(": \n").append(pResult);
 
         if (model instanceof GridModel) {
             final GridPrinter gridPrinter = new GridPrinter();

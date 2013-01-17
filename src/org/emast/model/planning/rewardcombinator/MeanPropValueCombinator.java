@@ -11,17 +11,17 @@ import org.emast.model.propositional.Proposition;
  *
  * @author Anderson
  */
-public class MeanRewardCombinator implements Combinator<Proposition> {
+public class MeanPropValueCombinator implements Combinator<Proposition> {
 
     @Override
-    public Map<Proposition, Double> combine(final Collection<Map<Proposition, Double>> pReputations) {
-        if (pReputations.isEmpty()) {
+    public Map<Proposition, Double> combine(final Collection<Map<Proposition, Double>> pValues) {
+        if (pValues.isEmpty()) {
             return Collections.EMPTY_MAP;
         }
         final Map<Proposition, Double> result = new HashMap<Proposition, Double>();
         final Map<Proposition, Integer> count = new HashMap<Proposition, Integer>();
         //find sums and counts
-        for (Map<Proposition, Double> map : pReputations) {
+        for (Map<Proposition, Double> map : pValues) {
             for (Proposition prop : map.keySet()) {
                 //count
                 Integer c = count.get(prop);

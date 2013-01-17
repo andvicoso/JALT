@@ -22,10 +22,15 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
      */
     private double alpha = 0.5;
     private QTable q;
+    private FrequencyTable frequency;
+    private NTable rewardTable;
 
     @Override
     public Policy run(Problem<M> pProblem, Object... pParameters) {
         model = pProblem.getModel();
+        //TODO: here or inside the main loop?
+        frequency = new FrequencyTable(model.getStates(), model.getActions());
+        rewardTable = new NTable(model.getStates(), model.getActions());
         //set initial q
         q = new QTable(model.getStates(), model.getActions());
         TransitionFunction tf = model.getTransitionFunction();
@@ -50,6 +55,8 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
                     if (nextState != null) {
                         updateQTable(state, action, reward, nextState);
                     }
+                    rewardTable.put(state, action, reward);
+                    frequency.inc(state, action);
                     //go to next state
                     state = nextState;
                 }
@@ -111,5 +118,13 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
 
     public double getAlpha() {
         return alpha;
+    }
+
+    public FrequencyTable getFrequencyTable() {
+        return frequency;
+    }
+
+    public NTable getRewardTable() {
+        return rewardTable;
     }
 }

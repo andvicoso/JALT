@@ -3,7 +3,7 @@ package org.emast.erg.rover;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.emast.model.converter.ReinforcementConverter;
+import org.emast.model.converter.ToRL;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
@@ -57,7 +57,7 @@ public class RoverProblemFactory extends ProblemFactory {
         pf.add(getRandomEmptyState(model), new Proposition("exit"));
         model.setPropositionFunction(pf);
         //create reward function 
-        model.setRewardFunction(ReinforcementConverter.convertRewardFunction(model, RoverModel.BAD_REWARD,
+        model.setRewardFunction(ToRL.convertRewardFunction(model, RoverModel.BAD_REWARD,
                 RoverModel.getBadRewardObstacles()));
         //create initial states
         final List<State> initStates = getRandomEmptyStates(model, agents);

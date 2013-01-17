@@ -4,10 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.emast.model.action.Action;
-import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.function.reward.RewardFunction;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.MDP;
 import org.emast.model.state.State;
+import org.emast.util.grid.GridPrinter;
 
 public class MDPModel implements MDP, Serializable {
 
@@ -110,12 +111,13 @@ public class MDPModel implements MDP, Serializable {
 
     @Override
     public String toString() {
+        GridPrinter gp = new GridPrinter();
         StringBuilder sb = new StringBuilder();
         sb.append("\nStates: ").append(states);
         sb.append("\nActions: ").append(actions);
         sb.append("\nAgents: ").append(agents);
-        sb.append("\nReward function: ").append(getRewardFunction());
-        sb.append("\nTransition function: ").append(getTransitionFunction());
+        sb.append("\nReward function: ").append("\n").append(gp.print(getRewardFunction(), this));
+        sb.append("\nTransition function: ").append("\n").append(gp.print(getTransitionFunction(), this));
 
         return sb.toString();
     }

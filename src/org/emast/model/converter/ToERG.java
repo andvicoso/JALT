@@ -14,7 +14,7 @@ import org.emast.model.propositional.Proposition;
  *
  * @author Anderson
  */
-public class ERGConverter {
+public class ToERG {
 
     public ERG convert(MDP pModel, Set<Proposition> pPropositions,
             PropositionFunction pPropositionFunction, Expression pGoal, Expression pPreservGoal) {
