@@ -9,7 +9,7 @@ import org.emast.model.test.Test;
  *
  * @author anderson
  */
-public class AgentTest {
+public class MainTest {
 
     private static Problem createProblem() {
         Problem p = CurrentProblem.create();

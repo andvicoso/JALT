@@ -24,6 +24,9 @@ public class CollectionsUtils {
 
     private static final Random random = new Random();
 
+    private CollectionsUtils() {
+    }
+
     public static <M> M draw(Map<M, Double> pValues) {
         if (!pValues.isEmpty()) {
             double sum = 0;
@@ -44,9 +47,6 @@ public class CollectionsUtils {
             }
         }
         return null;
-    }
-
-    private CollectionsUtils() {
     }
 
     public static <S> Map<String, S> asStringMap(S[] pParameters) {

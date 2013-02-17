@@ -53,6 +53,10 @@ public class NTable {
         int ai = actions.indexOf(action);
         values[si][ai] = value;
     }
+    
+    void put(State state, Action action, double newq, double reward, State nextState) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 
     public Double[][] getValues() {
         return values;

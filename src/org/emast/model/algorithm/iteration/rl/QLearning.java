@@ -22,15 +22,10 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
      */
     private double alpha = 0.5;
     private QTable q;
-    private FrequencyTable frequency;
-    private NTable rewardTable;
 
     @Override
     public Policy run(Problem<M> pProblem, Object... pParameters) {
         model = pProblem.getModel();
-        //TODO: here or inside the main loop?
-        frequency = new FrequencyTable(model.getStates(), model.getActions());
-        rewardTable = new NTable(model.getStates(), model.getActions());
         //set initial q
         q = new QTable(model.getStates(), model.getActions());
         TransitionFunction tf = model.getTransitionFunction();
@@ -55,8 +50,6 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
                     if (nextState != null) {
                         updateQTable(state, action, reward, nextState);
                     }
-                    rewardTable.put(state, action, reward);
-                    frequency.inc(state, action);
                     //go to next state
                     state = nextState;
                 }
@@ -66,14 +59,14 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
 //            System.out.println(new GridPrinter().toTable(q.getStateValue(), 5, 5));
 //            System.out.println(pProblem.toString(q.getPolicy()));
             //while  did not reach the max iteration
-        } while (getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError());//iterations < 100);//
+        } while (iterations < 100);//getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError());//
 
         return q.getPolicy(false);
     }
 
     protected void updateQTable(State state, Action action, double reward, State nextState) {
         //get current q value
-        double cq = q.get(state, action);
+        double cq = q.getQValue(state, action);
         //get new q value
         double value = reward + (getGama() * getMax(model, nextState)) - cq;
         double newq = cq + alpha * value;
@@ -87,7 +80,7 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
         Collection<Action> actions = pModel.getTransitionFunction().getActionsFrom(pModel.getActions(), pState);
         // search for the Q v for each state
         for (Action action : actions) {
-            Double value = q.get(pState, action);
+            Double value = q.getQValue(pState, action);
             if (max == null || value > max) {
                 max = value;
             }
@@ -118,13 +111,5 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
 
     public double getAlpha() {
         return alpha;
-    }
-
-    public FrequencyTable getFrequencyTable() {
-        return frequency;
-    }
-
-    public NTable getRewardTable() {
-        return rewardTable;
     }
 }

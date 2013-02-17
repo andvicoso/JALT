@@ -1,7 +1,7 @@
 package org.emast.model.algorithm.ensemble;
 
 import java.util.*;
-import org.emast.model.agent.ERGQLearning;
+import org.emast.model.algorithm.iteration.rl.erg.ERGQLearning;
 import org.emast.model.algorithm.DefaultAlgorithm;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.model.ERG;

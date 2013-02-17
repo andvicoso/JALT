@@ -4,7 +4,7 @@ import java.util.*;
 import org.emast.infra.log.Log;
 import org.emast.model.Chooser;
 import org.emast.model.Combinator;
-import org.emast.model.agent.ERGQLearning;
+import org.emast.model.algorithm.iteration.rl.erg.ERGQLearning;
 import org.emast.model.algorithm.DefaultAlgorithm;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.exception.InvalidExpressionException;

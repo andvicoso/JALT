@@ -3,6 +3,8 @@ package org.emast.model.solution;
 import java.util.*;
 import java.util.Map.Entry;
 import org.emast.model.action.Action;
+import org.emast.model.algorithm.iteration.rl.erg.ERGQTable;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
 
@@ -60,7 +62,7 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
 
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        
+
         for (;;) {
             Entry<Action, Double> e = i.next();
             Action key = e.getKey();
@@ -76,13 +78,28 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
         }
     }
 
-    public Map<State, Action> getBestPolicy() {
-        final Map<State, Action> policy = new HashMap<State, Action>();
+    public SimplePolicy getBestPolicy() {
+        final SimplePolicy policy = new SimplePolicy();
 
         for (final State state : keySet()) {
             policy.put(state, getBest(state));
         }
 
         return policy;
+    }
+
+    public TransitionFunction createTransitionFunction(final ERGQTable q) {
+        TransitionFunction tf = new TransitionFunction() {
+            @Override
+            public double getValue(State pState, State pFinalState, Action pAction) {
+                State fstate = q.getFinalState(pState, pAction);
+                if (State.isValid(pFinalState, fstate)) {
+                    return containsKey(pState) && get(pState).containsKey(pAction) ? get(pState).get(pAction) : 0d;
+                }
+                return 0d;
+            }
+        };
+
+        return tf;
     }
 }

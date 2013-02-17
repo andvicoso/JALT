@@ -26,6 +26,10 @@ public final class Expression implements Serializable {
     private static final String EVALUATE_DELIMS = " !()";
     private String expression;
 
+    public Expression() {
+        this("");
+    }
+
     public Expression(final String pExpressionText) {
         expression = pExpressionText;
         optimize();
@@ -132,8 +136,11 @@ public final class Expression implements Serializable {
     public void add(final Expression pExpression, final BinaryOperator pOperator) {
         if (expression == null) {
             expression = pExpression.toString();
+        } else if (expression.isEmpty()) {
+            expression = pExpression.expression;
         } else {
             String newExp = " " + pOperator + " ";
+
             if (isPrimitive() || isParenthesized(pExpression) || pExpression.isPrimitive()) {
                 newExp += pExpression;
             } else {
@@ -141,11 +148,11 @@ public final class Expression implements Serializable {
             }
             //TODO: do not add the same expression (term) 
             //at the end of the current expression
+
             if (!expression.endsWith(newExp)) {
                 expression += newExp;
             }
         }
-
         optimize();
     }
 

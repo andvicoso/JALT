@@ -97,7 +97,7 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
         Collection<Action> actions = pModel.getTransitionFunction().getActionsFrom(pModel.getActions(), pState);
         // search for the Q v for each state
         for (Action action : actions) {
-            Double value = qTable.get(pState, action);
+            Double value = qTable.getQValue(pState, action);
             if (max == null || value > max) {
                 max = value;
             }
@@ -112,7 +112,7 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
 
     private void updateQTable(MDP pModel, State state, Action action, double reward, State nextState) {
         //get current q value
-        double cq = qTable.get(state, action);
+        double cq = qTable.getQValue(state, action);
         //get new q value
         double value = reward + (0.9 * getMax(pModel, nextState)) - cq;
         double newq = cq + 0.5 * value;

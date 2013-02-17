@@ -1,6 +1,7 @@
 package org.emast.model.model.impl;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import org.emast.model.action.Action;
 import org.emast.model.function.PropositionFunction;
@@ -24,6 +25,10 @@ public class ERGGridModel extends GridModel implements ERG {
 
     public ERGGridModel(final int pRows, final int pCols) {
         super(pRows, pCols);
+        goal = new Expression();
+        preservationGoal = new Expression();
+        propositions = new HashSet<Proposition>(0);
+        pf = new PropositionFunction();
     }
 
     public ERGGridModel(Expression goal, Expression preservationGoal,

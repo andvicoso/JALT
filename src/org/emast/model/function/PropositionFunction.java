@@ -14,7 +14,7 @@ import org.emast.util.grid.GridUtils;
  *
  * @author And
  */
-public class PropositionFunction implements Serializable{
+public class PropositionFunction implements Serializable {
 
     private Map<State, Set<Proposition>> table;
 
@@ -22,15 +22,28 @@ public class PropositionFunction implements Serializable{
         table = new HashMap<State, Set<Proposition>>();
     }
 
-    public void add(final State pState, final Proposition... pProps) {
-        Set<Proposition> props = table.get(pState);
+    public void add(final State pState, final Collection<Proposition> pProps) {
+        Set<Proposition> props = getProps(pState);
 
-        if (props == null) {
-            props = new HashSet<Proposition>();
-            table.put(pState, props);
-        }
+        props.addAll(pProps);
+    }
+
+    public void add(final State pState, final Proposition... pProps) {
+        Set<Proposition> props = getProps(pState);
 
         props.addAll(Arrays.asList(pProps));
+    }
+
+    public void remove(final State pState, final Proposition... pProps) {
+        Set<Proposition> props = table.get(pState);
+
+        if (props != null) {
+            props.removeAll(Arrays.asList(pProps));
+        }
+    }
+
+    public void removeAll(final State pState) {
+        table.put(pState, null);
     }
 
     /**
@@ -115,5 +128,14 @@ public class PropositionFunction implements Serializable{
         }
 
         return sb.toString();
+    }
+
+    private Set<Proposition> getProps(final State pState) {
+        Set<Proposition> props = table.get(pState);
+        if (props == null) {
+            props = new HashSet<Proposition>();
+            table.put(pState, props);
+        }
+        return props;
     }
 }

@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.iteration.rl;
+package org.emast.model.algorithm.iteration.rl.erg;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,13 +14,16 @@ import org.emast.util.grid.GridPrinter;
  *
  * @author Anderson
  */
-public class QTable {
+public class ERGQTable {
 
     private List<State> states;
     private List<Action> actions;
     private Double[][] values;
+    private Double[][] rewards;
+    private Integer[][] freq;
+    private State[][] finalStates;
 
-    public QTable(QTable q) {
+    public ERGQTable(ERGQTable q) {
         this(q.getStates(), q.getActions());
 
         for (int i = 0; i < states.size(); i++) {
@@ -28,19 +31,24 @@ public class QTable {
         }
     }
 
-    public QTable(List<State> pStates, List<Action> pActions) {
+    public ERGQTable(List<State> pStates, List<Action> pActions) {
         states = pStates;
         actions = pActions;
         values = new Double[states.size()][actions.size()];
+        freq = new Integer[states.size()][actions.size()];
+        rewards = new Double[states.size()][actions.size()];
+        finalStates = new State[states.size()][actions.size()];
 
         for (int i = 0; i < states.size(); i++) {
             for (int j = 0; j < actions.size(); j++) {
                 values[i][j] = 0d;
+                freq[i][j] = 0;
+                rewards[i][j] = 0d;
             }
         }
     }
 
-    public QTable(Collection<State> states, Collection<Action> actions) {
+    public ERGQTable(Collection<State> states, Collection<Action> actions) {
         this(new ArrayList<State>(states), new ArrayList<Action>(actions));
     }
 
@@ -50,11 +58,35 @@ public class QTable {
 
         return si >= 0 && ai >= 0 ? values[si][ai] : 0d;
     }
+    //TODO: change to set of final states?
+    public State getFinalState(State state, Action action) {
+        int si = states.indexOf(state);
+        int ai = actions.indexOf(action);
 
-    public void put(State state, Action action, Double value) {
+        return si >= 0 && ai >= 0 ? finalStates[si][ai] : null;
+    }
+
+    public Integer getFrequency(State state, Action action) {
+        int si = states.indexOf(state);
+        int ai = actions.indexOf(action);
+
+        return si >= 0 && ai >= 0 ? freq[si][ai] : 0;
+    }
+
+    public Double getReward(State state, Action action) {
+        int si = states.indexOf(state);
+        int ai = actions.indexOf(action);
+
+        return si >= 0 && ai >= 0 ? rewards[si][ai] : 0d;
+    }
+
+    public void put(State state, Action action, Double value, Double reward, State finalState) {
         int si = states.indexOf(state);
         int ai = actions.indexOf(action);
         values[si][ai] = value;
+        rewards[si][ai] = reward;
+        finalStates[si][ai] = finalState;
+        freq[si][ai]++;
     }
 
     public Double[][] getValues() {
@@ -134,5 +166,14 @@ public class QTable {
         }
 
         return policy;
+    }
+
+    public double getTotalFrequency(State pState) {
+        int count = 0;
+        int si = states.indexOf(pState);
+        for (int i = 0; i < freq[si].length; i++) {
+            count += freq[si][i];
+        }
+        return count;
     }
 }
