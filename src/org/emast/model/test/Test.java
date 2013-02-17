@@ -22,38 +22,41 @@ public class Test implements Runnable {
 
     @Override
     public void run() {
-        print("\nModel:");
-        print(problem.getModel().toString());
-        print("\n\nProblem:");
-        print(problem.toString());
-        print("\nExecution:");
+        if (problem != null) {
 
-        long testInitMsecs = System.currentTimeMillis();
-        for (Algorithm algorithm : algorithms) {
-            print("\n------------------------------");
-            String algorithmName = algorithm.getClass().getSimpleName();
-            print("\nAlgorithm: ");
-            print(algorithmName);
-            println();
-            //execute
-            long initMsecs = System.currentTimeMillis();
-            Object result = algorithm.run(problem);
-            long diff = System.currentTimeMillis() - initMsecs;
-            //print time
-            print("\nTime: ");
-            print(toTimeString(diff));
-            //print results
-            print(algorithm.printResults());
-            //if a solution was found...
-            if (result != null) {
-                print("\n\nResult:");
-                print(problem.toString(result));
+            print("\nModel:");
+            print(problem.getModel().toString());
+            print("\n\nProblem:");
+            print(problem.toString());
+            print("\nExecution:");
+
+            long testInitMsecs = System.currentTimeMillis();
+            for (Algorithm algorithm : algorithms) {
+                print("\n------------------------------");
+                String algorithmName = algorithm.getClass().getSimpleName();
+                print("\nAlgorithm: ");
+                print(algorithmName);
+                println();
+                //execute
+                long initMsecs = System.currentTimeMillis();
+                Object result = algorithm.run(problem);
+                long diff = System.currentTimeMillis() - initMsecs;
+                //print time
+                print("\nTime: ");
+                print(toTimeString(diff));
+                //print results
+                print(algorithm.printResults());
+                //if a solution was found...
+                if (result != null) {
+                    print("\n\nResult:");
+                    print(problem.toString(result));
+                }
             }
+            msecs = System.currentTimeMillis() - testInitMsecs;
+            //print time
+            print("\nTotal Test Time: ");
+            print(toTimeString(msecs));
         }
-        msecs = System.currentTimeMillis() - testInitMsecs;
-        //print time
-        print("\nTotal Test Time: ");
-        print(toTimeString(msecs));
     }
 
     public static String toTimeString(final long pMsecs) {
@@ -71,5 +74,4 @@ public class Test implements Runnable {
     protected void println() {
         print("\n");
     }
-
 }

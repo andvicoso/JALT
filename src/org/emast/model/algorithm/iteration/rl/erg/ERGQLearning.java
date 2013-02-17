@@ -1,19 +1,14 @@
 package org.emast.model.algorithm.iteration.rl.erg;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.emast.model.Chooser;
-import org.emast.model.Combinator;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.IterationAlgorithm;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.model.MDP;
-import org.emast.model.planning.propositionschooser.MinValueChooser;
-import org.emast.model.planning.rewardcombinator.MeanPropValueCombinator;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.solution.Policy;
@@ -35,7 +30,8 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
     // private Policy policy;
     private Map<Proposition, Double> propSum;
     private Map<Proposition, Integer> propCount;
-    private Set<Proposition> badProps;
+    private Proposition badProp;
+    private static final Double BAD_VALUE = -20d;
 
     public ERGQLearning() {
         propCount = new HashMap<Proposition, Integer>();
@@ -68,11 +64,6 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
 
                     if (nextState != null) {
                         updateQTable(state, action, reward, nextState);
-                        badProps = getBadPropositions();
-
-                        if (!badProps.isEmpty()) {
-                            return q.getPolicy(false);
-                        }
                     }
                     //go to next state
                     state = nextState;
@@ -82,6 +73,11 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
 //            System.out.println(printResults());
 //            System.out.println(new GridPrinter().toTable(q.getStateValue(), 5, 5));
 //            System.out.println(pProblem.toString(q.getPolicy()));
+            badProp = getBadProposition();
+
+            if (badProp != null) {
+                break;
+            }
             //while  did not reach the max iteration
         } while (iterations < 100);//getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError());//
 
@@ -121,7 +117,7 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
         }
 
 
-        getBadPropositions();
+        getBadProposition();
     }
 
     private double getMax(MDP pModel, State pState) {
@@ -159,10 +155,18 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
         return values;
     }
 
-    private Set<Proposition> getBadPropositions() {
-        Combinator comb = new MeanPropValueCombinator();
-        Chooser chooser = new MinValueChooser(comb);
-        return chooser.choose(Collections.singleton(getPropsValues()));
+    private Proposition getBadProposition() {
+        Map<Proposition, Double> values = getPropsValues();
+
+        for (Map.Entry<Proposition, Double> entry : values.entrySet()) {
+            Proposition proposition = entry.getKey();
+            Double value = entry.getValue();
+            if (value < BAD_VALUE) {
+                return proposition;
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -185,7 +189,7 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
         return alpha;
     }
 
-    public Set<Proposition> getBadProps() {
-        return badProps;
+    public Proposition getBadProp() {
+        return badProp;
     }
 }

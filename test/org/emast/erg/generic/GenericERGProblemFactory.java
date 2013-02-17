@@ -18,7 +18,7 @@ public class GenericERGProblemFactory extends ProblemFactory {
     public static ProblemFactory createDefaultFactory() {
         double obstaclesRatio = 0.2;
         //double agentsRatio = 0.02;
-        int rows = 5;
+        int rows = 10;
         int cols = rows;
         int props = rows;
         int agents = 1;//(int) Math.ceil(rows * cols * agentsRatio);

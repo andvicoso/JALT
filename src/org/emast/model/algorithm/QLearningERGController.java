@@ -35,6 +35,7 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
             Log.info("\n" + pProblem.toString(policy_ql));
 
             model = ERGFactory.create(model, learning);
+            
             if (model != null) {
                 p = new Problem<ERG>(model, pProblem.getInitialStates());
 
