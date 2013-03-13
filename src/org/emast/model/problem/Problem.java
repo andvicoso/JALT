@@ -57,6 +57,9 @@ public class Problem<M extends MDP> implements Serializable {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("\nInitial states: ").append(initialStates);
+        if (finalStates != null && !finalStates.isEmpty()) {
+            sb.append("\nFinal states: ").append(finalStates);
+        }
         sb.append("\nError: ").append(error);
 
         if (model instanceof GridModel) {

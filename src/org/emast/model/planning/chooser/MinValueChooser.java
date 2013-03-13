@@ -1,4 +1,4 @@
-package org.emast.model.planning.propositionschooser;
+package org.emast.model.planning.chooser;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -6,29 +6,28 @@ import java.util.Map;
 import java.util.Set;
 import org.emast.model.Chooser;
 import org.emast.model.Combinator;
-import org.emast.model.propositional.Proposition;
 
 /**
  *
  * @author Anderson
  */
-public class MinValueChooser implements Chooser<Proposition> {
+public class MinValueChooser<T> implements Chooser<T> {
 
-    private final Combinator<Proposition> combinator;
+    private final Combinator<T> combinator;
 
-    public MinValueChooser(Combinator<Proposition> pCombinator) {
+    public MinValueChooser(Combinator<T> pCombinator) {
         combinator = pCombinator;
     }
 
     @Override
-    public Set<Proposition> choose(Collection<Map<Proposition, Double>> pReps) {
-        Proposition ret = null;
+    public Set<T> choose(Collection<Map<T, Double>> pReps) {
+        T ret = null;
         //combine values for propositions from collection
-        Map<Proposition, Double> map = combinator.combine(pReps);
+        Map<T, Double> map = combinator.combine(pReps);
         Double min = Collections.min(map.values());
 
-        for (Map.Entry<Proposition, Double> entry : map.entrySet()) {
-            Proposition prop = entry.getKey();
+        for (Map.Entry<T, Double> entry : map.entrySet()) {
+            T prop = entry.getKey();
             Double d = entry.getValue();
 
             if (min.equals(d)) {

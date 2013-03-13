@@ -18,7 +18,7 @@ import org.emast.util.CollectionsUtils;
  */
 public class AntennaCoverageModel extends ERGGridModel {
 
-    public static final int BAD_REWARD = -30;
+    public static final double BAD_REWARD = -30d;
     private static final double OTHERWISE = -1;
 
     public AntennaCoverageModel(final int pRows, final int pCols, final int pAgents) {

@@ -73,8 +73,8 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
             for (final Action action : getActions(pPrune, state)) {
                 double sum = 0;
                 for (final State reachableState : tf.getReachableStates(model.getStates(), state, action)) {
-                    final Double trans = tf.getValue(state, reachableState, action);
-                    if (trans != null && pValues.get(reachableState) != null) {
+                    final double trans = tf.getValue(state, reachableState, action);
+                    if (pValues.get(reachableState) != null) {
                         sum += trans * pValues.get(reachableState);
                     }
                 }

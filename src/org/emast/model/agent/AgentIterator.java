@@ -26,6 +26,10 @@ public class AgentIterator<M extends MDP> extends DefaultAlgorithm<M, Plan> {
     protected Policy policy;
     protected int iterations;
 
+    public AgentIterator() {
+        this(0);
+    }
+
     public AgentIterator(int pAgent) {
         agent = pAgent;
     }

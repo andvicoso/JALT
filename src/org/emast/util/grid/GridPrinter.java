@@ -12,6 +12,7 @@ import org.emast.model.model.Grid;
 import org.emast.model.model.MDP;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.solution.Policy;
+import org.emast.model.solution.SimplePolicy;
 import org.emast.model.state.State;
 
 /**
@@ -30,8 +31,12 @@ public class GridPrinter {
     public <M extends MDP & Grid> String print(M pModel, Map<Integer, State> pInitialStates, Object pResult) {
         String[][] grid = getGrid(pModel, pInitialStates);
 
-        if (pResult != null && pResult instanceof Policy) {
-            fillWithActions(grid, (Policy) pResult);
+        if (pResult != null) {
+            if (pResult instanceof Policy) {
+                fillWithActions(grid, (Policy) pResult);
+            } else if (pResult instanceof SimplePolicy) {
+                fillWithActions(grid, (SimplePolicy) pResult);
+            }
         }
 
         return toTable(grid);
@@ -96,8 +101,12 @@ public class GridPrinter {
     }
 
     public void fillWithActions(String[][] pGrid, Policy pPolicy) {
+        fillWithActions(pGrid, pPolicy.getBestPolicy());
+    }
+
+    public void fillWithActions(String[][] pGrid, SimplePolicy pPolicy) {
         for (State state : pPolicy.getStates()) {
-            Action action = pPolicy.getBest(state);
+            Action action = pPolicy.get(state);
             int row = GridUtils.getRow(state) + 1;
             int col = GridUtils.getCol(state) + 1;
 
@@ -230,7 +239,7 @@ public class GridPrinter {
                     value = String.format("%1$.2f", tf.getValue(state, best, action));
                     value = best.getName() + " " + value;
                 }
-                
+
                 grid[i][j] = value;
             }
         }

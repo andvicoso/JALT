@@ -11,6 +11,17 @@ import org.emast.model.propositional.operator.BinaryOperator;
  */
 public class PreservationGoalFactory {
 
+    public Expression createPreservationGoalExp(Expression pOriginalPreservGoal, Collection<Expression> pExpressions) {
+        Expression result = new Expression(pOriginalPreservGoal);
+        for (Expression e : pExpressions) {
+            //negate it
+            Expression neg = e.negate();
+            //add to the returned exp
+            result.add(neg, BinaryOperator.AND);
+        }
+        return result;
+    }
+
     public Expression createPreservationGoal(Expression pOriginalPreservGoal, Collection<Proposition> pProps) {
         Expression exp = new Expression(pOriginalPreservGoal);
         for (Proposition prop : pProps) {

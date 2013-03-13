@@ -3,13 +3,14 @@ package org.emast.model.algorithm.iteration.rl.erg;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.IterationAlgorithm;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
-import org.emast.model.propositional.Expression;
+import org.emast.model.propositional.Proposition;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 
@@ -17,7 +18,7 @@ import org.emast.model.state.State;
  *
  * @author anderson
  */
-public class ERGQLearning extends IterationAlgorithm<ERG> {
+public class ERGQLearningIndivProp extends IterationAlgorithm<ERG> {
 
     private static final int MAX_IT = 10;
     private static final double BAD_VALUE = -20d;
@@ -29,13 +30,13 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
     private double alpha = 0.5;
     private ERGQTable q;
     // private Policy policy;
-    private Map<Expression, Double> expSum;
-    private Map<Expression, Integer> expCount;
-    private Expression badExpression;
+    private Map<Proposition, Double> propSum;
+    private Map<Proposition, Integer> propCount;
+    private Proposition badProp;
 
-    public ERGQLearning() {
-        expCount = new HashMap<Expression, Integer>();
-        expSum = new HashMap<Expression, Double>();
+    public ERGQLearningIndivProp() {
+        propCount = new HashMap<Proposition, Integer>();
+        propSum = new HashMap<Proposition, Double>();
     }
 
     @Override
@@ -73,14 +74,13 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
 //            System.out.println(printResults());
 //            System.out.println(new GridPrinter().toTable(q.getStateValue(), 5, 5));
 //            System.out.println(pProblem.toString(q.getPolicy()));
-            badExpression = getBadExpression();
+            badProp = getBadProposition();
 
 //            if (badProp != null) {
 //                break;
 //            }
-             System.out.print(iterations);
             //while did not reach the max iteration
-        } while (iterations < 1);//getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError());//
+        } while (iterations < MAX_IT);//getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError());//
 
         return new Policy();//q.getPolicy(false);//TODO:
     }
@@ -93,25 +93,28 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
         double newq = cq + alpha * value;
         //save q
         q.put(state, action, newq, reward, nextState);
-        //save q for the next state expression
-        updateProps(value, nextState);
+
+        updateProps(reward, nextState);
     }
 
-    protected void updateProps(double value, State nextState) {
-        Expression exp = model.getPropositionFunction().getExpressionForState(nextState);
-        if (exp != null) {
+    protected void updateProps(double reward, State nextState) {
+        Set<Proposition> props = model.getPropositionFunction().getPropositionsForState(nextState);
+        if (props != null) {
+            double value = reward / props.size();
             double sum = 0;
             int count = 0;
 
-            if (expSum.containsKey(exp)) {
-                sum = expSum.get(exp);
-            }
-            if (expCount.containsKey(exp)) {
-                count = expCount.get(exp);
-            }
+            for (Proposition p : props) {
+                if (propSum.containsKey(p)) {
+                    sum = propSum.get(p);
+                }
+                if (propCount.containsKey(p)) {
+                    count = propCount.get(p);
+                }
 
-            expSum.put(exp, sum + value);
-            expCount.put(exp, count + 1);
+                propSum.put(p, sum + value);
+                propCount.put(p, count + 1);
+            }
         }
     }
 
@@ -134,13 +137,13 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
         return max;
     }
 
-    public Map<Expression, Double> getExpsValues() {
-        Map<Expression, Double> values = new HashMap<Expression, Double>();
+    public Map<Proposition, Double> getPropsValues() {
+        Map<Proposition, Double> values = new HashMap<Proposition, Double>();
 
-        for (Expression p : expSum.keySet()) {
+        for (Proposition p : propSum.keySet()) {
             double value = 0;
-            Double sum = expSum.get(p);
-            Integer count = expCount.get(p);
+            Double sum = propSum.get(p);
+            Integer count = propCount.get(p);
             if (sum != null && count != null) {
                 value = sum / count;
             }
@@ -150,11 +153,11 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
         return values;
     }
 
-    private Expression getBadExpression() {
-        Map<Expression, Double> values = getExpsValues();
+    private Proposition getBadProposition() {
+        Map<Proposition, Double> values = getPropsValues();
 
-        for (Map.Entry<Expression, Double> entry : values.entrySet()) {
-            Expression proposition = entry.getKey();
+        for (Map.Entry<Proposition, Double> entry : values.entrySet()) {
+            Proposition proposition = entry.getKey();
             Double value = entry.getValue();
             if (value < BAD_VALUE) {
                 return proposition;
@@ -184,7 +187,7 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
         return alpha;
     }
 
-    public Expression getBadProp() {
-        return badExpression;
+    public Proposition getBadProp() {
+        return badProp;
     }
 }

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.emast.model.action.Action;
-import org.emast.model.solution.Policy;
+import org.emast.model.solution.SimplePolicy;
 import org.emast.model.state.State;
 import org.emast.util.grid.GridPrinter;
 
@@ -59,6 +59,7 @@ public class ERGQTable {
         return si >= 0 && ai >= 0 ? values[si][ai] : 0d;
     }
     //TODO: change to set of final states?
+
     public State getFinalState(State state, Action action) {
         int si = states.indexOf(state);
         int ai = actions.indexOf(action);
@@ -99,6 +100,31 @@ public class ERGQTable {
 
     public List<State> getStates() {
         return states;
+    }
+
+    public String[][] getFrequencyTableStr() {
+        String[][] table = new String[states.size() + 1][actions.size() + 1];
+        table[0][0] = getTitle();
+        int i = 1;
+        for (State state : states) {
+            table[i++][0] = state.getName();
+        }
+        int j = 1;
+        for (Action action : actions) {
+            table[0][j++] = action.getName();
+        }
+
+        i = 1;
+        for (State state : states) {
+            j = 1;
+            for (Action action : actions) {
+                table[i][j] = getFrequency(state, action) + "";
+                j++;
+            }
+            i++;
+        }
+
+        return table;
     }
 
     public String[][] toTable() {
@@ -153,15 +179,21 @@ public class ERGQTable {
         return map;
     }
 
-    public Policy getPolicy(boolean pAddZeros) {
-        final Policy policy = new Policy();
+    public SimplePolicy getPolicy() {
+        final SimplePolicy policy = new SimplePolicy();
 
         for (State state : states) {
+            double max = 0;
+            Action max_action = null;
             for (Action action : actions) {
                 double value = getQValue(state, action);
-                if (pAddZeros || value != 0) {
-                    policy.put(state, action, value);
+                if (value != 0 && (max_action == null || value > max)) {
+                    max = value;
+                    max_action = action;
                 }
+            }
+            if (max_action != null) {
+                policy.put(state, max_action);
             }
         }
 
@@ -175,5 +207,9 @@ public class ERGQTable {
             count += freq[si][i];
         }
         return count;
+    }
+
+    public Integer[][] getFrequencyTable() {
+        return freq;
     }
 }

@@ -49,7 +49,7 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M> {
 //            System.out.println(new GridPrinter().toTable(v, 3, 3));
 //            System.out.println(pProblem.toString(pi));
             lastv = v;
-        } while (getError(lastv, v) > pProblem.getError());
+        } while (iterations <= MAX_ITERATIONS);//getError(lastv, v) > pProblem.getError());
 
         return pi;
     }

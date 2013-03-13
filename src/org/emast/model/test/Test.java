@@ -34,8 +34,7 @@ public class Test implements Runnable {
             for (Algorithm algorithm : algorithms) {
                 print("\n------------------------------");
                 String algorithmName = algorithm.getClass().getSimpleName();
-                print("\nAlgorithm: ");
-                print(algorithmName);
+                print("\nAlgorithm: " + algorithmName);
                 println();
                 //execute
                 long initMsecs = System.currentTimeMillis();

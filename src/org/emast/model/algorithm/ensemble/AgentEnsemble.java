@@ -11,8 +11,8 @@ import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.PreservationGoalFactory;
 import org.emast.model.planning.ValidPathFinder;
-import org.emast.model.planning.propositionschooser.MinValueChooser;
-import org.emast.model.planning.rewardcombinator.MeanPropValueCombinator;
+import org.emast.model.planning.chooser.MinValueChooser;
+import org.emast.model.planning.rewardcombinator.MeanValueCombinator;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -118,12 +118,12 @@ public class AgentEnsemble extends DefaultAlgorithm<ERG, Policy> implements Poli
     }
 
     private boolean changePreservGoal(Problem<ERG> pProblem) {
-        Combinator comb = new MeanPropValueCombinator();
+        Combinator comb = new MeanValueCombinator();
         Chooser chooser = new MinValueChooser(comb);//new CombinePropsRewardChooser(comb, -10);
         Collection<Map<Proposition, Double>> values = new ArrayList<Map<Proposition, Double>>(agentIterators.size());
         //get results for each agent
         for (ERGQLearning agent : agentIterators) {
-            values.add(agent.getPropsValues());
+            //values.add(agent.getExpsValues());//TODO
         }
         //choose "bad" propositions
         Collection<Proposition> props = chooser.choose(values);

@@ -26,27 +26,32 @@ public class RandomProblemGenerator {
         Scanner reader = new Scanner(System.in);
         Problem p = null;
 
+        out:
         do {
             if (p != null) {
                 System.out.println("Problem: " + p.toString());
             }
-            
-            System.out.print("console: ");
-            String c = reader.nextLine();
 
-            if (c.equals("r")) {
-                break;
-            } else if (c.equals("s") && p != null) {
-                save(p);
-            } else if (c.equals("h")) {
-                System.out.println(printMenu());
-            } else if (c.equals("l")) {
-                p = getLastExecuted();
-            } else if (c.equals("n")) {
-                p = factory.create();
-            } else if (c.equals("q")) {
-                p = null;
-                break;
+            System.out.print("console: ");
+            String cmds = reader.nextLine().toLowerCase();
+
+            for (int i = 0; i < cmds.length(); i++) {
+                String c = cmds.charAt(i) + "";
+
+                if (c.equals("r")) {
+                    break out;
+                } else if (c.equals("s") && p != null) {
+                    save(p);
+                } else if (c.equals("h")) {
+                    System.out.println(printMenu());
+                } else if (c.equals("l")) {
+                    p = getLastExecuted();
+                } else if (c.equals("n")) {
+                    p = factory.create();
+                } else if (c.equals("q")) {
+                    p = null;
+                    break out;
+                }
             }
         } while (true);
 
@@ -117,6 +122,8 @@ public class RandomProblemGenerator {
         commands.add(new Command("q", "quit", "Quit program"));
 
         return commands;
+
+
     }
 
     private static class Command {

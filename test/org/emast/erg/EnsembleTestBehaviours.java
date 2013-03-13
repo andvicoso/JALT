@@ -9,13 +9,12 @@ import org.emast.model.agent.behavior.collective.ChangePreservGoal;
 import org.emast.model.agent.behavior.individual.reward.CommReward;
 import org.emast.model.agent.behavior.individual.reward.PropRepReward;
 import org.emast.model.algorithm.Algorithm;
-import org.emast.model.algorithm.ensemble.AgentEnsemble;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.algorithm.reachability.PPFERG;
-import org.emast.model.planning.propositionschooser.CombinePropsRewardChooser;
+import org.emast.model.planning.chooser.CombineRewardChooser;
 import org.emast.model.Chooser;
 import org.emast.model.algorithm.ensemble.AgentEnsembleBehavior;
-import org.emast.model.planning.rewardcombinator.MeanPropValueCombinator;
+import org.emast.model.planning.rewardcombinator.MeanValueCombinator;
 import org.emast.model.test.Test;
 
 /**
@@ -50,7 +49,7 @@ public class EnsembleTestBehaviours {
 
     private static List<Collective> createCollectiveBehaviors(PolicyGenerator pg, double badRewardValue) {
         boolean acceptOnePath = true;
-        Chooser chooser = new CombinePropsRewardChooser(new MeanPropValueCombinator(), badRewardValue);
+        Chooser chooser = new CombineRewardChooser(new MeanValueCombinator(), badRewardValue);
         Collective change = new ChangePreservGoal(pg, chooser, acceptOnePath);
 
         return Arrays.asList(change);

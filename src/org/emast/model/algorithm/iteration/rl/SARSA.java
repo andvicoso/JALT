@@ -13,7 +13,7 @@ public class SARSA<M extends MDP> extends QLearning<M> {
     @Override
     protected void updateQTable(State state, Action action, double reward, State nextState) {
         //get next action
-        Action nextAction = getQTable().getPolicy(true).getBest(nextState);//model.getTransitionFunction().getAction(model.getActions(), state);
+        Action nextAction = getQTable().getPolicy(true).getBestAction(nextState);//model.getTransitionFunction().getAction(model.getActions(), state);
         //get current q value
         double cq = getQTable().getQValue(state, action);
         //get new q value

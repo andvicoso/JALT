@@ -69,7 +69,7 @@ public class CollectionsUtils {
         return map;
     }
 
-    public static Map createMap(Collection pKeys, double pValue) {
+    public static <T> Map<T, Double> createMap(Collection<T> pKeys, Double pValue) {
         final Map map = new HashMap();
         for (Object object : pKeys) {
             map.put(object, pValue);

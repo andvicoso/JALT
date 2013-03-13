@@ -5,24 +5,23 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.emast.model.Combinator;
-import org.emast.model.propositional.Proposition;
 
 /**
  *
  * @author Anderson
  */
-public class MeanPropValueCombinator implements Combinator<Proposition> {
+public class MeanValueCombinator implements Combinator<Object> {
 
     @Override
-    public Map<Proposition, Double> combine(final Collection<Map<Proposition, Double>> pValues) {
+    public Map<Object, Double> combine(final Collection<Map<Object, Double>> pValues) {
         if (pValues.isEmpty()) {
             return Collections.EMPTY_MAP;
         }
-        final Map<Proposition, Double> result = new HashMap<Proposition, Double>();
-        final Map<Proposition, Integer> count = new HashMap<Proposition, Integer>();
+        final Map<Object, Double> result = new HashMap<Object, Double>();
+        final Map<Object, Integer> count = new HashMap<Object, Integer>();
         //find sums and counts
-        for (Map<Proposition, Double> map : pValues) {
-            for (Proposition prop : map.keySet()) {
+        for (Map<Object, Double> map : pValues) {
+            for (Object prop : map.keySet()) {
                 //count
                 Integer c = count.get(prop);
                 count.put(prop, (c == null ? 0 : c) + 1);
@@ -36,7 +35,7 @@ public class MeanPropValueCombinator implements Combinator<Proposition> {
             }
         }
         //mean
-        for (Proposition prop : result.keySet()) {
+        for (Object prop : result.keySet()) {
             Integer c = count.get(prop);
             Double sum = result.get(prop);
 

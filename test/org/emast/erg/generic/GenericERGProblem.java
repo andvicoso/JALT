@@ -1,6 +1,7 @@
 package org.emast.erg.generic;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.emast.model.function.reward.RewardFunctionProposition;
 import org.emast.model.model.impl.ERGGridModel;
@@ -14,7 +15,6 @@ import org.emast.util.CollectionsUtils;
  */
 public class GenericERGProblem extends ERGGridModel {
 
-    private final HashSet<Proposition> badRewarders;
     private final Proposition finalProp;
 
     public GenericERGProblem(final int pRows, final int pCols, final int pAgents, final int pPropositions,
@@ -22,8 +22,33 @@ public class GenericERGProblem extends ERGGridModel {
         super(pRows, pCols);
         setAgents(pAgents);
         //set props
-        badRewarders = new HashSet<Proposition>(pObstacles);
+        HashSet<Proposition> badRewarders = new HashSet<Proposition>(pObstacles);
         Set<Proposition> props = new HashSet<Proposition>(pPropositions);
+        setPropositions(props);
+        fillPropsAndBadRewarders(pPropositions, pObstacles, props, badRewarders);
+
+        finalProp = new Proposition("@");
+        setGoal(new Expression(finalProp));
+
+        //add bad reward to bad prop
+        Map<Proposition, Double> rws = CollectionsUtils.createMap(badRewarders, pBadReward);
+        //add good reward to final prop
+        rws.put(finalProp, -pBadReward);
+
+        RewardFunctionProposition rf = new RewardFunctionProposition(this, rws, pOtherwise);
+        //set two random propositions as preservation goal  
+        //setPreservationGoal(new Expression(BinaryOperator.AND, badRewarders).negate());
+        //set bad reward function
+
+        setRewardFunction(rf);
+    }
+
+    public Proposition getFinalProp() {
+        return finalProp;
+    }
+
+    private void fillPropsAndBadRewarders(final int pPropositions, final int pObstacles,
+            Set<Proposition> props, HashSet<Proposition> badRewarders) {
         char initProp = 'b';
         for (int i = 0; i < pPropositions; i++) {
             char c = (char) (initProp + i);
@@ -39,22 +64,5 @@ public class GenericERGProblem extends ERGGridModel {
                 badRewarders.add(proposition);
             }
         }
-        setPropositions(props);
-        //set a random proposition as final goal 
-        finalProp = new Proposition("a");//CollectionsUtils.getRandom(props);
-        setGoal(new Expression(finalProp));
-        //set two random propositions as preservation goal  
-        //setPreservationGoal(new Expression(BinaryOperator.AND, badRewarders).negate());
-        //set bad reward function
-        setRewardFunction(new RewardFunctionProposition(this,
-                CollectionsUtils.createMap(badRewarders, pBadReward), pOtherwise));
-    }
-
-    public HashSet<Proposition> getBadRewarders() {
-        return badRewarders;
-    }
-
-    public Proposition getFinalProp() {
-        return finalProp;
     }
 }

@@ -46,7 +46,7 @@ public class PolicyIteration implements PolicyGenerator<MDP> {
                 }
                 // save the max value and position in the policy
                 final Double max = Collections.max(q.keySet());
-                final Double current = getSum(model, values, state, pi.getBest(state));
+                final Double current = getSum(model, values, state, pi.getBestAction(state));
                 // save the max value and position in the policy
                 if (max > current && !pi.get(state).equals(q.get(max))) {
                     values.put(state, max);
@@ -63,8 +63,8 @@ public class PolicyIteration implements PolicyGenerator<MDP> {
     private Map<State, Double> evaluatePolicy(MDP pModel, Policy policy) {
         final Map<State, Double> values = new HashMap<State, Double>();
         for (final State state : policy.getStates()) {
-            Double x = pModel.getRewardFunction().getValue(state, policy.getBest(state));
-            x += getGama() * getSum(pModel, values, state, policy.getBest(state));
+            Double x = pModel.getRewardFunction().getValue(state, policy.getBestAction(state));
+            x += getGama() * getSum(pModel, values, state, policy.getBestAction(state));
 
             values.put(state, x);
         }

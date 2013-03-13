@@ -95,4 +95,15 @@ public class Utils {
 
         return null;
     }
+
+    public static String[][] toStringTable(Object[][] objs) {
+        String[][] grid = new String[objs.length][objs[0].length];
+
+        for (int i = 0; i < objs.length; i++) {
+            for (int j = 0; j < objs[0].length; j++) {
+                grid[j][j] = objs[j][j].toString();
+            }
+        }
+        return grid;
+    }
 }

@@ -21,9 +21,21 @@ public class Log {
 //        } catch (Exception ex) {
 //        }
 //    }
+    public static void info(Object pMsg) {
+        info(pMsg.toString());
+    }
+
     public static void info(String pMsg) {
         //logger.info(pMsg);
         System.out.println(pMsg);
+    }
+
+    public static void debug(Object pMsg) {
+        debug(pMsg.toString());
+    }
+
+    public static void error(Object pMsg) {
+        error(pMsg.toString());
     }
 
     public static void debug(String pMsg) {

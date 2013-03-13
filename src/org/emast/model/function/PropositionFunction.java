@@ -28,6 +28,11 @@ public class PropositionFunction implements Serializable {
         props.addAll(pProps);
     }
 
+    public void set(final State pState, final Collection<Proposition> pProps) {
+        removeAll(pState);
+        add(pState, pProps);
+    }
+
     public void add(final State pState, final Proposition... pProps) {
         Set<Proposition> props = getProps(pState);
 

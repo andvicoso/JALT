@@ -26,8 +26,8 @@ public abstract class TransitionFunction implements Serializable {
         Collection<Action> possibleActions = getActionsFrom(pModelActions, pState);
 
         for (final Action action : possibleActions) {
-            final Double value = getValue(pState, State.ANY, action);
-            if (value != null && value > 0) {
+            final double value = getValue(pState, State.ANY, action);
+            if (value > 0) {
                 map.put(action, value);
             }
         }
@@ -38,8 +38,8 @@ public abstract class TransitionFunction implements Serializable {
             final State pState, final Action pAction) {
         final Map<State, Double> map = new HashMap<State, Double>();
         for (final State state : pModelStates) {
-            final Double value = getValue(pState, state, pAction);
-            if (value != null && value > 0) {
+            final double value = getValue(pState, state, pAction);
+            if (value > 0) {
                 map.put(state, value);
             }
         }
@@ -50,7 +50,7 @@ public abstract class TransitionFunction implements Serializable {
             final State pState, final Action pActions) {
         final Map<State, Double> map = new HashMap<State, Double>();
         for (final State state : pModelStates) {
-            final Double value = getValue(state, pState, pActions);
+            final double value = getValue(state, pState, pActions);
             if (value > 0) {
                 map.put(state, value);
             }

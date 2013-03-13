@@ -23,4 +23,8 @@ public class SimplePolicy extends HashMap<State, Action> {
 
         return sb.toString();
     }
+
+    public Set<State> getStates() {
+        return keySet();
+    }
 }

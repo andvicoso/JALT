@@ -16,8 +16,8 @@ import org.emast.model.model.ERG;
 import org.emast.model.model.MDP;
 import org.emast.model.model.impl.ERGModel;
 import org.emast.model.planning.PreservationGoalFactory;
-import org.emast.model.planning.propositionschooser.MinValueChooser;
-import org.emast.model.planning.rewardcombinator.MeanPropValueCombinator;
+import org.emast.model.planning.chooser.MinValueChooser;
+import org.emast.model.planning.rewardcombinator.MeanValueCombinator;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
@@ -35,30 +35,32 @@ public class ERGFactory {
 
     public static ERG create(MDP model, ERGQLearning q,
             PropositionFunction pf, Set<Proposition> props, Expression preservGoal, Expression finalGoal) {
-        return create(model, q.getQTable(), q.getPropsValues(), pf, props, preservGoal, finalGoal);
+        return create(model, q.getQTable(), q.getExpsValues(), pf, props, preservGoal, finalGoal);
     }
 
-    public static ERG create(MDP model, ERGQTable qt, Map<Proposition, Double> propsValues, PropositionFunction pf,
+    public static ERG create(MDP model, ERGQTable qt, Map<Expression, Double> expsValues, PropositionFunction pf,
             Set<Proposition> props, Expression preservGoal, Expression finalGoal) {
-        RewardFunction rf = model.getRewardFunction();//createRewardFunction(qt);
-        TransitionFunction tf = createTransitionFunctionFrequency(qt);
-        Expression newPreservGoal = createPreservationGoal(propsValues, preservGoal);
+        if (!expsValues.isEmpty()) {
+            RewardFunction rf = model.getRewardFunction();//createRewardFunction(qt);
+            TransitionFunction tf = createTransitionFunctionFrequency(qt);
+            Expression newPreservGoal = createPreservationGoal(expsValues, preservGoal);
 
-        if (changePreservGoal(model, pf, props, preservGoal, finalGoal, newPreservGoal)) {
-            Log.info("Changed preservation goal from {"
-                    + preservGoal + "} to {" + newPreservGoal + "}");
+            if (changePreservGoal(model, pf, props, preservGoal, finalGoal, newPreservGoal)) {
+                Log.info("Changed preservation goal from {"
+                        + preservGoal + "} to {" + newPreservGoal + "}");
 
-            ERG erg = new ERGModel();
-            erg.setActions(model.getActions());
-            erg.setStates(model.getStates());
-            erg.setRewardFunction(rf);
-            erg.setTransitionFunction(tf);
-            erg.setPropositionFunction(pf);
-            erg.setPreservationGoal(newPreservGoal);
-            erg.setGoal(finalGoal);
-            erg.setPropositions(props);
+                ERG erg = new ERGModel();
+                erg.setActions(model.getActions());
+                erg.setStates(model.getStates());
+                erg.setRewardFunction(rf);
+                erg.setTransitionFunction(tf);
+                erg.setPropositionFunction(pf);
+                erg.setPreservationGoal(newPreservGoal);
+                erg.setGoal(finalGoal);
+                erg.setPropositions(props);
 
-            return erg;
+                return erg;
+            }
         }
         return null;
     }
@@ -88,11 +90,11 @@ public class ERGFactory {
         };
     }
 
-    private static Expression createPreservationGoal(Map<Proposition, Double> propsValues, Expression preservGoal) {
-        Combinator comb = new MeanPropValueCombinator();
+    private static Expression createPreservationGoal(Map<Expression, Double> expsValues, Expression preservGoal) {
+        Combinator comb = new MeanValueCombinator();
         Chooser chooser = new MinValueChooser(comb);
-        Set<Proposition> finalProps = chooser.choose(Collections.singleton(propsValues));
-        Expression newPreservGoal = new PreservationGoalFactory().createPreservationGoal(preservGoal, finalProps);
+        Set<Expression> exps = chooser.choose(Collections.singleton(expsValues));
+        Expression newPreservGoal = new PreservationGoalFactory().createPreservationGoalExp(preservGoal, exps);
 
         return newPreservGoal;
     }
