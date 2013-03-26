@@ -10,7 +10,6 @@ import org.emast.model.state.State;
 public abstract class IterationAlgorithm<M extends MDP> extends DefaultAlgorithm<M, Policy>
         implements PolicyGenerator<M> {
 
-    public static final int MAX_ITERATIONS = 10;
     /**
      * Discount factor The discount factor determines the importance of future rewards. A factor of 0 will
      * make the agent "opportunistic" by only considering current rewards, while a factor approaching 1 will
@@ -62,6 +61,8 @@ public abstract class IterationAlgorithm<M extends MDP> extends DefaultAlgorithm
                 }
             }
         }
+
+        System.out.println("Error: " + String.format("%.4g", maxDif));
 
         return maxDif;
     }

@@ -5,12 +5,14 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import org.emast.model.action.Action;
+import org.emast.model.function.PropositionFunction;
 import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.model.Grid;
 import org.emast.model.model.MDP;
 import org.emast.model.propositional.Proposition;
+import org.emast.model.solution.Plan;
 import org.emast.model.solution.Policy;
 import org.emast.model.solution.SimplePolicy;
 import org.emast.model.state.State;
@@ -36,13 +38,15 @@ public class GridPrinter {
                 fillWithActions(grid, (Policy) pResult);
             } else if (pResult instanceof SimplePolicy) {
                 fillWithActions(grid, (SimplePolicy) pResult);
+            } else if (pResult instanceof Plan) {
+                fillWithActions(grid, pInitialStates, (Plan) pResult);
             }
         }
 
         return toTable(grid);
     }
 
-    private <M extends MDP & Grid> String[][] getGrid(M pModel, Map<Integer, State> pInitialStates) {
+    public <M extends MDP & Grid> String[][] getGrid(M pModel, Map<Integer, State> pInitialStates) {
         String[][] grid = createGrid(pModel);
 
         if (pModel instanceof ERG) {
@@ -101,24 +105,29 @@ public class GridPrinter {
     }
 
     public void fillWithActions(String[][] pGrid, Policy pPolicy) {
-        fillWithActions(pGrid, pPolicy.getBestPolicy());
+        for (State state : pPolicy.getStates()) {
+            Collection<Action> actions = pPolicy.getBestActions(state);
+            int row = GridUtils.getRow(state) + 1;
+            int col = GridUtils.getCol(state) + 1;
+
+            for (Action action : actions) {
+                getActionSymbol(action, pGrid, row, col);
+            }
+        }
+    }
+
+    public void fillWithActions(String[][] pGrid, Map<Integer, State> pInitialStates, Plan pPlan) {
+        for (State state : pInitialStates.values()) {
+            for (Action action : pPlan) {
+                getActionSymbol(state, action, pGrid);
+            }
+        }
     }
 
     public void fillWithActions(String[][] pGrid, SimplePolicy pPolicy) {
         for (State state : pPolicy.getStates()) {
             Action action = pPolicy.get(state);
-            int row = GridUtils.getRow(state) + 1;
-            int col = GridUtils.getCol(state) + 1;
-
-            if (action.getName().equals("north")) {
-                pGrid[row][col] = pGrid[row][col] + " ^";
-            } else if (action.getName().equals("south")) {
-                pGrid[row][col] = pGrid[row][col] + " v";
-            } else if (action.getName().equals("west")) {
-                pGrid[row][col] = pGrid[row][col] + " <";
-            } else if (action.getName().equals("east")) {
-                pGrid[row][col] = pGrid[row][col] + " >";
-            }
+            getActionSymbol(state, action, pGrid);
         }
     }
 
@@ -245,5 +254,43 @@ public class GridPrinter {
         }
 
         return toTable(grid);
+    }
+
+    public String print(PropositionFunction pf, MDP mdp) {
+        int i = 0;
+        final String[][] grid = new String[mdp.getStates().size() + 1][mdp.getActions().size() + 1];
+        grid[0][0] = " ";
+
+        for (State state : mdp.getStates()) {
+            int j = 0;
+            i++;
+            grid[i][0] = state.getName();
+
+            for (Action action : mdp.getActions()) {
+                j++;
+                grid[0][j] = action.getName();
+                grid[i][j] = pf.getExpressionForState(state).toString();
+            }
+        }
+
+        return toTable(grid);
+    }
+
+    private void getActionSymbol(State state, Action action, String[][] pGrid) {
+        int row = GridUtils.getRow(state) + 1;
+        int col = GridUtils.getCol(state) + 1;
+        getActionSymbol(action, pGrid, row, col);
+    }
+
+    private void getActionSymbol(Action action, String[][] pGrid, int row, int col) {
+        if (action.getName().equals("north")) {
+            pGrid[row][col] = pGrid[row][col] + " ^";
+        } else if (action.getName().equals("south")) {
+            pGrid[row][col] = pGrid[row][col] + " v";
+        } else if (action.getName().equals("west")) {
+            pGrid[row][col] = pGrid[row][col] + " <";
+        } else if (action.getName().equals("east")) {
+            pGrid[row][col] = pGrid[row][col] + " >";
+        }
     }
 }

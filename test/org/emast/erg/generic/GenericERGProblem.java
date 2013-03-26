@@ -8,7 +8,7 @@ import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.util.CollectionsUtils;
-
+import static org.emast.util.DefaultTestProperties.*;
 /**
  *
  * @author Anderson
@@ -26,10 +26,9 @@ public class GenericERGProblem extends ERGGridModel {
         Set<Proposition> props = new HashSet<Proposition>(pPropositions);
         setPropositions(props);
         fillPropsAndBadRewarders(pPropositions, pObstacles, props, badRewarders);
-
-        finalProp = new Proposition("@");
+        //final goal
+        finalProp = new Proposition(FINAL_GOAL);
         setGoal(new Expression(finalProp));
-
         //add bad reward to bad prop
         Map<Proposition, Double> rws = CollectionsUtils.createMap(badRewarders, pBadReward);
         //add good reward to final prop
@@ -49,7 +48,7 @@ public class GenericERGProblem extends ERGGridModel {
 
     private void fillPropsAndBadRewarders(final int pPropositions, final int pObstacles,
             Set<Proposition> props, HashSet<Proposition> badRewarders) {
-        char initProp = 'b';
+        char initProp = 'a';
         for (int i = 0; i < pPropositions; i++) {
             char c = (char) (initProp + i);
             String cs = c + "";

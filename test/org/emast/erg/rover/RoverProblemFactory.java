@@ -11,7 +11,7 @@ import org.emast.model.problem.ProblemFactory;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
-
+import static org.emast.util.DefaultTestProperties.*;
 /**
  *
  * @author And
@@ -57,7 +57,7 @@ public class RoverProblemFactory extends ProblemFactory {
         pf.add(getRandomEmptyState(model), new Proposition("exit"));
         model.setPropositionFunction(pf);
         //create reward function 
-        model.setRewardFunction(ToRL.convertRewardFunction(model, RoverModel.BAD_REWARD,
+        model.setRewardFunction(ToRL.convertRewardFunction(model, BAD_REWARD,
                 RoverModel.getBadRewardObstacles()));
         //create initial states
         final List<State> initStates = getRandomEmptyStates(model, agents);

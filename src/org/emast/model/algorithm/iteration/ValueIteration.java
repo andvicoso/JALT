@@ -27,6 +27,7 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M> {
         // When the maximmum error is greater than the defined error,
         // the best policy is found
         do {
+            lastv = v;
             iterations++;
             //set initial v
             v = new HashMap<State, Double>();
@@ -46,11 +47,13 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M> {
                 }
             }
 //            System.out.println(printResults());
-//            System.out.println(new GridPrinter().toTable(v, 3, 3));
+            System.out.println(new GridPrinter().toTable(v, 10, 10));
 //            System.out.println(pProblem.toString(pi));
-            lastv = v;
-        } while (iterations <= MAX_ITERATIONS);//getError(lastv, v) > pProblem.getError());
+              System.out.print(iterations);
+        } while (getError(lastv, v) > pProblem.getError());//iterations < MAX_ITERATIONS);//
 
+         //System.out.println(printResults());
+        
         return pi;
     }
 

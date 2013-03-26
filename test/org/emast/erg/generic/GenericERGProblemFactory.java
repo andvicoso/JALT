@@ -8,6 +8,7 @@ import org.emast.model.problem.ProblemFactory;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
+import static org.emast.util.DefaultTestProperties.*;
 
 /**
  *
@@ -15,6 +16,8 @@ import org.emast.util.CollectionsUtils;
  */
 public class GenericERGProblemFactory extends ProblemFactory {
 
+    public static final double CHANCE_OF_HAVING_PROP = 0.33;
+    public static final int MAX_PROPS_PER_STATE = 4;
     private final int rows;
     private final int cols;
     private final int agents;
@@ -25,16 +28,14 @@ public class GenericERGProblemFactory extends ProblemFactory {
 
     public static ProblemFactory createDefaultFactory() {
         //double agentsRatio = 0.02;
-        int rows = 5;
+        int rows = 10;
         int cols = rows;
-        int props = rows;
+        int props = (int) Math.ceil(rows / 5);
         int agents = 1;//(int) Math.ceil(rows * cols * agentsRatio);
-        int numberOfBadProps = (int) Math.ceil(props / 5);
-        double badReward = -30;
-        double otherwise = -1;
+        int numberOfBadProps = (int) Math.ceil(rows / 5);
 
         return new GenericERGProblemFactory(rows, cols, agents, props, numberOfBadProps,
-                badReward, otherwise);
+                BAD_REWARD, OTHERWISE);
     }
 
     public GenericERGProblemFactory(final int pRows, final int pCols, final int pAgents, final int pPropositions,
@@ -67,9 +68,9 @@ public class GenericERGProblemFactory extends ProblemFactory {
     private void spreadPropositions(final ERG model, final PropositionFunction pf) {
         //spread propositions over the grid
         for (State s : model.getStates()) {
-            //50% of chance of having some props
-            if (Math.random() > 0.5) {
-                for (int i = 0; i < Math.random() * 4; i++) {
+            //chance of having some props
+            if (CHANCE_OF_HAVING_PROP > Math.random()) {
+                for (int i = 0; i < Math.random() * MAX_PROPS_PER_STATE; i++) {
                     Proposition prop = CollectionsUtils.getRandom(model.getPropositions());
                     Set<Proposition> sprops = pf.getPropositionsForState(s);
                     if (sprops == null) {
@@ -87,7 +88,7 @@ public class GenericERGProblemFactory extends ProblemFactory {
         do {
             finalState = CollectionsUtils.getRandom(model.getStates());
             Set<Proposition> propsState = pf.getPropositionsForState(finalState);
-            if (propsState != null && hasBadProp(propsState) || propsState == null) {
+            if ((propsState != null && !hasBadProp(propsState)) || propsState == null) {
                 break;
             }
         } while (true);
@@ -95,10 +96,12 @@ public class GenericERGProblemFactory extends ProblemFactory {
     }
 
     private boolean hasBadProp(Set<Proposition> propsState) {
-        for (Proposition prop : propsState) {
-            char v = prop.getName().charAt(0);
-            if (Character.isUpperCase(v)) {
-                return true;
+        if (propsState != null) {
+            for (Proposition prop : propsState) {
+                char v = prop.getName().charAt(0);
+                if (Character.isUpperCase(v)) {
+                    return true;
+                }
             }
         }
         return false;

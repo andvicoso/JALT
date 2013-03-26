@@ -4,7 +4,7 @@ import org.emast.erg.generic.GenericERGProblemFactory;
 import org.emast.model.problem.Problem;
 import org.emast.model.problem.ProblemFactory;
 import org.emast.util.FileUtils;
-import org.emast.util.RandomProblemGenerator;
+import org.emast.util.ProblemsCLI;
 
 /**
  *
@@ -27,7 +27,7 @@ public class CurrentProblem {
 
     public static Problem createRandom() {
         ProblemFactory factory = GenericERGProblemFactory.createDefaultFactory();//AntennaCoverageProblemFactory.createDefaultFactory();
-        RandomProblemGenerator rpg = new RandomProblemGenerator(factory);
+        ProblemsCLI rpg = new ProblemsCLI(factory);
 
         return rpg.run();
     }

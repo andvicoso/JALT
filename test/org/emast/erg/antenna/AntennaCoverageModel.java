@@ -6,6 +6,7 @@ import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.util.CollectionsUtils;
+import static org.emast.util.DefaultTestProperties.*;
 
 /**
  * Problem that represents a grid with holes, stones and antennas. The agent must find the path to exit up,
@@ -17,9 +18,6 @@ import org.emast.util.CollectionsUtils;
  * @author anderson
  */
 public class AntennaCoverageModel extends ERGGridModel {
-
-    public static final double BAD_REWARD = -30d;
-    private static final double OTHERWISE = -1;
 
     public AntennaCoverageModel(final int pRows, final int pCols, final int pAgents) {
         super(pRows, pCols);

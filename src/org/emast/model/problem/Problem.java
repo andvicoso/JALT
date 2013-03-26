@@ -16,7 +16,7 @@ import org.emast.util.grid.GridPrinter;
  */
 public class Problem<M extends MDP> implements Serializable {
 
-    private double error = 0.009;
+    private double error = 0.0009;
     private Map<Integer, State> initialStates;
     private Set<State> finalStates;
     private M model;
@@ -73,13 +73,14 @@ public class Problem<M extends MDP> implements Serializable {
 
     public String toString(Object pResult) {
         final StringBuilder sb = new StringBuilder();
-        final String resultName = pResult.getClass().getSimpleName();
-        sb.append("\n").append(resultName).append(": \n").append(pResult);
 
         if (model instanceof GridModel) {
             final GridPrinter gridPrinter = new GridPrinter();
             final String grid = gridPrinter.print((GridModel) model, initialStates, pResult);
             sb.append("\n").append(grid);
+        } else {
+            final String resultName = pResult.getClass().getSimpleName();
+            sb.append("\n").append(resultName).append(": \n").append(pResult);
         }
 
         return sb.toString();

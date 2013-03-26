@@ -13,7 +13,7 @@ import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
 import org.emast.util.grid.GridUtils;
 import org.emast.util.grid.distancemeasure.CityBlock;
-
+import static org.emast.util.DefaultTestProperties.*;
 /**
  *
  * @author Anderson
@@ -65,7 +65,7 @@ public class AntennaExamples {
 
 
         model.setRewardFunction(ToRL.convertRewardFunction(model,
-                AntennaCoverageModel.BAD_REWARD, AntennaCoverageModel.getBadRewardObstacles()));
+                BAD_REWARD, AntennaCoverageModel.getBadRewardObstacles()));
 
         return new Problem<ERG>(model, initialStates, finalStates);
     }
@@ -109,7 +109,7 @@ public class AntennaExamples {
 
 
         model.setRewardFunction(ToRL.convertRewardFunction(model,
-                AntennaCoverageModel.BAD_REWARD, AntennaCoverageModel.getBadRewardObstacles()));
+                BAD_REWARD, AntennaCoverageModel.getBadRewardObstacles()));
 
         return new Problem<ERG>(model, initialStates, finalStates);
     }
@@ -154,7 +154,7 @@ public class AntennaExamples {
 
 
         model.setRewardFunction(ToRL.convertRewardFunction(model,
-                AntennaCoverageModel.BAD_REWARD, AntennaCoverageModel.getBadRewardObstacles()));
+                BAD_REWARD, AntennaCoverageModel.getBadRewardObstacles()));
 
         return new Problem<ERG>(model, initialStates, finalStates);
     }

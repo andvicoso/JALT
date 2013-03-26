@@ -11,6 +11,7 @@ import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
 import org.emast.util.grid.distancemeasure.DistanceMeasure;
 import org.emast.util.grid.distancemeasure.Euclidean;
+import static org.emast.util.DefaultTestProperties.*;
 
 /**
  *
@@ -93,8 +94,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
         pf.add(CollectionsUtils.getRandom(sts), down, exit);
         //create reward function 
         model.setRewardFunction(ToRL.convertRewardFunction(model,
-                AntennaCoverageModel.BAD_REWARD,
-                AntennaCoverageModel.getBadRewardObstacles()));
+                BAD_REWARD, AntennaCoverageModel.getBadRewardObstacles()));
         //create initial states
         final List<State> initStates = getRandomEmptyStates(model, agents);
 

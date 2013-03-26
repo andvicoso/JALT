@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.iteration.rl;
+package org.emast.model.algorithm.table;
 
 import java.util.ArrayList;
 import java.util.Collection;

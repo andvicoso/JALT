@@ -16,7 +16,7 @@ import org.emast.model.Chooser;
 import org.emast.model.algorithm.ensemble.AgentEnsembleBehavior;
 import org.emast.model.planning.rewardcombinator.MeanValueCombinator;
 import org.emast.model.test.Test;
-
+import static org.emast.util.DefaultTestProperties.*;
 /**
  *
  * @author Anderson
@@ -38,11 +38,8 @@ public class EnsembleTestBehaviours {
     }
 
     private static List<Individual> createIndividualBehaviors(double pBadRewardThreshold) {
-        double badMsgValue = -20;
-        double messageCost = -1;
-
         Individual propRepRewardBehavior = new PropRepReward(pBadRewardThreshold);
-        Individual commRewardBehavior = new CommReward(messageCost, badMsgValue, false);
+        Individual commRewardBehavior = new CommReward(MSG_COST, BAD_MSG_VALUE, false);
 
         return Arrays.asList(propRepRewardBehavior);//, commRewardBehavior);
     }

@@ -1,5 +1,7 @@
 package org.emast.model.algorithm.iteration.rl.erg;
 
+import org.emast.model.algorithm.table.erg.ERGQTable;
+import org.emast.model.algorithm.table.erg.ERGQTableItem;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -13,7 +15,6 @@ import org.emast.model.function.PropositionFunction;
 import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
-import org.emast.model.model.MDP;
 import org.emast.model.model.impl.ERGModel;
 import org.emast.model.planning.PreservationGoalFactory;
 import org.emast.model.planning.chooser.MinValueChooser;
@@ -33,19 +34,20 @@ public class ERGFactory {
                 model.getPropositions(), model.getPreservationGoal(), model.getGoal());
     }
 
-    public static ERG create(MDP model, ERGQLearning q,
+    public static ERG create(ERG model, ERGQLearning q,
             PropositionFunction pf, Set<Proposition> props, Expression preservGoal, Expression finalGoal) {
-        return create(model, q.getQTable(), q.getExpsValues(), pf, props, preservGoal, finalGoal);
+        return create(model, q.getQTable(), pf, props, preservGoal, finalGoal);
     }
 
-    public static ERG create(MDP model, ERGQTable qt, Map<Expression, Double> expsValues, PropositionFunction pf,
+    public static ERG create(ERG model, ERGQTable qt, PropositionFunction pf,
             Set<Proposition> props, Expression preservGoal, Expression finalGoal) {
+        Map<Expression, Double> expsValues = qt.getExpsValues();
         if (!expsValues.isEmpty()) {
             RewardFunction rf = model.getRewardFunction();//createRewardFunction(qt);
             TransitionFunction tf = createTransitionFunctionFrequency(qt);
-            Expression newPreservGoal = createPreservationGoal(expsValues, preservGoal);
+            Expression newPreservGoal = createPresevationGoal(model, expsValues);
 
-            if (changePreservGoal(model, pf, props, preservGoal, finalGoal, newPreservGoal)) {
+            if (newPreservGoal != null) {
                 Log.info("Changed preservation goal from {"
                         + preservGoal + "} to {" + newPreservGoal + "}");
 
@@ -65,14 +67,15 @@ public class ERGFactory {
         return null;
     }
 
-    private static TransitionFunction createTransitionFunctionFrequency(final ERGQTable q) {
+    public static TransitionFunction createTransitionFunctionFrequency(final ERGQTable q) {
         TransitionFunction tf = new TransitionFunction() {
             @Override
             public double getValue(State pState, State pFinalState, Action pAction) {
-                State fstate = q.getFinalState(pState, pAction);
+                ERGQTableItem item = q.get(pState, pAction);
+                State fstate = item.getFinalState();
                 if (State.isValid(pFinalState, fstate)) {
-                    double total = q.getTotalFrequency(pState);
-                    return total != 0 ? q.getFrequency(pState, pAction) / total : 0;
+                    double total = q.getTotal(pState);
+                    return total != 0 ? item.getFrequency() / total : 0;
                 }
                 return 0d;
             }
@@ -81,29 +84,19 @@ public class ERGFactory {
         return tf;
     }
 
-    private static RewardFunction createRewardFunction(final ERGQTable rt) {
+    private static RewardFunction createRewardFunction(final ERGQTable q) {
         return new RewardFunction() {
             @Override
             public double getValue(State pState, Action pAction) {
-                return rt.getReward(pState, pAction);
+                return q.get(pState, pAction).getReward();
             }
         };
     }
 
-    private static Expression createPreservationGoal(Map<Expression, Double> expsValues, Expression preservGoal) {
-        Combinator comb = new MeanValueCombinator();
-        Chooser chooser = new MinValueChooser(comb);
-        Set<Expression> exps = chooser.choose(Collections.singleton(expsValues));
-        Expression newPreservGoal = new PreservationGoalFactory().createPreservationGoalExp(preservGoal, exps);
-
-        return newPreservGoal;
-    }
-
-    private static boolean existValidFinalState(MDP model, PropositionFunction pf, Set<Proposition> props,
-            Expression newPreservGoal, Expression finalGoal) {
+    private static boolean existValidFinalState(PropositionFunction pf, Expression newPreservGoal,
+            Iterable<State> finalStates) {
         try {
-            Collection<State> finalStates = pf.intension(
-                    model.getStates(), props, finalGoal);
+
 
             for (State state : finalStates) {
                 if (pf.satisfies(state, newPreservGoal)) {
@@ -116,12 +109,40 @@ public class ERGFactory {
         return false;
     }
 
-    private static boolean changePreservGoal(MDP model, PropositionFunction pf, Set<Proposition> props,
-            Expression preservGoal, Expression finalGoal, Expression newPreservGoal) {
+    public static Expression createPreservationGoal(Map<Expression, Double> expsValues, Expression preservGoal) {
+        Combinator comb = new MeanValueCombinator();
+        Chooser chooser = new MinValueChooser(comb);
+        Set<Expression> exps = chooser.choose(Collections.singleton(expsValues));
+        Expression newPreservGoal = new PreservationGoalFactory().createPreservationGoalExp(preservGoal, exps);
+
+        return newPreservGoal;
+    }
+
+    public static Expression createPresevationGoal(ERG model, Map<Expression, Double> expsValues) {
+        PropositionFunction pf = model.getPropositionFunction();
+        Expression pg = model.getPreservationGoal();
+        Expression finalNewPg = null;
+
+        try {
+            Collection<State> finalStates = pf.intension(model.getStates(), model.getPropositions(), model.getGoal());
+            Expression newPg = createPreservationGoal(expsValues, pg);
+
+            if (canChangePreservGoal(pf, pg, newPg, finalStates)) {
+                finalNewPg = newPg;
+            }
+        } catch (Exception ex) {
+        }
+
+        return finalNewPg;
+    }
+
+    public static boolean canChangePreservGoal(PropositionFunction pf,
+            Expression preservGoal, Expression newPreservGoal, Iterable<State> finalStates) {
+
         //compare previous goal with the newly created
         return !newPreservGoal.equals(preservGoal)
                 && !preservGoal.contains(newPreservGoal)
                 && !preservGoal.contains(newPreservGoal.negate())
-                && existValidFinalState(model, pf, props, newPreservGoal, finalGoal);
+                && existValidFinalState(pf, newPreservGoal, finalStates);
     }
 }

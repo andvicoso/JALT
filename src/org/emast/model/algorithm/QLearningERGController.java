@@ -5,16 +5,15 @@ import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.ValueIteration;
 import org.emast.model.algorithm.iteration.rl.erg.ERGFactory;
 import org.emast.model.algorithm.iteration.rl.erg.ERGQLearning;
-import org.emast.model.algorithm.reachability.PPFERG;
-import org.emast.model.function.transition.TransitionFunction;
+import org.emast.model.algorithm.table.erg.ERGQTable;
+import org.emast.model.algorithm.table.erg.ERGQTableItem;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
-import org.emast.model.solution.Plan;
+import org.emast.model.propositional.Expression;
 import org.emast.model.solution.Policy;
-import org.emast.model.solution.SimplePolicy;
 import org.emast.model.state.State;
-import org.emast.util.grid.GridPrinter;
-
+import org.emast.util.Utils;
+import static org.emast.util.DefaultTestProperties.*;
 /**
  *
  * @author Anderson
@@ -22,52 +21,36 @@ import org.emast.util.grid.GridPrinter;
 public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
 
     private static final int MAX_IT = 2;
+    
+    private long init;
+    private long end;
+    private ERGQTable q;
     private ERGQLearning learning;
 
     @Override
     public Policy run(Problem<ERG> pProblem, Object... pParameters) {
-        PPFERG ppferg = new PPFERG();
         int iterations = 0;
         Problem<ERG> p = pProblem;
         ERG model = pProblem.getModel();
-
+        Expression newPreservGoal;
+        
         findBestPlan(pProblem);
+
         //start main loop
         do {
             Log.info("\nITERATION " + iterations++ + ":\n");
 
-            learning = new ERGQLearning();
-            learning.run(p);
-            SimplePolicy policy_ql = learning.getQTable().getPolicy();
+            //1. RUN QLEARNING UNTIL A HIGH ERROR IS FOUND (QUICK STOP LEARNING) 
+            runQLearning(p);
 
-            //Log.info("\nQTable: \n" + learning.getQTable());
-            //Log.info("\nPolicy QLearning: \n" + policy_ql.toString());
-            Log.info("\nQLearning" + pProblem.toString(policy_ql));
-            //Log.info("\n" + new GridPrinter().toTable(learning.getQTable().getFrequencyTableStr()));
+            //2. GET NEW PRESERVATION GOAL FROM QLEARNING ITERATIONS
+            newPreservGoal = ERGFactory.createPresevationGoal(model, learning.getQTable().getExpsValues());
 
-            //ai.run(pProblem, policy_ql);
-            //Log.info("\nTotal reward value: " + ai.getTotalReward());
-
-            model = ERGFactory.create(model, learning);
-
-            //break if model could not be created
-            if (model != null) {
-                Log.info("\n" + new GridPrinter().print(model.getTransitionFunction(), model));
-                p = new Problem<ERG>(model, pProblem.getInitialStates());
-
-                Policy policy_ppferg = ppferg.run(p);
-
-                TransitionFunction tf = policy_ppferg.createTransitionFunction(learning.getQTable(),
-                        model.getTransitionFunction(), model);
-                model.setTransitionFunction(tf);
-
-                Log.info("\n" + new GridPrinter().print(tf, model));
-
-                //Log.info("\nPolicy PPFERG: \n" + policy_ppferg.getBestPolicy().toString());
-                Log.info("\nPPFERG" + pProblem.toString(policy_ppferg));
-                findBestPlan(p);
+            //3. REDUCE Q FOR STATES THAT WERE VISITED IN QLEARNING EXPLORATION
+            if (newPreservGoal != null) {
+                lowerQ(model, newPreservGoal);
             }
-        } while (model != null && iterations < MAX_IT);
+        } while (newPreservGoal != null && (iterations < MAX_IT));
 
         return new Policy();//learning.getQTable().getPolicy(false);//TODO
     }
@@ -78,24 +61,71 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
     }
 
     private void findBestPlan(Problem<ERG> pProblem) {
-        ERG model = pProblem.getModel();
+        Log.info("\nValue Iteration");
+        //ERG model = pProblem.getModel();
         ValueIteration vi = new ValueIteration();
+        initTime();
         Policy pi = vi.run(pProblem, (Object) null);
+        endTime();
+//        State st = pProblem.getInitialStates().get(0);
+//        double sum = 0;
+//        do {
+//            Action a = pi.getBestAction(st);
+//            sum += model.getRewardFunction().getValue(st, a);
+//            st = model.getTransitionFunction().getBestReachableState(model.getStates(), st, a);
+//        } while (st != null && !pProblem.getFinalStates().contains(st));
 
-        //Log.info("\n" + pProblem.toString(pi));
+        Log.info("\nIterations: " + vi.getIterations());
+        //Log.info("Best plan reward value: " + sum);
+        Log.info("Best policy: " + pProblem.toString(pi));
+    }
 
-        State st = pProblem.getInitialStates().get(0);
-        Plan plan = new Plan();
-        double sum = 0;
-        do {
-            Action a = pi.getBestAction(st);
-            sum += model.getRewardFunction().getValue(st, a);
-            st = model.getTransitionFunction().getBestReachableState(model.getStates(), st, a);
-            plan.add(a);
-        } while (st != null && !pProblem.getFinalStates().contains(st));
+    private void initTime() {
+        init = System.currentTimeMillis();
+    }
 
-        Log.info("Value Iteration its: " + vi.getIterations());
-        Log.info("Best plan: " + plan);
-        Log.info("Best plan reward value: " + sum);
+    private void endTime() {
+        end = System.currentTimeMillis();
+        long diff = end - init;
+        Log.info("\nTime: " + Utils.toTimeString(diff));
+    }
+
+    private void runQLearning(Problem<ERG> p) {
+        //create q learning algorithm with high error
+        learning = new ERGQLearning(q);
+        //really run
+        initTime();
+        learning.run(p);
+        endTime();
+        //print policy found by qlearning
+        Policy policy_ql = learning.getQTable().getPolicy();
+        Log.info("QLearning final policy: " + p.toString(policy_ql));
+    }
+
+    private void lowerQ(ERG model, Expression newPreservGoal) {
+        ERGQTable oldq = learning.getQTable();
+        q = new ERGQTable(model.getStates(), model.getActions());
+
+        for (State state : model.getStates()) {
+            for (Action action : model.getActions()) {
+                ERGQTableItem item = oldq.get(state, action);
+                Expression exp = item.getExpression();
+                double value = 0;
+                try {
+                    if (exp != null && !newPreservGoal.evaluate(exp.getPropositions())) {
+                        value = BAD_Q_VALUE;
+                    }
+                } catch (Exception e) {
+                }
+
+                q.put(state, action, newItem(item, value));
+            }
+        }
+    }
+
+    private ERGQTableItem newItem(ERGQTableItem item, double value) {
+        ERGQTableItem nitem = new ERGQTableItem(item);
+        nitem.setValue(value);
+        return nitem;
     }
 }

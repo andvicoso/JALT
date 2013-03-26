@@ -21,7 +21,6 @@ public class ERGModel extends MDPModel implements ERG {
     private Expression preservationGoal;
     private PropositionFunction pf;
     private Set<Proposition> propositions;
-    private double otherwiseValue = -1d;
 
     public ERGModel() {
     }
@@ -84,11 +83,12 @@ public class ERGModel extends MDPModel implements ERG {
 
     @Override
     public String toString() {
+        //GridPrinter gp = new GridPrinter();
         StringBuilder sb = new StringBuilder(super.toString());
         sb.append("\nPropositions: ").append(getPropositions());
-        sb.append("\nProposition function: ").append(getPropositionFunction());
         sb.append("\nFinal goal: ").append(getGoal());
         sb.append("\nPreservation goal: ").append(getPreservationGoal());
+        //TODO: sb.append("\nProposition function: ").append("\n").append(gp.print(getPropositionFunction(), this));
 
         return sb.toString();
     }

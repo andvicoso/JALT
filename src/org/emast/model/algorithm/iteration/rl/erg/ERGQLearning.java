@@ -1,8 +1,8 @@
 package org.emast.model.algorithm.iteration.rl.erg;
 
+import org.emast.model.algorithm.table.erg.ERGQTable;
+import org.emast.model.algorithm.table.erg.ERGQTableItem;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.IterationAlgorithm;
 import org.emast.model.function.transition.TransitionFunction;
@@ -12,15 +12,13 @@ import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
-
+import static org.emast.util.DefaultTestProperties.*;
 /**
  *
  * @author anderson
  */
 public class ERGQLearning extends IterationAlgorithm<ERG> {
 
-    private static final int MAX_IT = 10;
-    private static final double BAD_VALUE = -20d;
     /**
      * The learning rate. The learning rate determines to what extent the newly acquired information will
      * override the old information. A factor of 0 will make the agent not learn anything, while a factor of 1
@@ -28,23 +26,24 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
      */
     private double alpha = 0.5;
     private ERGQTable q;
-    // private Policy policy;
-    private Map<Expression, Double> expSum;
-    private Map<Expression, Integer> expCount;
     private Expression badExpression;
 
+    public ERGQLearning(ERGQTable q) {
+        this.q = q;
+    }
+
     public ERGQLearning() {
-        expCount = new HashMap<Expression, Integer>();
-        expSum = new HashMap<Expression, Double>();
     }
 
     @Override
     public Policy run(Problem<ERG> pProblem, Object... pParameters) {
         model = pProblem.getModel();
-        //set initial q
-        q = new ERGQTable(model.getStates(), model.getActions());
+        if (q == null) {
+            q = new ERGQTable(model.getStates(), model.getActions());
+        }
         TransitionFunction tf = model.getTransitionFunction();
         ERGQTable lastq;
+
         //start the main loop
         do {
             iterations++;
@@ -55,7 +54,7 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
             //environment iteration loop
             do {
                 //get random action
-                action = getAction(state);
+                action = model.getTransitionFunction().getAction(model.getActions(), state);
                 if (action != null) {
                     //get reward
                     double reward = model.getRewardFunction().getValue(state, action);
@@ -73,46 +72,26 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
 //            System.out.println(printResults());
 //            System.out.println(new GridPrinter().toTable(q.getStateValue(), 5, 5));
 //            System.out.println(pProblem.toString(q.getPolicy()));
-            badExpression = getBadExpression();
+            badExpression = q.getBadExpression();
 
-//            if (badProp != null) {
-//                break;
-//            }
-             System.out.print(iterations);
+            System.out.print(iterations + " ");
+            //System.out.println(new GridPrinter().toTable(q.toTable()));
             //while did not reach the max iteration
-        } while (iterations < 1);//getError(lastq.getStateValue(), q.getStateValue()) > pProblem.getError());//
+        } while (iterations < MAX_ITERATIONS);//getError(lastq.getStateValue(), q.getStateValue()) > ERROR//pProblem.getError()
 
         return new Policy();//q.getPolicy(false);//TODO:
     }
 
     protected void updateQTable(State state, Action action, double reward, State nextState) {
         //get current q value
-        double cq = q.getQValue(state, action);
+        double cq = q.get(state, action).getValue();
         //get new q value
         double value = reward + (getGama() * getMax(model, nextState)) - cq;
         double newq = cq + alpha * value;
-        //save q
-        q.put(state, action, newq, reward, nextState);
-        //save q for the next state expression
-        updateProps(value, nextState);
-    }
-
-    protected void updateProps(double value, State nextState) {
+        //get expression for state
         Expression exp = model.getPropositionFunction().getExpressionForState(nextState);
-        if (exp != null) {
-            double sum = 0;
-            int count = 0;
-
-            if (expSum.containsKey(exp)) {
-                sum = expSum.get(exp);
-            }
-            if (expCount.containsKey(exp)) {
-                count = expCount.get(exp);
-            }
-
-            expSum.put(exp, sum + value);
-            expCount.put(exp, count + 1);
-        }
+        //save q
+        q.put(state, action, new ERGQTableItem(newq, reward, getFrequency(state, action), nextState, exp));
     }
 
     private double getMax(MDP pModel, State pState) {
@@ -121,7 +100,7 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
         Collection<Action> actions = pModel.getTransitionFunction().getActionsFrom(pModel.getActions(), pState);
         // search for the Q v for each state
         for (Action action : actions) {
-            Double value = q.getQValue(pState, action);
+            Double value = q.get(pState, action).getValue();
             if (max == null || value > max) {
                 max = value;
             }
@@ -134,46 +113,12 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
         return max;
     }
 
-    public Map<Expression, Double> getExpsValues() {
-        Map<Expression, Double> values = new HashMap<Expression, Double>();
-
-        for (Expression p : expSum.keySet()) {
-            double value = 0;
-            Double sum = expSum.get(p);
-            Integer count = expCount.get(p);
-            if (sum != null && count != null) {
-                value = sum / count;
-            }
-            values.put(p, value);
-        }
-
-        return values;
-    }
-
-    private Expression getBadExpression() {
-        Map<Expression, Double> values = getExpsValues();
-
-        for (Map.Entry<Expression, Double> entry : values.entrySet()) {
-            Expression proposition = entry.getKey();
-            Double value = entry.getValue();
-            if (value < BAD_VALUE) {
-                return proposition;
-            }
-        }
-
-        return null;
-    }
-
     @Override
     public String printResults() {
         StringBuilder sb = new StringBuilder(super.printResults());
         sb.append("\nLast values:\n").append(q.toString());
 
         return sb.toString();
-    }
-
-    protected Action getAction(State state) {
-        return model.getTransitionFunction().getAction(model.getActions(), state);
     }
 
     public ERGQTable getQTable() {
@@ -186,5 +131,10 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
 
     public Expression getBadProp() {
         return badExpression;
+    }
+
+    private Integer getFrequency(State state, Action action) {
+        ERGQTableItem item = q.get(state, action);
+        return item != null ? item.getFrequency() + 1 : 1;
     }
 }

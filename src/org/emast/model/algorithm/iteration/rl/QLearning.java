@@ -1,5 +1,6 @@
 package org.emast.model.algorithm.iteration.rl;
 
+import org.emast.model.algorithm.table.QTable;
 import java.util.Collection;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.IterationAlgorithm;
@@ -66,7 +67,7 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
 
     protected void updateQTable(State state, Action action, double reward, State nextState) {
         //get current q value
-        double cq = q.getQValue(state, action);
+        double cq = q.get(state, action);
         //get new q value
         double value = reward + (getGama() * getMax(model, nextState)) - cq;
         double newq = cq + alpha * value;
@@ -80,7 +81,7 @@ public class QLearning<M extends MDP> extends IterationAlgorithm<M> {
         Collection<Action> actions = pModel.getTransitionFunction().getActionsFrom(pModel.getActions(), pState);
         // search for the Q v for each state
         for (Action action : actions) {
-            Double value = q.getQValue(pState, action);
+            Double value = q.get(pState, action);
             if (max == null || value > max) {
                 max = value;
             }

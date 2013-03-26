@@ -11,14 +11,14 @@ import org.emast.model.problem.ProblemFactory;
  *
  * @author Anderson
  */
-public class RandomProblemGenerator {
+public class ProblemsCLI {
 
     public static final String DEFAULT_SUFFIX = "problem.emast";
     public static final String DEFAULT_DIR = "problems";
     private final ProblemFactory factory;
     private static final List<Command> COMMANDS = createCommands();
 
-    public RandomProblemGenerator(ProblemFactory pFactory) {
+    public ProblemsCLI(ProblemFactory pFactory) {
         factory = pFactory;
     }
 
@@ -48,7 +48,9 @@ public class RandomProblemGenerator {
                     p = getLastExecuted();
                 } else if (c.equals("n")) {
                     p = factory.create();
-                } else if (c.equals("q")) {
+                } else if (c.equals("p")) {
+                    p = listFiles();
+                }else if (c.equals("q")) {
                     p = null;
                     break out;
                 }
@@ -78,39 +80,18 @@ public class RandomProblemGenerator {
     }
 
     private Problem getLastExecuted() {
-        File last = getLastModified(DEFAULT_DIR + File.separator, 0l);
+        File last = FileUtils.getLastModified(DEFAULT_DIR + File.separator, "emast", 0l);
         return last != null ? FileUtils.fromFile(last.getAbsolutePath()) : null;
     }
 
-    public File getLastModified(String path, Long lastModified) {
-        File root = new File(path);
-        File[] list = root.listFiles();
-        File last = null;
-
-        if (list != null) {
-            for (File f : list) {
-                if (f.isDirectory()) {
-                    File dir_last = getLastModified(f.getAbsolutePath(), lastModified);
-                    f = dir_last;
-                }
-                if (f.lastModified() > lastModified) {
-                    last = f;
-                    lastModified = last.lastModified();
-                }
-            }
-        }
-
-        return last;
-    }
-
-    private static Command getCommand(String shortcut) {
-        for (Command command : COMMANDS) {
-            if (command.shortcut.equals(shortcut)) {
-                return command;
-            }
-        }
-        return getCommand("m");
-    }
+//    private static Command getCommand(String shortcut) {
+//        for (Command command : COMMANDS) {
+//            if (command.shortcut.equals(shortcut)) {
+//                return command;
+//            }
+//        }
+//        return getCommand("m");
+//    }
 
     private static List<Command> createCommands() {
         List<Command> commands = new ArrayList<Command>();
@@ -120,10 +101,23 @@ public class RandomProblemGenerator {
         commands.add(new Command("l", "last", "Retrieve the last executed environment"));
         commands.add(new Command("n", "new", "Create a new random environment"));
         commands.add(new Command("q", "quit", "Quit program"));
+        commands.add(new Command("p", "list", "List problem files"));
 
         return commands;
 
 
+    }
+
+    private Problem listFiles() {
+//        File root = new File(path);
+//        File[] list = root.listFiles();
+//        
+//        if (list != null) {
+//            for (File f : list) {
+//                if (!f.isDirectory()) {
+//                }
+//                }
+        return new Problem(null, null);
     }
 
     private static class Command {

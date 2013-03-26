@@ -6,15 +6,12 @@ import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.util.CollectionsUtils;
-
+import static org.emast.util.DefaultTestProperties.*;
 /**
  *
  * @author anderson
  */
 public class RoverModel extends ERGGridModel {
-
-    public static final double BAD_REWARD = -20;
-    private static final double OTHERWISE = -1;
 
     public RoverModel(final int pRows, final int pCols, final int pAgents) {
         super(pRows, pCols);

@@ -3,9 +3,6 @@ package org.emast.model.solution;
 import java.util.*;
 import java.util.Map.Entry;
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.iteration.rl.erg.ERGQTable;
-import org.emast.model.function.transition.TransitionFunction;
-import org.emast.model.model.MDP;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
 
@@ -36,12 +33,45 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
         return sb.toString();
     }
 
+    public Collection<Action> getBestActions(State state) {
+        Map<Action, Double> map = get(state);
+        if (map != null && !map.isEmpty()) {
+            Map<Action, Double> temp = new HashMap<Action, Double>(map);
+            Double max = Collections.max(temp.values());
+            Set<Action> actions = CollectionsUtils.getKeysForValue(temp, max);
+            if (max == 0) {
+                for (Action action : actions) {
+                    temp.remove(action);
+                }
+                if (temp.isEmpty()) {
+                    return Collections.EMPTY_SET;
+                }
+                max = Collections.max(temp.values());
+                actions = CollectionsUtils.getKeysForValue(temp, max);
+            }
+
+            return actions;
+        }
+        return Collections.EMPTY_SET;
+    }
+
     public Action getBestAction(State state) {
         Map<Action, Double> map = get(state);
         if (map != null && !map.isEmpty()) {
             Double max = Collections.max(map.values());
-            Collection<Action> bestActions = CollectionsUtils.getKeysForValue(map, max);
-            return CollectionsUtils.getRandom(bestActions);
+            Map<Action, Double> temp = new HashMap<Action, Double>(map);
+            Set<Action> actions = CollectionsUtils.getKeysForValue(temp, max);
+            if (max == 0) {
+                for (Action action : actions) {
+                    temp.remove(action);
+                }
+                if (temp.isEmpty()) {
+                    return null;
+                }
+                max = Collections.max(temp.values());
+                actions = CollectionsUtils.getKeysForValue(temp, max);
+            }
+            return CollectionsUtils.getRandom(actions);
         }
         return null;
     }
@@ -105,30 +135,5 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
         }
 
         return policy;
-    }
-
-    public TransitionFunction createTransitionFunction(final ERGQTable q, final TransitionFunction oldTf, final MDP mdp) {
-        TransitionFunction tf = new TransitionFunction() {
-            @Override
-            public double getValue(State pState, State pFinalState, Action pAction) {
-                State fstate = q.getFinalState(pState, pAction);
-                if (State.isValid(pFinalState, fstate) && containsKey(pState) && get(pState).containsKey(pAction)) {
-                    double oldValue = oldTf.getValue(pState, pFinalState, pAction);
-                    double sum = 0;
-                    int count = 0;
-                    for (Action action : mdp.getActions()) {
-                        double value = oldTf.getValue(pState, pFinalState, action);
-                        count = value > 0 ? count + 1 : count;
-                        sum += value;
-                    }
-                    double diff = 1.0 - sum;
-                    double d = diff / count;
-                    return oldValue + d;
-                }
-                return 0d;
-            }
-        };
-
-        return tf;
     }
 }

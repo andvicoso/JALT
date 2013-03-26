@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import org.emast.model.action.Action;
 import org.emast.model.agent.behavior.Individual;
-import org.emast.model.algorithm.iteration.rl.PropTable;
-import org.emast.model.algorithm.iteration.rl.QTable;
+import org.emast.model.algorithm.table.PropTable;
+import org.emast.model.algorithm.table.QTable;
 import org.emast.model.model.ERG;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -97,7 +97,7 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
         Collection<Action> actions = pModel.getTransitionFunction().getActionsFrom(pModel.getActions(), pState);
         // search for the Q v for each state
         for (Action action : actions) {
-            Double value = qTable.getQValue(pState, action);
+            Double value = qTable.get(pState, action);
             if (max == null || value > max) {
                 max = value;
             }
@@ -112,7 +112,7 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
 
     private void updateQTable(MDP pModel, State state, Action action, double reward, State nextState) {
         //get current q value
-        double cq = qTable.getQValue(state, action);
+        double cq = qTable.get(state, action);
         //get new q value
         double value = reward + (0.9 * getMax(pModel, nextState)) - cq;
         double newq = cq + 0.5 * value;
