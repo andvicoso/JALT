@@ -17,12 +17,8 @@ public abstract class IterationAlgorithm<M extends MDP> extends DefaultAlgorithm
      * diverge.
      */
     protected double gama = 0.9d;
-    protected int iterations;
+    protected int iterations = 0;
     protected M model;
-
-    public IterationAlgorithm() {
-        iterations = -1;
-    }
 
     public int getIterations() {
         return iterations;
@@ -39,6 +35,10 @@ public abstract class IterationAlgorithm<M extends MDP> extends DefaultAlgorithm
         sb.append("\nGama: ").append(gama);
 
         return sb.toString();
+    }
+
+    public double getError() {
+        return 0.0009;
     }
 
     protected double getError(Map<State, Double> lastv, Map<State, Double> v) {

@@ -10,18 +10,18 @@ import org.emast.model.Combinator;
  *
  * @author Anderson
  */
-public class MeanValueCombinator implements Combinator<Object> {
+public class MeanValueCombinator<T> implements Combinator<T> {
 
     @Override
-    public Map<Object, Double> combine(final Collection<Map<Object, Double>> pValues) {
+    public Map<T, Double> combine(final Collection<Map<T, Double>> pValues) {
         if (pValues.isEmpty()) {
             return Collections.EMPTY_MAP;
         }
-        final Map<Object, Double> result = new HashMap<Object, Double>();
-        final Map<Object, Integer> count = new HashMap<Object, Integer>();
+        final Map<T, Double> result = new HashMap<T, Double>();
+        final Map<T, Integer> count = new HashMap<T, Integer>();
         //find sums and counts
-        for (Map<Object, Double> map : pValues) {
-            for (Object prop : map.keySet()) {
+        for (Map<T, Double> map : pValues) {
+            for (T prop : map.keySet()) {
                 //count
                 Integer c = count.get(prop);
                 count.put(prop, (c == null ? 0 : c) + 1);
@@ -35,7 +35,7 @@ public class MeanValueCombinator implements Combinator<Object> {
             }
         }
         //mean
-        for (Object prop : result.keySet()) {
+        for (T prop : result.keySet()) {
             Integer c = count.get(prop);
             Double sum = result.get(prop);
 

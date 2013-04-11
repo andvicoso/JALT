@@ -8,8 +8,9 @@ public final class DefaultTestProperties {
 
     public static final String FINAL_GOAL = "@";
     
-    public static final int MAX_ITERATIONS = 20;
+    public static final int MAX_ITERATIONS = 3;
     
+    public static final double GOOD_Q_VALUE = 30;
     public static final double BAD_Q_VALUE = -30;
     public static final double BAD_REWARD = -30;
     public static final double BAD_EXP_VALUE = -30;

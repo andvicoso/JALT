@@ -46,7 +46,6 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
 
         //start the main loop
         do {
-            iterations++;
             lastq = new ERGQTable(q);
             //get initial state
             State state = pProblem.getInitialStates().get(0);
@@ -69,6 +68,8 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
                 }
                 //while there is a valid state to go to
             } while (action != null && state != null && !pProblem.getFinalStates().contains(state));
+            
+            iterations++;
 //            System.out.println(printResults());
 //            System.out.println(new GridPrinter().toTable(q.getStateValue(), 5, 5));
 //            System.out.println(pProblem.toString(q.getPolicy()));

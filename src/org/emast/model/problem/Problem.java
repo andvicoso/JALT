@@ -16,7 +16,6 @@ import org.emast.util.grid.GridPrinter;
  */
 public class Problem<M extends MDP> implements Serializable {
 
-    private double error = 0.0009;
     private Map<Integer, State> initialStates;
     private Set<State> finalStates;
     private M model;
@@ -39,14 +38,6 @@ public class Problem<M extends MDP> implements Serializable {
         return model;
     }
 
-    public double getError() {
-        return error;
-    }
-
-    public void setError(double error) {
-        this.error = error;
-    }
-
     public void save() {
         final String filename = getClass().getSimpleName()
                 + Utils.toFileTimeString(System.currentTimeMillis()) + ".emastp";
@@ -60,7 +51,6 @@ public class Problem<M extends MDP> implements Serializable {
         if (finalStates != null && !finalStates.isEmpty()) {
             sb.append("\nFinal states: ").append(finalStates);
         }
-        sb.append("\nError: ").append(error);
 
         if (model instanceof GridModel) {
             final GridPrinter gridPrinter = new GridPrinter();

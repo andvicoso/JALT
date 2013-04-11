@@ -2,13 +2,10 @@ package org.emast.model.algorithm.iteration.rl.erg;
 
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.algorithm.table.erg.ERGQTableItem;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import org.emast.infra.log.Log;
-import org.emast.model.Chooser;
-import org.emast.model.Combinator;
+import org.emast.model.chooser.base.MultiChooser;
 import org.emast.model.action.Action;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.function.PropositionFunction;
@@ -17,8 +14,7 @@ import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.model.impl.ERGModel;
 import org.emast.model.planning.PreservationGoalFactory;
-import org.emast.model.planning.chooser.MinValueChooser;
-import org.emast.model.planning.rewardcombinator.MeanValueCombinator;
+import org.emast.model.chooser.MinValueChooser;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
@@ -45,7 +41,7 @@ public class ERGFactory {
         if (!expsValues.isEmpty()) {
             RewardFunction rf = model.getRewardFunction();//createRewardFunction(qt);
             TransitionFunction tf = createTransitionFunctionFrequency(qt);
-            Expression newPreservGoal = createPresevationGoal(model, expsValues);
+            Expression newPreservGoal = createPresevationGoal(model, expsValues, null);
 
             if (newPreservGoal != null) {
                 Log.info("Changed preservation goal from {"
@@ -110,26 +106,36 @@ public class ERGFactory {
     }
 
     public static Expression createPreservationGoal(Map<Expression, Double> expsValues, Expression preservGoal) {
-        Combinator comb = new MeanValueCombinator();
-        Chooser chooser = new MinValueChooser(comb);
-        Set<Expression> exps = chooser.choose(Collections.singleton(expsValues));
+        Set<Expression> exps = getBadExpressions(expsValues);
         Expression newPreservGoal = new PreservationGoalFactory().createPreservationGoalExp(preservGoal, exps);
 
         return newPreservGoal;
     }
 
-    public static Expression createPresevationGoal(ERG model, Map<Expression, Double> expsValues) {
-        PropositionFunction pf = model.getPropositionFunction();
-        Expression pg = model.getPreservationGoal();
+    public static Expression createPresevationGoal(ERG model, Map<Expression, Double> expsValues, Set<Expression> avoid) {
+        //PropositionFunction pf = model.getPropositionFunction();
+        //Expression pg = model.getPreservationGoal();
         Expression finalNewPg = null;
 
         try {
-            Collection<State> finalStates = pf.intension(model.getStates(), model.getPropositions(), model.getGoal());
-            Expression newPg = createPreservationGoal(expsValues, pg);
+            //Collection<State> finalStates = pf.intension(model.getStates(), model.getPropositions(), model.getGoal());
+            //createPreservationGoal(expsValues, pg);
 
-            if (canChangePreservGoal(pf, pg, newPg, finalStates)) {
-                finalNewPg = newPg;
+            while (true) {
+                Expression exp = getBadExpressions(expsValues).iterator().next();
+                if (!avoid.contains(exp)) {
+                    finalNewPg = exp;
+                    break;
+                } else if (expsValues.isEmpty()) {
+                    break;
+                }
+                expsValues.remove(exp);
             }
+
+            // if (canChangePreservGoal(pf, pg, newPg, finalStates)) {
+            //finalNewPg = newPg;
+//                Log.info("Changed preservation goal from {"+ pg + "} to {" + finalNewPg + "}");
+            //  }
         } catch (Exception ex) {
         }
 
@@ -144,5 +150,10 @@ public class ERGFactory {
                 && !preservGoal.contains(newPreservGoal)
                 && !preservGoal.contains(newPreservGoal.negate())
                 && existValidFinalState(pf, newPreservGoal, finalStates);
+    }
+
+    public static Set<Expression> getBadExpressions(Map<Expression, Double> expsValues) {
+        MultiChooser<Expression> chooser = new MinValueChooser<Expression>();
+        return chooser.choose(expsValues);
     }
 }

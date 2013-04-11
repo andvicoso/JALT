@@ -69,9 +69,6 @@ public abstract class ProblemFactory {
     }
 
     public static Problem create(Problem pProblem, MDP pModel) {
-        Problem p = new Problem(pModel, pProblem.getInitialStates());
-        p.setError(pProblem.getError());
-
-        return p;
+        return new Problem(pModel, pProblem.getInitialStates(), pProblem.getFinalStates());
     }
 }

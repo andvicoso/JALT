@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.emast.infra.log.Log;
-import org.emast.model.Chooser;
+import org.emast.model.Combinator;
+import org.emast.model.chooser.base.MultiChooser;
 import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.individual.reward.PropReward;
@@ -26,22 +27,24 @@ import org.emast.util.CollectionsUtils;
  */
 public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
 
-    private final PolicyGenerator<ERG> algorithm;
-    private final Chooser<Proposition> chooser;
-    private final boolean acceptOnePath;
     private final PreservationGoalFactory factory;
+    private final PolicyGenerator<ERG> algorithm;
+    private final MultiChooser<Proposition> chooser;
+    private final Combinator<Proposition> combinator;
+    private final boolean acceptOnePath;
 
     /**
      *
      * @param pAlgorithm
      * @param pChooser
-     * @param pAcceptOnePath Indicates if the algorithm should accept at least one 
-     * valid path to the final goal for one agent
+     * @param pAcceptOnePath Indicates if the algorithm should accept at least one valid path to the final
+     * goal for one agent
      */
-    public ChangePreservGoal(PolicyGenerator<ERG> pAlgorithm, Chooser<Proposition> pChooser,
+    public ChangePreservGoal(PolicyGenerator<ERG> pAlgorithm, MultiChooser<Proposition> pChooser, Combinator<Proposition> pCombinator,
             boolean pAcceptOnePath) {
         algorithm = pAlgorithm;
         chooser = pChooser;
+        combinator = pCombinator;
         acceptOnePath = pAcceptOnePath;
         factory = new PreservationGoalFactory();
     }
@@ -55,8 +58,9 @@ public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
                     PropReward.class);
             reps.addAll(getPropositionsValues(behaviors));
         }
+        Map<Proposition, Double> combined = combinator.combine(reps);
         //choose "bad" propositions
-        Collection<Proposition> props = chooser.choose(reps);
+        Collection<Proposition> props = chooser.choose(combined);
         //verify the need to change the preservation goal
         if (!props.isEmpty()) {
             changePreservationGoal(pProblem, props);

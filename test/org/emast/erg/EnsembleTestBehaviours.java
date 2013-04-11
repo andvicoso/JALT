@@ -3,6 +3,7 @@ package org.emast.erg;
 import java.util.Arrays;
 import java.util.List;
 import org.emast.CurrentProblem;
+import org.emast.model.Combinator;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.Individual;
 import org.emast.model.agent.behavior.collective.ChangePreservGoal;
@@ -11,12 +12,14 @@ import org.emast.model.agent.behavior.individual.reward.PropRepReward;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.algorithm.reachability.PPFERG;
-import org.emast.model.planning.chooser.CombineRewardChooser;
-import org.emast.model.Chooser;
+import org.emast.model.chooser.base.MultiChooser;
 import org.emast.model.algorithm.ensemble.AgentEnsembleBehavior;
+import org.emast.model.chooser.ThresholdChooser;
 import org.emast.model.planning.rewardcombinator.MeanValueCombinator;
+import org.emast.model.propositional.Proposition;
 import org.emast.model.test.Test;
 import static org.emast.util.DefaultTestProperties.*;
+
 /**
  *
  * @author Anderson
@@ -46,8 +49,9 @@ public class EnsembleTestBehaviours {
 
     private static List<Collective> createCollectiveBehaviors(PolicyGenerator pg, double badRewardValue) {
         boolean acceptOnePath = true;
-        Chooser chooser = new CombineRewardChooser(new MeanValueCombinator(), badRewardValue);
-        Collective change = new ChangePreservGoal(pg, chooser, acceptOnePath);
+        MultiChooser<Proposition> chooser = new ThresholdChooser<Proposition>(badRewardValue);
+        Combinator<Combinator> combinator = new MeanValueCombinator();
+        Collective change = new ChangePreservGoal(pg, chooser, combinator, acceptOnePath);
 
         return Arrays.asList(change);
     }
