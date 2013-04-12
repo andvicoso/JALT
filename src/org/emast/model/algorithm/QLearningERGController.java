@@ -7,13 +7,15 @@ import org.emast.infra.log.Log;
 import org.emast.model.chooser.base.MultiChooser;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.ValueIteration;
-import static org.emast.model.algorithm.iteration.rl.erg.ERGFactory.getBadExpressions;
+import org.emast.model.algorithm.iteration.rl.erg.ERGFactory;
 import org.emast.model.algorithm.iteration.rl.erg.ERGQLearning;
+import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.algorithm.table.erg.ERGQTableItem;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
-import org.emast.model.chooser.MinValueChooser;
+import org.emast.model.chooser.ThresholdChooser;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.operator.BinaryOperator;
@@ -21,6 +23,7 @@ import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.util.Utils;
 import static org.emast.util.DefaultTestProperties.*;
+import org.emast.util.grid.GridPrinter;
 
 /**
  *
@@ -38,6 +41,8 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
 
     @Override
     public Policy run(Problem<ERG> pProblem, Object... pParameters) {
+        MultiChooser<Expression> badChooser = new ThresholdChooser<Expression>(-15, true);
+//        MultiChooser<Expression> goodChooser = new ThresholdChooser<Expression>(GOOD_EXP_VALUE, false);
         avoid = new HashSet<Expression>();
         attract = new HashSet<Expression>();
 
@@ -55,23 +60,43 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
             //1. RUN QLEARNING UNTIL A HIGH ERROR IS FOUND (QUICK STOP LEARNING) 
             runQLearning(p);
 
-            //2. GET NEW PRESERVATION GOAL FROM QLEARNING ITERATIONS
-            newPreservGoal = getWorstExpression(learning.getQTable().getExpsValues(), avoid);
+            //2. GET GOOD AND BAD EXPRESSIONS FROM QLEARNING ITERATIONS
+            Set<Expression> badExps = getExpressions(learning.getQTable().getExpsValues(),
+                    badChooser, avoid);
+//            Set<Expression> goodExps = getExpressions(learning.getQTable().getExpsValues(),
+//                    goodChooser, attract);
 
-            //3. REDUCE Q FOR STATES THAT WERE VISITED IN QLEARNING EXPLORATION
-            // WHICH HAVE THE NEW PRESERVATION GOAL
-            if (newPreservGoal != null) {
-                model.getPreservationGoal().add(newPreservGoal, BinaryOperator.AND);
-
-                avoid.add(newPreservGoal);
+            //3. CHANGE THE Q VALUE FOR STATES THAT WERE VISITED IN QLEARNING EXPLORATION
+            // WHICH HAVE THE FOUND EXPRESSIONS
+            if (!badExps.isEmpty()) {
+                avoid.addAll(badExps);
                 System.out.println("Avoid: " + avoid);
+
+//                attract.addAll(goodExps);
+//                System.out.println("Attract: " + attract);
 
                 changeQ(model);
                 System.out.println("QTable: \n" + q.toString());
+            } else {
+                break;
             }
-        } while (newPreservGoal != null && (iterations < MAX_IT));
+        } while (iterations < MAX_IT);
 
-        return new Policy();//learning.getQTable().getPolicy(false);//TODO
+        //4. CREATE NEW PRESERVATION GOAL FROM EXPRESSIONS THAT SHOULD BE AVOIDED
+        //AND JOIN IT WITH THE CURRENT
+        Expression badExp = new Expression(BinaryOperator.OR, avoid.toArray(new Expression[avoid.size()]));
+        model.getPreservationGoal().add(badExp.parenthesize().negate(), BinaryOperator.AND);
+
+        //5. CREATE NEW TRANSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
+        TransitionFunction t = ERGFactory.createTransitionFunctionFrequency(q);
+        model.setTransitionFunction(t);
+
+        Log.info("\n" + new GridPrinter().print(t, model));
+
+        //6. RUN PPFERG FOR THE FINAL PRESERV GOAL AND TRANSITION FUNCTION
+        //AND GET THE FINAL POLICY!
+        final PPFERG ppferg = new PPFERG();
+        return ppferg.run(p);
     }
 
     @Override
@@ -162,41 +187,13 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
 
         return false;
     }
-//    private boolean matchAvoidExpression(Set<Proposition> propositions) throws InvalidExpressionException {
-//        for (Expression exp : avoid) {
-//            if (!exp.evaluate(propositions)) {
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
 
-    private Expression getWorstExpression(Map<Expression, Double> expsValues, Set<Expression> avoid) {
-        Expression finalNewPg = null;
-
-        while (true) {
-            Expression exp = getBadExpressions(expsValues).iterator().next();
-            if (!avoid.contains(exp)) {
-                finalNewPg = exp;
-                break;
-            } else if (expsValues.isEmpty()) {
-                break;
-            }
-            expsValues.remove(exp);
-        }
-
-        return finalNewPg;
-    }
-
-    private Set<Expression> getBadExpressions(Map<Expression, Double> expsValues) {
-        MultiChooser<Expression> chooser = new MinValueChooser<Expression>();
+    private Set<Expression> getExpressions(Map<Expression, Double> expsValues, MultiChooser<Expression> chooser,
+            Set<Expression> container) {
         Set<Expression> exps = chooser.choose(expsValues);
-        return exps;
-    }
 
-    private Set<Expression> getGoodExpressions(Map<Expression, Double> expsValues) {
-        MultiChooser chooser = new MinValueChooser();
-        return chooser.choose(expsValues);
+        exps.removeAll(container);
+
+        return exps;
     }
 }

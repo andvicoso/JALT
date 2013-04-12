@@ -12,16 +12,20 @@ import java.util.Set;
 public class ThresholdChooser<T> implements MultiChooser<T> {
 
     private final double threshold;
+    private final boolean lower;
 
-    public ThresholdChooser(double pThreshold) {
+    public ThresholdChooser(double pThreshold, boolean pLower) {
         threshold = pThreshold;
+        lower = pLower;
     }
 
     @Override
     public Set<T> choose(Map<T, Double> pValues) {
         Set<T> set = new HashSet<T>();
         for (T t : pValues.keySet()) {
-            if (pValues.get(t) <= threshold) {
+            if (lower && pValues.get(t) <= threshold) {
+                set.add(t);
+            } else if (!lower && pValues.get(t) >= threshold) {
                 set.add(t);
             }
         }

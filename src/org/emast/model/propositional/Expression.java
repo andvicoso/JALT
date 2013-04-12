@@ -84,7 +84,7 @@ public final class Expression implements Serializable {
     public Expression negate() {
         String exp = expression;
         if (!isPrimitive() && !isParenthesized()) {
-            exp = parenthesize();
+            exp = parenthesizeString();
         }
         if (isNegated()) {
             return new Expression(exp.substring(1));
@@ -156,15 +156,19 @@ public final class Expression implements Serializable {
         optimize();
     }
 
+    public Expression parenthesize() {
+        return new Expression(parenthesizeString());
+    }
+
     public String parenthesize(final Expression pExp) {
-        return parenthesize(pExp.toString());
+        return parenthesizeString(pExp.toString());
     }
 
-    public String parenthesize() {
-        return parenthesize(expression);
+    public String parenthesizeString() {
+        return parenthesizeString(expression);
     }
 
-    public String parenthesize(String pExt) {
+    public String parenthesizeString(String pExt) {
         return "(" + pExt + ")";
     }
 

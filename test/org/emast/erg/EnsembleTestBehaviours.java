@@ -49,8 +49,8 @@ public class EnsembleTestBehaviours {
 
     private static List<Collective> createCollectiveBehaviors(PolicyGenerator pg, double badRewardValue) {
         boolean acceptOnePath = true;
-        MultiChooser<Proposition> chooser = new ThresholdChooser<Proposition>(badRewardValue);
-        Combinator<Combinator> combinator = new MeanValueCombinator();
+        MultiChooser<Proposition> chooser = new ThresholdChooser<Proposition>(badRewardValue, true);
+        Combinator<Proposition> combinator = new MeanValueCombinator();
         Collective change = new ChangePreservGoal(pg, chooser, combinator, acceptOnePath);
 
         return Arrays.asList(change);
