@@ -15,9 +15,13 @@ import org.emast.model.algorithm.table.erg.ERGQTableItem;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.chooser.ThresholdChooser;
+import org.emast.model.function.PropositionFunction;
+import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.TransitionFunction;
+import org.emast.model.model.impl.ERGModel;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
+import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
@@ -34,68 +38,50 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
     private static final int MAX_IT = 3;
     private long init;
     private long end;
-    private ERGQTable q;
     private ERGQLearning learning;
-    private Set<Expression> avoid;
-    private Set<Expression> attract;
 
     @Override
     public Policy run(Problem<ERG> pProblem, Object... pParameters) {
         MultiChooser<Expression> badChooser = new ThresholdChooser<Expression>(-15, true);
-//        MultiChooser<Expression> goodChooser = new ThresholdChooser<Expression>(GOOD_EXP_VALUE, false);
-        avoid = new HashSet<Expression>();
-        attract = new HashSet<Expression>();
-
-        int iterations = 0;
+        Set<Expression> avoid = new HashSet<Expression>();
+        //int iterations = 0;
         Problem<ERG> p = pProblem;
-        ERG model = pProblem.getModel();
-        Expression newPreservGoal;
+        ERG model = p.getModel();
 
         // findBestPlan(pProblem);
 
         //start main loop
-        do {
-            Log.info("\nITERATION " + iterations++ + ":\n");
+        //do {
+        //Log.info("\nITERATION " + iterations++ + ":\n");
 
-            //1. RUN QLEARNING UNTIL A HIGH ERROR IS FOUND (QUICK STOP LEARNING) 
-            runQLearning(p);
+        ERGQTable q = new ERGQTable(model.getStates(), model.getActions());
 
-            //2. GET GOOD AND BAD EXPRESSIONS FROM QLEARNING ITERATIONS
-            Set<Expression> badExps = getExpressions(learning.getQTable().getExpsValues(),
-                    badChooser, avoid);
-//            Set<Expression> goodExps = getExpressions(learning.getQTable().getExpsValues(),
-//                    goodChooser, attract);
+        //1. RUN QLEARNING UNTIL A HIGH ERROR IS FOUND (QUICK STOP LEARNING) 
+        runQLearning(p, q);
 
-            //3. CHANGE THE Q VALUE FOR STATES THAT WERE VISITED IN QLEARNING EXPLORATION
-            // WHICH HAVE THE FOUND EXPRESSIONS
-            if (!badExps.isEmpty()) {
-                avoid.addAll(badExps);
-                System.out.println("Avoid: " + avoid);
+        //2. GET BAD EXPRESSIONS FROM QLEARNING ITERATIONS
+        Set<Expression> badExps = badChooser.choose(q.getExpsValues());
 
-//                attract.addAll(goodExps);
-//                System.out.println("Attract: " + attract);
+        //3. CHANGE THE Q VALUE FOR STATES THAT WERE VISITED IN QLEARNING EXPLORATION
+        // WHICH HAVE THE FOUND EXPRESSIONS
+        if (!badExps.isEmpty()) {
+            avoid.addAll(badExps);
+            System.out.println("Avoid: " + avoid);
 
-                changeQ(model);
-                System.out.println("QTable: \n" + q.toString());
-            } else {
-                break;
-            }
-        } while (iterations < MAX_IT);
+            updateQ(model, q, avoid);
+            System.out.println("QTable: \n" + q.toString());
+        }
 
-        //4. CREATE NEW PRESERVATION GOAL FROM EXPRESSIONS THAT SHOULD BE AVOIDED
-        //AND JOIN IT WITH THE CURRENT
-        Expression badExp = new Expression(BinaryOperator.OR, avoid.toArray(new Expression[avoid.size()]));
-        model.getPreservationGoal().add(badExp.parenthesize().negate(), BinaryOperator.AND);
+        //4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
+        model = createModel(model, q, avoid);
+        p = new Problem<ERG>(model, p.getInitialStates(), p.getFinalStates());
 
-        //5. CREATE NEW TRANSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
-        TransitionFunction t = ERGFactory.createTransitionFunctionFrequency(q);
-        model.setTransitionFunction(t);
+        //} while (iterations < MAX_IT);
 
-        Log.info("\n" + new GridPrinter().print(t, model));
-
-        //6. RUN PPFERG FOR THE FINAL PRESERV GOAL AND TRANSITION FUNCTION
-        //AND GET THE FINAL POLICY!
+        //5. RUN PPFERG FOR THE NEW MODEL
         final PPFERG ppferg = new PPFERG();
+
+        //6. GET THE FINAL POLICY FROM PPFERG EXECUTED OVER THE NEW MODEL
         return ppferg.run(p);
     }
 
@@ -134,7 +120,7 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
         Log.info("\nTime: " + Utils.toTimeString(diff));
     }
 
-    private void runQLearning(Problem<ERG> p) {
+    private void runQLearning(Problem<ERG> p, ERGQTable q) {
         //create q learning algorithm with high error
         learning = new ERGQLearning(q);
         //really run
@@ -146,9 +132,8 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
         Log.info("QLearning final policy: " + p.toString(policy_ql));
     }
 
-    private void changeQ(ERG model) {
+    private ERGQTable updateQ(ERG model, ERGQTable q, Set<Expression> avoid) {
         ERGQTable oldq = learning.getQTable();
-        q = new ERGQTable(model.getStates(), model.getActions());
 
         for (State state : model.getStates()) {
             for (Action action : model.getActions()) {
@@ -159,8 +144,6 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
                     if (exp != null && !exp.getPropositions().isEmpty()) {
                         if (matchExpression(exp, avoid)) {
                             value = BAD_Q_VALUE;
-                        } else if (matchExpression(exp, attract)) {
-                            value = GOOD_Q_VALUE;
                         }
                     }
                 } catch (Exception e) {
@@ -169,6 +152,8 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
                 q.put(state, action, newItem(item, value));
             }
         }
+
+        return q;
     }
 
     private ERGQTableItem newItem(ERGQTableItem item, double value) {
@@ -188,12 +173,40 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
         return false;
     }
 
-    private Set<Expression> getExpressions(Map<Expression, Double> expsValues, MultiChooser<Expression> chooser,
-            Set<Expression> container) {
-        Set<Expression> exps = chooser.choose(expsValues);
+    private ERG createModel(ERG oldModel, ERGQTable q, Set<Expression> avoid) {
+        ERGModel model = new ERGModel();
+        //COPY MAIN PROPERTIES
+        model.setStates(q.getStates());
+        model.setActions(q.getActions());
+        model.setGoal(oldModel.getGoal());
+        model.setAgents(oldModel.getAgents());
+        //GET THE SET OF PROPOSITIONS FROM EXPLORATED STATES
+        model.setPropositions(getPropositions(q.getExpsValues()));
+        //CREATE NEW PRESERVATION GOAL FROM EXPRESSIONS THAT SHOULD BE AVOIDED
+        Expression badExp = new Expression(BinaryOperator.OR, avoid.toArray(new Expression[avoid.size()]));
+        model.setPreservationGoal(badExp.parenthesize().negate());
+        //CREATE NEW TRANSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
+        TransitionFunction tf = ERGFactory.createTransitionFunctionFrequency(q);
+        model.setTransitionFunction(tf);
+        //CREATE NEW PROPOSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
+        PropositionFunction pf = ERGFactory.createPropositionFunction(q);
+        model.setPropositionFunction(pf);
+        //CREATE NEW PROPOSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
+        RewardFunction rf = ERGFactory.createRewardFunction(q);
+        model.setRewardFunction(rf);
 
-        exps.removeAll(container);
+        Log.info("\n" + new GridPrinter().print(tf, model));
 
-        return exps;
+        return model;
+    }
+
+    private Set<Proposition> getPropositions(Map<Expression, Double> expsValues) {
+        Set<Proposition> props = new HashSet<Proposition>();
+        for (Expression exp : expsValues.keySet()) {
+            Set<Proposition> expProps = exp.getPropositions();
+            props.addAll(expProps);
+        }
+
+        return props;
     }
 }

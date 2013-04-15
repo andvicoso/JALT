@@ -89,7 +89,7 @@ public class ERGQLearning extends IterationAlgorithm<ERG> {
         //get new q value
         double value = reward + (getGama() * getMax(model, nextState)) - cq;
         double newq = cq + alpha * value;
-        //get expression for state
+        //get expression for next state
         Expression exp = model.getPropositionFunction().getExpressionForState(nextState);
         //save q
         q.put(state, action, new ERGQTableItem(newq, reward, getFrequency(state, action), nextState, exp));

@@ -80,7 +80,7 @@ public class ERGFactory {
         return tf;
     }
 
-    private static RewardFunction createRewardFunction(final ERGQTable q) {
+    public static RewardFunction createRewardFunction(final ERGQTable q) {
         return new RewardFunction() {
             @Override
             public double getValue(State pState, Action pAction) {
@@ -155,5 +155,22 @@ public class ERGFactory {
     public static Set<Expression> getBadExpressions(Map<Expression, Double> expsValues) {
         MultiChooser<Expression> chooser = new MinValueChooser<Expression>();
         return chooser.choose(expsValues);
+    }
+
+    public static PropositionFunction createPropositionFunction(final ERGQTable q) {
+        PropositionFunction pf = new PropositionFunction();
+
+        for (State state : q.getStates()) {
+            for (Action action : q.getActions()) {
+                ERGQTableItem item = q.get(state, action);
+                if (item != null && item.getExpression() != null) {
+                    State fState = item.getFinalState();
+                    Set<Proposition> props = item.getExpression().getPropositions();
+                    pf.add(fState, props);
+                }
+            }
+        }
+
+        return pf;
     }
 }
