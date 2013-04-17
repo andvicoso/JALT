@@ -3,7 +3,6 @@ package org.emast.model.chooser;
 import org.emast.model.chooser.base.SingleChooser;
 import org.emast.model.chooser.base.MultiChooser;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.emast.util.CollectionsUtils;

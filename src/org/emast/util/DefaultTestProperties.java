@@ -15,7 +15,7 @@ public final class DefaultTestProperties {
 
     public static final double BAD_Q_VALUE = -30;
     public static final double BAD_REWARD = -30;
-    public static final double BAD_EXP_VALUE = -30;
+    public static final double BAD_EXP_VALUE = -15;
     public static final double BAD_MSG_VALUE = -20;
     
     public static final double OTHERWISE = -1;

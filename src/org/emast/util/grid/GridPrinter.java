@@ -171,6 +171,18 @@ public class GridPrinter {
         }
     }
 
+    private <M extends MDP & Grid> String[][] createGrid(M pModel, String[][] pValues) {
+        String[][] grid = new String[pModel.getRows()][pModel.getCols()];
+
+        for (State state : pModel.getStates()) {
+            int row = GridUtils.getRow(state);
+            int col = GridUtils.getCol(state);
+            grid[row][col] = pValues[row][col];
+        }
+
+        return grid;
+    }
+
     private <M extends MDP & Grid> String[][] createGrid(M pModel) {
         String[][] grid = new String[pModel.getRows()][pModel.getCols()];
 
@@ -292,5 +304,11 @@ public class GridPrinter {
         } else if (action.getName().equals("east")) {
             pGrid[row][col] = pGrid[row][col] + " >";
         }
+    }
+
+    public <M extends MDP & Grid> String printTable(M pModel, String[][] pValues) {
+        String[][] grid = createGrid(pModel, pValues);
+        grid = addIndexes(grid, pModel.getRows(), pModel.getCols());
+        return toTable(grid);
     }
 }

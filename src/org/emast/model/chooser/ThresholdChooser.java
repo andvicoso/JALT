@@ -4,12 +4,13 @@ import org.emast.model.chooser.base.MultiChooser;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.emast.model.chooser.base.SingleChooser;
 
 /**
  *
  * @author Anderson
  */
-public class ThresholdChooser<T> implements MultiChooser<T> {
+public class ThresholdChooser<T> implements SingleChooser<T>, MultiChooser<T> {
 
     private final double threshold;
     private final boolean lower;
@@ -30,5 +31,18 @@ public class ThresholdChooser<T> implements MultiChooser<T> {
             }
         }
         return set;
+    }
+
+    @Override
+    public T chooseOne(Map<T, Double> pValues) {
+        return choose(pValues).iterator().next();
+    }
+
+    public double getThreshold() {
+        return threshold;
+    }
+
+    public boolean isLower() {
+        return lower;
     }
 }

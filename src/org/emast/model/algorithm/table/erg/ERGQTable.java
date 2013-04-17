@@ -9,7 +9,7 @@ import org.emast.model.propositional.Expression;
 import org.emast.model.solution.Policy;
 import org.emast.model.solution.SimplePolicy;
 import org.emast.model.state.State;
-import static org.emast.util.DefaultTestProperties.*;
+import org.emast.util.grid.GridUtils;
 
 /**
  *
@@ -50,6 +50,24 @@ public class ERGQTable extends StateActionTable<ERGQTableItem> {
                 j++;
             }
             i++;
+        }
+
+        return table;
+    }
+
+    public String[][] getFrequencyTableModel() {
+        String[][] table = new String[getStates().size()][getStates().size()];
+        table[0][0] = getTitle();
+
+        for (State state : getStates()) {
+            int i = GridUtils.getRow(state);
+            int j = GridUtils.getCol(state);
+            String str = "";
+            for (Action action : getActions()) {
+                str += "" + action.getName().charAt(0) + get(state, action).getFrequency() + " ";
+            }
+            
+            table[i][j] = str;
         }
 
         return table;
@@ -132,20 +150,6 @@ public class ERGQTable extends StateActionTable<ERGQTableItem> {
         }
 
         return expValues;
-    }
-
-    public Expression getBadExpression() {
-        Map<Expression, Double> expValues = getExpsValues();
-
-        for (Map.Entry<Expression, Double> entry : expValues.entrySet()) {
-            Expression proposition = entry.getKey();
-            Double value = entry.getValue();
-            if (value < BAD_EXP_VALUE) {
-                return proposition;
-            }
-        }
-
-        return null;
     }
 
     @Override

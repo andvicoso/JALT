@@ -1,23 +1,22 @@
-package org.emast.model.algorithm;
+package org.emast.model.algorithm.controller;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.emast.infra.log.Log;
-import org.emast.model.chooser.base.MultiChooser;
 import org.emast.model.action.Action;
+import org.emast.model.algorithm.DefaultAlgorithm;
 import org.emast.model.algorithm.iteration.ValueIteration;
 import org.emast.model.algorithm.iteration.rl.erg.ERGFactory;
 import org.emast.model.algorithm.iteration.rl.erg.ERGQLearning;
-import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.algorithm.table.erg.ERGQTableItem;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
-import org.emast.model.chooser.ThresholdChooser;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.TransitionFunction;
+import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.model.impl.ERGModel;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
@@ -25,7 +24,6 @@ import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
-import org.emast.util.Utils;
 import static org.emast.util.DefaultTestProperties.*;
 import org.emast.util.grid.GridPrinter;
 
@@ -33,57 +31,9 @@ import org.emast.util.grid.GridPrinter;
  *
  * @author Anderson
  */
-public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
+public abstract class AbstractERGQLearningController extends DefaultAlgorithm<ERG, Policy> {
 
-    private static final int MAX_IT = 3;
-    private long init;
-    private long end;
-    private ERGQLearning learning;
-
-    @Override
-    public Policy run(Problem<ERG> pProblem, Object... pParameters) {
-        MultiChooser<Expression> badChooser = new ThresholdChooser<Expression>(-15, true);
-        Set<Expression> avoid = new HashSet<Expression>();
-        //int iterations = 0;
-        Problem<ERG> p = pProblem;
-        ERG model = p.getModel();
-
-        // findBestPlan(pProblem);
-
-        //start main loop
-        //do {
-        //Log.info("\nITERATION " + iterations++ + ":\n");
-
-        ERGQTable q = new ERGQTable(model.getStates(), model.getActions());
-
-        //1. RUN QLEARNING UNTIL A HIGH ERROR IS FOUND (QUICK STOP LEARNING) 
-        runQLearning(p, q);
-
-        //2. GET BAD EXPRESSIONS FROM QLEARNING ITERATIONS
-        Set<Expression> badExps = badChooser.choose(q.getExpsValues());
-
-        //3. CHANGE THE Q VALUE FOR STATES THAT WERE VISITED IN QLEARNING EXPLORATION
-        // WHICH HAVE THE FOUND EXPRESSIONS
-        if (!badExps.isEmpty()) {
-            avoid.addAll(badExps);
-            System.out.println("Avoid: " + avoid);
-
-            updateQ(model, q, avoid);
-            System.out.println("QTable: \n" + q.toString());
-        }
-
-        //4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
-        model = createModel(model, q, avoid);
-        p = new Problem<ERG>(model, p.getInitialStates(), p.getFinalStates());
-
-        //} while (iterations < MAX_IT);
-
-        //5. RUN PPFERG FOR THE NEW MODEL
-        final PPFERG ppferg = new PPFERG();
-
-        //6. GET THE FINAL POLICY FROM PPFERG EXECUTED OVER THE NEW MODEL
-        return ppferg.run(p);
-    }
+    protected ERGQLearning learning;
 
     @Override
     public String printResults() {
@@ -110,34 +60,27 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
         Log.info("Best policy: " + pProblem.toString(pi));
     }
 
-    private void initTime() {
-        init = System.currentTimeMillis();
-    }
-
-    private void endTime() {
-        end = System.currentTimeMillis();
-        long diff = end - init;
-        Log.info("\nTime: " + Utils.toTimeString(diff));
-    }
-
-    private void runQLearning(Problem<ERG> p, ERGQTable q) {
+    protected void runQLearning(Problem<ERG> p, ERGQTable q) {
         //create q learning algorithm with high error
-        learning = new ERGQLearning(q);
+        learning = createERGQLearning(q);
         //really run
         initTime();
         learning.run(p);
         endTime();
+
+        Log.info("ERGQLearning frequency table: ");
+        Log.info("\n" + new GridPrinter().printTable((ERGGridModel) p.getModel(),
+                learning.getQTable().getFrequencyTableModel()));
+
         //print policy found by qlearning
-        Policy policy_ql = learning.getQTable().getPolicy();
-        Log.info("QLearning final policy: " + p.toString(policy_ql));
+//        Policy policy_ql = learning.getQTable().getPolicy();
+//        Log.info("ERGQLearning final policy: " + p.toString(policy_ql));
     }
 
-    private ERGQTable updateQ(ERG model, ERGQTable q, Set<Expression> avoid) {
-        ERGQTable oldq = learning.getQTable();
-
+    protected ERGQTable updateQ(ERG model, ERGQTable q, Set<Expression> avoid) {
         for (State state : model.getStates()) {
             for (Action action : model.getActions()) {
-                ERGQTableItem item = oldq.get(state, action);
+                ERGQTableItem item = q.get(state, action);
                 Expression exp = item.getExpression();
                 double value = 0;
                 try {
@@ -173,7 +116,7 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
         return false;
     }
 
-    private ERG createModel(ERG oldModel, ERGQTable q, Set<Expression> avoid) {
+    protected ERG createModel(ERG oldModel, ERGQTable q, Set<Expression> avoid) {
         ERGModel model = new ERGModel();
         //COPY MAIN PROPERTIES
         model.setStates(q.getStates());
@@ -195,7 +138,7 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
         RewardFunction rf = ERGFactory.createRewardFunction(q);
         model.setRewardFunction(rf);
 
-        Log.info("\n" + new GridPrinter().print(tf, model));
+        Log.info("\nTransition Function\n" + new GridPrinter().print(tf, model));
 
         return model;
     }
@@ -208,5 +151,9 @@ public class QLearningERGController extends DefaultAlgorithm<ERG, Policy> {
         }
 
         return props;
+    }
+
+    protected ERGQLearning createERGQLearning(ERGQTable q) {
+        return new ERGQLearning(q);
     }
 }

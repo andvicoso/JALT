@@ -1,7 +1,7 @@
 package org.emast.erg;
 
 import org.emast.CurrentProblem;
-import org.emast.model.algorithm.QLearningERGController;
+import org.emast.model.algorithm.controller.ERGQLearningController4;
 import org.emast.model.problem.Problem;
 import org.emast.model.test.Test;
 
@@ -18,6 +18,6 @@ public class MainTest {
     }
 
     public static void main(final String[] pArgs) {
-        new Test(createProblem(), new QLearningERGController()).run();// new ValueIterationAlgorithm(), 
+        new Test(createProblem(), new ERGQLearningController4()).run();// new ValueIterationAlgorithm(), 
     }
 }
