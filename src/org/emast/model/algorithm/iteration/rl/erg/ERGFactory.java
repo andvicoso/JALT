@@ -7,6 +7,7 @@ import java.util.Set;
 import org.emast.infra.log.Log;
 import org.emast.model.chooser.base.MultiChooser;
 import org.emast.model.action.Action;
+import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.function.reward.RewardFunction;
@@ -25,14 +26,14 @@ import org.emast.model.state.State;
  */
 public class ERGFactory {
 
-    public static ERG create(ERG model, ERGQLearning q) {
+    public static ERG create(ERG model, QLearning<ERG> q) {
         return create(model, q, model.getPropositionFunction(),
                 model.getPropositions(), model.getPreservationGoal(), model.getGoal());
     }
 
-    public static ERG create(ERG model, ERGQLearning q,
+    public static ERG create(ERG model, QLearning<ERG> q,
             PropositionFunction pf, Set<Proposition> props, Expression preservGoal, Expression finalGoal) {
-        return create(model, q.getQTable(), pf, props, preservGoal, finalGoal);
+        return create(model, (ERGQTable) q.getQTable(), pf, props, preservGoal, finalGoal);
     }
 
     public static ERG create(ERG model, ERGQTable qt, PropositionFunction pf,

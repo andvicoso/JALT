@@ -8,6 +8,7 @@ import org.emast.model.action.Action;
 import org.emast.model.agent.behavior.Individual;
 import org.emast.model.algorithm.table.PropTable;
 import org.emast.model.algorithm.table.QTable;
+import org.emast.model.algorithm.table.QTableItem;
 import org.emast.model.model.ERG;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -24,7 +25,7 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
 
     private List<Individual<M>> behaviors;
     private PropTable propTable;
-    private QTable qTable;
+    private QTable<QTableItem> q;
 
     public ERGAgentIterator(int pNumber) {
         this(pNumber, Collections.EMPTY_LIST);
@@ -43,7 +44,7 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
     public Plan run(Problem<M> pProblem, Object... pParameters) {
         M model = pProblem.getModel();
         propTable = new PropTable(model.getStates(), model.getPropositions());
-        qTable = new QTable(model.getStates(), model.getActions());
+        q = new QTable(model.getStates(), model.getActions());
         Action action;
 
         for (int i = 0; i < 10; i++) {
@@ -86,7 +87,7 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
         }
 
         print(propTable.getPropValue().toString());
-        print(qTable.toString());
+        print(q.toString());
 
         return plan;
     }
@@ -97,7 +98,7 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
         Collection<Action> actions = pModel.getTransitionFunction().getActionsFrom(pModel.getActions(), pState);
         // search for the Q v for each state
         for (Action action : actions) {
-            Double value = qTable.get(pState, action);
+            Double value = q.getValue(pState, action);
             if (max == null || value > max) {
                 max = value;
             }
@@ -112,12 +113,17 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
 
     private void updateQTable(MDP pModel, State state, Action action, double reward, State nextState) {
         //get current q value
-        double cq = qTable.get(state, action);
+        double cq = q.getValue(state, action);
         //get new q value
         double value = reward + (0.9 * getMax(pModel, nextState)) - cq;
         double newq = cq + 0.5 * value;
         //save q
-        qTable.put(state, action, newq);
+        q.put(state, action, new QTableItem(newq, reward, getFrequency(state, action), nextState));
+    }
+
+    protected Integer getFrequency(State state, Action action) {
+        QTableItem item = q.get(state, action);
+        return item != null ? item.getFrequency() + 1 : 1;
     }
 
     private void updatePropTable(ERG pModel, State pNextState, double pReward) {
@@ -148,6 +154,6 @@ public class ERGAgentIterator<M extends ERG> extends AgentIterator<M> {
     }
 
     public QTable getQTable() {
-        return qTable;
+        return q;
     }
 }

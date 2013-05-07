@@ -3,12 +3,10 @@ package org.emast.model.algorithm.controller;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.DefaultAlgorithm;
-import org.emast.model.algorithm.iteration.ValueIteration;
+import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.algorithm.iteration.rl.erg.ERGFactory;
-import org.emast.model.algorithm.iteration.rl.erg.ERGQLearning;
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.algorithm.table.erg.ERGQTableItem;
 import org.emast.model.exception.InvalidExpressionException;
@@ -16,7 +14,6 @@ import org.emast.model.model.ERG;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.TransitionFunction;
-import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.model.impl.ERGModel;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
@@ -25,7 +22,6 @@ import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import static org.emast.util.DefaultTestProperties.*;
-import org.emast.util.grid.GridPrinter;
 
 /**
  *
@@ -33,51 +29,27 @@ import org.emast.util.grid.GridPrinter;
  */
 public abstract class AbstractERGQLearningController extends DefaultAlgorithm<ERG, Policy> {
 
-    protected ERGQLearning learning;
+    protected QLearning learning;
 
     @Override
     public String printResults() {
         return learning.printResults();
     }
 
-    private void findBestPlan(Problem<ERG> pProblem) {
-        Log.info("\nValue Iteration");
-        //ERG model = pProblem.getModel();
-        ValueIteration vi = new ValueIteration();
-        initTime();
-        Policy pi = vi.run(pProblem, (Object) null);
-        endTime();
-//        State st = pProblem.getInitialStates().get(0);
-//        double sum = 0;
-//        do {
-//            Action a = pi.getBestAction(st);
-//            sum += model.getRewardFunction().getValue(st, a);
-//            st = model.getTransitionFunction().getBestReachableState(model.getStates(), st, a);
-//        } while (st != null && !pProblem.getFinalStates().contains(st));
-
-        Log.info("\nIterations: " + vi.getIterations());
-        //Log.info("Best plan reward value: " + sum);
-        Log.info("Best policy: " + pProblem.toString(pi));
-    }
-
     protected void runQLearning(Problem<ERG> p, ERGQTable q) {
         //create q learning algorithm with high error
-        learning = createERGQLearning(q);
+        learning = createQLearning(q);
         //really run
         initTime();
         learning.run(p);
         endTime();
 
-        Log.info("ERGQLearning frequency table: ");
-        Log.info("\n" + new GridPrinter().printTable((ERGGridModel) p.getModel(),
-                learning.getQTable().getFrequencyTableModel()));
-
-        //print policy found by qlearning
-//        Policy policy_ql = learning.getQTable().getPolicy();
-//        Log.info("ERGQLearning final policy: " + p.toString(policy_ql));
+//        Log.info("ERGQLearning frequency table: ");
+//        Log.info("\n" + new GridPrinter().printTable((ERGGridModel) p.getModel(),
+//                learning.getQTable().getFrequencyTableModel()));
     }
 
-    protected ERGQTable updateQ(ERG model, ERGQTable q, Set<Expression> avoid) {
+    protected ERGQTable updateQTable(ERG model, ERGQTable q, Set<Expression> avoid) {
         for (State state : model.getStates()) {
             for (Action action : model.getActions()) {
                 ERGQTableItem item = q.get(state, action);
@@ -126,19 +98,18 @@ public abstract class AbstractERGQLearningController extends DefaultAlgorithm<ER
         //GET THE SET OF PROPOSITIONS FROM EXPLORATED STATES
         model.setPropositions(getPropositions(q.getExpsValues()));
         //CREATE NEW PRESERVATION GOAL FROM EXPRESSIONS THAT SHOULD BE AVOIDED
-        Expression badExp = new Expression(BinaryOperator.OR, avoid.toArray(new Expression[avoid.size()]));
-        model.setPreservationGoal(badExp.parenthesize().negate());
+        model.setPreservationGoal(createNewPreservationGoal(avoid));
         //CREATE NEW TRANSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
         TransitionFunction tf = ERGFactory.createTransitionFunctionFrequency(q);
         model.setTransitionFunction(tf);
         //CREATE NEW PROPOSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
         PropositionFunction pf = ERGFactory.createPropositionFunction(q);
         model.setPropositionFunction(pf);
-        //CREATE NEW PROPOSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
+        //CREATE NEW REWARD FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
         RewardFunction rf = ERGFactory.createRewardFunction(q);
         model.setRewardFunction(rf);
 
-        Log.info("\nTransition Function\n" + new GridPrinter().print(tf, model));
+        //Log.info("\nTransition Function\n" + new GridPrinter().print(tf, model));
 
         return model;
     }
@@ -153,7 +124,12 @@ public abstract class AbstractERGQLearningController extends DefaultAlgorithm<ER
         return props;
     }
 
-    protected ERGQLearning createERGQLearning(ERGQTable q) {
-        return new ERGQLearning(q);
+    protected QLearning createQLearning(ERGQTable q) {
+        return new QLearning(q);
+    }
+
+    private Expression createNewPreservationGoal(Set<Expression> avoid) {
+        Expression badExp = new Expression(BinaryOperator.OR, avoid.toArray(new Expression[avoid.size()]));
+        return badExp.parenthesize().negate();
     }
 }

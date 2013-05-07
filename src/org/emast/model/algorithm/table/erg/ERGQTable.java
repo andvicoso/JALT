@@ -4,18 +4,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.table.StateActionTable;
+import org.emast.model.algorithm.table.QTable;
+import org.emast.model.model.ERG;
+import org.emast.model.model.MDP;
 import org.emast.model.propositional.Expression;
-import org.emast.model.solution.Policy;
-import org.emast.model.solution.SimplePolicy;
 import org.emast.model.state.State;
-import org.emast.util.grid.GridUtils;
 
 /**
  *
  * @author Anderson
  */
-public class ERGQTable extends StateActionTable<ERGQTableItem> {
+public class ERGQTable extends QTable<ERGQTableItem> {
 
     private Map<Expression, Double> expSum;
     private Map<Expression, Integer> expCount;
@@ -28,112 +27,6 @@ public class ERGQTable extends StateActionTable<ERGQTableItem> {
     public ERGQTable(ERGQTable q) {
         super(q);
         initExpMaps();
-    }
-
-    public String[][] getFrequencyTableStr() {
-        String[][] table = new String[getStates().size() + 1][getActions().size() + 1];
-        table[0][0] = getTitle();
-        int i = 1;
-        for (State state : getStates()) {
-            table[i++][0] = state.getName();
-        }
-        int j = 1;
-        for (Action action : getActions()) {
-            table[0][j++] = action.getName();
-        }
-
-        i = 1;
-        for (State state : getStates()) {
-            j = 1;
-            for (Action action : getActions()) {
-                table[i][j] = get(state, action).getFrequency() + "";
-                j++;
-            }
-            i++;
-        }
-
-        return table;
-    }
-
-    public String[][] getFrequencyTableModel() {
-        String[][] table = new String[getStates().size()][getStates().size()];
-        table[0][0] = getTitle();
-
-        for (State state : getStates()) {
-            int i = GridUtils.getRow(state);
-            int j = GridUtils.getCol(state);
-            String str = "";
-            for (Action action : getActions()) {
-                str += "" + action.getName().charAt(0) + get(state, action).getFrequency() + " ";
-            }
-            
-            table[i][j] = str;
-        }
-
-        return table;
-    }
-
-    public Map<State, Double> getStateValue() {
-        final Map<State, Double> map = new HashMap<State, Double>();
-
-        for (State state : getStates()) {
-            double max = -Double.MAX_VALUE;
-            for (Action action : getActions()) {
-                Double value = get(state, action).getValue();
-                if (value != 0 && value >= max) {
-                    max = value;
-                }
-            }
-            map.put(state, max == -Double.MAX_VALUE ? 0 : max);
-        }
-
-        return map;
-    }
-
-    public SimplePolicy getSimplePolicy() {
-        final SimplePolicy policy = new SimplePolicy();
-
-        for (State state : getStates()) {
-            double max = 0;
-            Action max_action = null;
-            for (Action action : getActions()) {
-                Double value = get(state, action).getValue();
-                if (value != 0 && (max_action == null || value > max)) {
-                    max = value;
-                    max_action = action;
-                }
-            }
-            if (max_action != null) {
-                policy.put(state, max_action);
-            }
-        }
-
-        return policy;
-    }
-
-    public Policy getPolicy() {
-        final Policy policy = new Policy();
-
-        for (State state : getStates()) {
-            Map<Action, Double> map = new HashMap<Action, Double>();
-            for (Action action : getActions()) {
-                Double value = get(state, action).getValue();
-                map.put(action, value);
-            }
-            policy.put(state, map);
-        }
-
-        return policy;
-    }
-
-    public double getTotal(State pState) {
-        int count = 0;
-
-        Map<Action, ERGQTableItem> v = getValues().get(pState);
-        for (Map.Entry<Action, ERGQTableItem> entry : v.entrySet()) {
-            count += entry.getValue().getFrequency();
-        }
-        return count;
     }
 
     public Map<Expression, Double> getExpsValues() {
@@ -155,11 +48,11 @@ public class ERGQTable extends StateActionTable<ERGQTableItem> {
     @Override
     public void put(State state, Action action, ERGQTableItem value) {
         super.put(state, action, value);
-        updateProps(value.getValue(), value.getExpression());
+        updateExpressionValues(value.getValue(), value.getExpression());
     }
 
-    protected void updateProps(double value, Expression exp) {
-        if (exp != null) {
+    protected void updateExpressionValues(double value, Expression exp) {
+        if (exp != null && !exp.isEmpty()) {
             double sum = 0;
             int count = 0;
 
@@ -181,7 +74,18 @@ public class ERGQTable extends StateActionTable<ERGQTableItem> {
     }
 
     @Override
-    protected String formatValue(State state, Action action, ERGQTableItem value) {
-        return String.format("%.4g", value.getValue());
+    public QTable clone() {
+        return new ERGQTable(this);
+    }
+
+    @Override
+    public void updateQ(MDP model, double qValue, State state, Action action, double reward, State nextState) {
+        final ERG erg = (ERG) model;
+        //get expression for next state
+        Expression exp = erg.getPropositionFunction().getExpressionForState(nextState);
+        //save q
+        put(state, action, new ERGQTableItem(qValue, reward, incFrequency(state, action), nextState, exp));
+        //update
+        updateExpressionValues(reward, exp);
     }
 }

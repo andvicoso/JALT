@@ -1,15 +1,18 @@
 package org.emast.model.algorithm.iteration;
 
 import java.util.*;
+import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
+import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.model.Grid;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.util.grid.GridPrinter;
+import static org.emast.util.DefaultTestProperties.*;
 
-public class ValueIteration<M extends MDP> extends IterationAlgorithm<M> {
+public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy> implements PolicyGenerator<M> {
 
     private Map<State, Double> lastv;
     private Map<State, Double> v;
@@ -28,7 +31,7 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M> {
         // the best policy is found
         do {
             lastv = v;
-            iterations++;
+            episodes++;
             //set initial v
             v = new HashMap<State, Double>();
             //create the policy
@@ -46,14 +49,14 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M> {
                     pi.put(state, q);
                 }
             }
-//            System.out.println(printResults());
-            System.out.println(new GridPrinter().toTable(v, 10, 10));
-//            System.out.println(pProblem.toString(pi));
-              System.out.print(iterations);
-        } while (getError(lastv, v) > getError());//iterations < MAX_ITERATIONS);//
+//            Log.info("\n"+printResults());
+            Log.info("\n" + new GridPrinter().toTable(v, 10, 10));
+//            Log.info("\n"+pProblem.toString(pi));
+            Log.info(episodes);
+        } while (getError(lastv, v) > ERROR);//iterations < MAX_ITERATIONS);//
 
-         //System.out.println(printResults());
-        
+        //Log.info("\n"+printResults());
+
         return pi;
     }
 

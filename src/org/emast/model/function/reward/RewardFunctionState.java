@@ -19,7 +19,7 @@ public class RewardFunctionState<M extends MDP> extends DefaultRewardFunction<M,
     @Override
     public double getValue(final State pState, final Action pAction) {
         Set<State> rewardStates = getRewards().keySet();
-        //any state that leads to a bad proposition gives a getBadReward()
+        //any state that leads to a bad state gives a BadReward
         State nextState = getModel().getTransitionFunction().getBestReachableState(
                 getModel().getStates(), pState, pAction);
         if (rewardStates.contains(nextState) && getRewards().containsKey(nextState)) {

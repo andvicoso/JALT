@@ -1,21 +1,19 @@
 package org.emast.model.algorithm.iteration.rl.erg;
 
-import org.emast.model.algorithm.table.erg.ERGQTable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.emast.model.action.Action;
+import org.emast.model.algorithm.iteration.rl.QLearning;
+import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.model.ERG;
-import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Proposition;
-import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 
 /**
  *
  * @author anderson
  */
-public class ERGQLearningIndivProp extends ERGQLearning {
+public class ERGQLearningIndivProp extends QLearning<ERG> {
 
     // private Policy policy;
     private Map<Proposition, Double> propSum;
@@ -23,50 +21,9 @@ public class ERGQLearningIndivProp extends ERGQLearning {
     private Proposition badProp;
 
     public ERGQLearningIndivProp() {
+        super(new ERGQTable(null));//TODO
         propCount = new HashMap<Proposition, Integer>();
         propSum = new HashMap<Proposition, Double>();
-    }
-
-    @Override
-    public Policy run(Problem<ERG> pProblem, Object... pParameters) {
-        model = pProblem.getModel();
-        //set initial q
-        q = new ERGQTable(model.getStates(), model.getActions());
-        ERGQTable lastq;
-        //start the main loop
-        do {
-            iterations++;
-            lastq = new ERGQTable(q);
-            //get initial state
-            State state = pProblem.getInitialStates().get(0);
-            Action action;
-            //environment iteration loop
-            do {
-                //get random action
-                action = getAction(state);
-                if (action != null) {
-                    //get reward
-                    double reward = model.getRewardFunction().getValue(state, action);
-                    //get next state
-                    State nextState = getNextState(state, action);
-
-                    if (nextState != null) {
-                        updateQTable(state, action, reward, nextState);
-                    }
-                    //go to next state
-                    state = nextState;
-                }
-                //while there is a valid state to go to
-            } while (action != null && state != null && !pProblem.getFinalStates().contains(state));
-            //badProp = getBadProposition();
-
-//            if (badProp != null) {
-//                break;
-//            }
-            //while did not reach the max iteration
-        } while (isStop(lastq));
-
-        return new Policy();//q.getPolicy(false);//TODO:
     }
 
     protected void updateProps(double reward, State nextState) {

@@ -1,14 +1,13 @@
 package org.emast.model.algorithm.iteration;
 
 import java.util.Map;
+import org.emast.infra.log.Log;
 import org.emast.model.algorithm.DefaultAlgorithm;
-import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.model.MDP;
-import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
+import static org.emast.util.DefaultTestProperties.*;
 
-public abstract class IterationAlgorithm<M extends MDP> extends DefaultAlgorithm<M, Policy>
-        implements PolicyGenerator<M> {
+public abstract class IterationAlgorithm<M extends MDP, R> extends DefaultAlgorithm<M, R> {
 
     /**
      * Discount factor The discount factor determines the importance of future rewards. A factor of 0 will
@@ -16,12 +15,12 @@ public abstract class IterationAlgorithm<M extends MDP> extends DefaultAlgorithm
      * make it strive for a long-term high reward. If the discount factor meets or exceeds 1, the values may
      * diverge.
      */
-    protected double gama = 0.9d;
-    protected int iterations = 0;
+    protected double gama = GAMA;
+    protected int episodes = 0;
     protected M model;
 
-    public int getIterations() {
-        return iterations;
+    public int getEpisodes() {
+        return episodes;
     }
 
     public double getGama() {
@@ -31,20 +30,16 @@ public abstract class IterationAlgorithm<M extends MDP> extends DefaultAlgorithm
     @Override
     public String printResults() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\nIterations: ").append(iterations);
+        sb.append("\nEpisodes: ").append(episodes);
         sb.append("\nGama: ").append(gama);
 
         return sb.toString();
     }
 
-    public double getError() {
-        return 0.0009;
-    }
-
     protected double getError(Map<State, Double> lastv, Map<State, Double> v) {
         double maxDif = -Double.MAX_VALUE;
 
-        if (iterations == 0) {
+        if (episodes == 0) {
             maxDif = Double.MAX_VALUE;
         } else {
             for (State state : lastv.keySet()) {
@@ -62,7 +57,7 @@ public abstract class IterationAlgorithm<M extends MDP> extends DefaultAlgorithm
             }
         }
 
-        System.out.println("Error: " + String.format("%.4g", maxDif));
+        Log.info("Error: " + String.format("%.4g", maxDif));
 
         return maxDif;
     }

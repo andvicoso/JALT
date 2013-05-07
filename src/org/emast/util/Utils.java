@@ -43,10 +43,11 @@ public class Utils {
     }
 
     public static String toTimeString(long millis) {
-        return String.format("%d min, %d sec",
-                TimeUnit.MILLISECONDS.toMinutes(millis),
-                TimeUnit.MILLISECONDS.toSeconds(millis)
-                - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+        long min = TimeUnit.MILLISECONDS.toMinutes(millis);
+        long sec = TimeUnit.MILLISECONDS.toSeconds(millis)
+                - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
+
+        return String.format("%d min, %d sec", min, sec) + "(" + millis + " ms)";
     }
 
     public static String toFileTimeString(long millis) {

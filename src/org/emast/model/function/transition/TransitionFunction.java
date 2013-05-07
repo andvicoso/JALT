@@ -63,17 +63,11 @@ public abstract class TransitionFunction implements Serializable {
         return getReachableStatesValues(pModelStates, pState, pAction).keySet();
     }
 
-    public Action getAction(final Collection<Action> pModelActions,
-            final State pState) {
-        Map<Action, Double> actionsValues = getActionValues(pModelActions, pState);
-        return CollectionsUtils.draw(actionsValues);
-    }
-
-    public State getNextState(final Collection<Action> pModelActions, final Collection<State> pModelStates,
-            final State pState) {
-        Action action = getAction(pModelActions, pState);
-        return action != null ? getBestReachableState(pModelStates, pState, action) : null;
-    }
+//    public State getNextState(final Collection<Action> pModelActions, final Collection<State> pModelStates,
+//            final State pState) {
+//        Action action = getAction(pModelActions, pState);
+//        return action != null ? getBestReachableState(pModelStates, pState, action) : null;
+//    }
 
     public State getBestReachableState(final Collection<State> pModelStates,
             final State pState, final Action pAction) {

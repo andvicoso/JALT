@@ -3,16 +3,16 @@ package org.emast.model.algorithm.ensemble;
 import java.util.*;
 import org.emast.infra.log.Log;
 import org.emast.model.chooser.base.MultiChooser;
-import org.emast.model.Combinator;
-import org.emast.model.algorithm.iteration.rl.erg.ERGQLearning;
+import org.emast.model.combinator.Combinator;
 import org.emast.model.algorithm.DefaultAlgorithm;
 import org.emast.model.algorithm.PolicyGenerator;
+import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.planning.PreservationGoalFactory;
 import org.emast.model.planning.ValidPathFinder;
 import org.emast.model.chooser.MinValueChooser;
-import org.emast.model.planning.rewardcombinator.MeanValueCombinator;
+import org.emast.model.combinator.MeanValueCombinator;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -26,7 +26,7 @@ import org.emast.model.state.State;
 public class AgentEnsemble extends DefaultAlgorithm<ERG, Policy> implements PolicyGenerator<ERG> {
 
     private final PolicyGenerator<ERG> policyGenerator;
-    private List<ERGQLearning> agentIterators;
+    private List<QLearning> agentIterators;
 
     public AgentEnsemble(PolicyGenerator<ERG> pPolicyGenerator) {
         policyGenerator = pPolicyGenerator;
@@ -35,7 +35,7 @@ public class AgentEnsemble extends DefaultAlgorithm<ERG, Policy> implements Poli
     @Override
     public String printResults() {
         final StringBuilder sb = new StringBuilder();
-        for (ERGQLearning agent : agentIterators) {
+        for (QLearning agent : agentIterators) {
             sb.append(agent.printResults());
         }
         return sb.toString();
@@ -49,13 +49,13 @@ public class AgentEnsemble extends DefaultAlgorithm<ERG, Policy> implements Poli
         ERG model = problem.getModel();
         //start main loop
         do {
-            agentIterators = new ArrayList<ERGQLearning>(model.getAgents());
+            agentIterators = new ArrayList<QLearning>(model.getAgents());
             Log.info("\nITERATION " + iterations++ + ":\n");
             //create initial policy
             policy = policyGenerator.run(pProblem);
 
             for (int i = 0; i < model.getAgents(); i++) {
-                final ERGQLearning agentIterator = new ERGQLearning();
+                final QLearning agentIterator = new QLearning();
                 agentIterators.add(agentIterator);
                 agentIterator.run(pProblem, policy);
             }
@@ -122,7 +122,7 @@ public class AgentEnsemble extends DefaultAlgorithm<ERG, Policy> implements Poli
         MultiChooser<Proposition> chooser = new MinValueChooser<Proposition>();
         Collection<Map<Proposition, Double>> values = new ArrayList<Map<Proposition, Double>>(agentIterators.size());
         //get results for each agent
-        for (ERGQLearning agent : agentIterators) {
+        for (QLearning agent : agentIterators) {
             //values.add(agent.getExpsValues());//TODO
         }
         Map<Proposition, Double> combined = comb.combine(values);

@@ -22,10 +22,11 @@ public class CurrentProblem {
     }
 
     public static Problem create() {
-        return createRandom();//new AntennaExamples().getAAAI2013NoInitialPreserv();
+        //DynaSuttonMazeTests.getERGFigure95Example();//
+        return createFromCLI();//new AntennaExamples().getAAAI2013NoInitialPreserv();
     }
 
-    public static Problem createRandom() {
+    public static Problem createFromCLI() {
         ProblemFactory factory = GenericERGProblemFactory.createDefaultFactory();//AntennaCoverageProblemFactory.createDefaultFactory();
         ProblemsCLI rpg = new ProblemsCLI(factory);
 

@@ -1,6 +1,7 @@
 package org.emast.model.algorithm.reachability;
 
 import java.util.*;
+import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
@@ -35,7 +36,7 @@ public class PPFERG<M extends ERG> extends PPF<M> {
         model = pProblem.getModel();
         //print initial msg
         String modelName = model.getClass().getSimpleName();
-        System.out.println("Running PPFERG for " + modelName);
+        Log.info("\nRunning PPFERG for " + modelName);
         //get the initial state for only one agent
         final Collection<State> preserveIntension = intension(model.getPreservationGoal());
         final Collection<State> goalsIntension = intension(model.getGoal());

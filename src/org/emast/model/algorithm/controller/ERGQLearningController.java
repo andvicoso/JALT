@@ -2,6 +2,7 @@ package org.emast.model.algorithm.controller;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.emast.infra.log.Log;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.model.ERG;
@@ -34,10 +35,10 @@ public class ERGQLearningController extends AbstractERGQLearningController {
         // WHICH HAVE THE FOUND EXPRESSIONS
         if (!badExps.isEmpty()) {
             avoid.addAll(badExps);
-            System.out.println("Avoid: " + avoid);
+            Log.info("\nAvoid: " + avoid);
 
-            updateQ(model, q, avoid);
-            System.out.println("QTable: \n" + q.toString());
+            updateQTable(model, q, avoid);
+            Log.info("\nQTable: \n" + q.toString());
         }
         //4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
         model = createModel(model, q, avoid);

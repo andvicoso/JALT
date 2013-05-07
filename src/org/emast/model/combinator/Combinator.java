@@ -1,4 +1,4 @@
-package org.emast.model;
+package org.emast.model.combinator;
 
 import java.util.Collection;
 import java.util.Map;

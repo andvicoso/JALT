@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import org.emast.infra.log.Log;
 import org.emast.model.problem.Problem;
 import org.emast.model.problem.ProblemFactory;
 
@@ -29,10 +30,10 @@ public class ProblemsCLI {
         out:
         do {
             if (p != null) {
-                System.out.println("Problem: " + p.toString());
+                Log.info("\nProblem: " + p.toString());
             }
 
-            System.out.print("console: ");
+            Log.info("console: ");
             String cmds = reader.nextLine().toLowerCase();
 
             for (int i = 0; i < cmds.length(); i++) {
@@ -43,14 +44,14 @@ public class ProblemsCLI {
                 } else if (c.equals("s") && p != null) {
                     save(p);
                 } else if (c.equals("h")) {
-                    System.out.println(printMenu());
+                    Log.info("\n" + printMenu());
                 } else if (c.equals("l")) {
                     p = getLastExecuted();
                 } else if (c.equals("n")) {
                     p = factory.create();
                 } else if (c.equals("p")) {
                     p = listFiles();
-                }else if (c.equals("q")) {
+                } else if (c.equals("q")) {
                     p = null;
                     break out;
                 }
@@ -81,6 +82,7 @@ public class ProblemsCLI {
 
     private Problem getLastExecuted() {
         File last = FileUtils.getLastModified(DEFAULT_DIR + File.separator, "emast", 0l);
+        Log.info(last.toString());
         return last != null ? FileUtils.fromFile(last.getAbsolutePath()) : null;
     }
 
@@ -92,7 +94,6 @@ public class ProblemsCLI {
 //        }
 //        return getCommand("m");
 //    }
-
     private static List<Command> createCommands() {
         List<Command> commands = new ArrayList<Command>();
         commands.add(new Command("h", "help", "Show commands"));

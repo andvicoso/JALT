@@ -65,6 +65,11 @@ public class StateActionTable<T> {
         return values;
     }
 
+    public Map<Action, T> getValues(State state) {
+        return values.get(state);
+    }
+    
+
     public String[][] toTable() {
         String[][] table = new String[getStates().size() + 1][getActions().size() + 1];
         table[0][0] = getTitle();

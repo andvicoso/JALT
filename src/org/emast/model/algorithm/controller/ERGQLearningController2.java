@@ -27,11 +27,11 @@ public class ERGQLearningController2 extends AbstractERGQLearningController {
         Set<Expression> avoid = new HashSet<Expression>();
         Problem<ERG> p = pProblem;
         ERG model = p.getModel();
-        int iterations = 0;
+        int episodes = 0;
         Expression badExp;
         //start main loop
         do {
-            Log.info("\nITERATION " + iterations++ + ":\n");
+            Log.info("\nEPISODE " + episodes++ + ":\n");
             //create new q table for each itraction
             ERGQTable q = new ERGQTable(model.getStates(), model.getActions());
             //1. RUN QLEARNING UNTIL A HIGH ERROR IS FOUND (QUICK STOP LEARNING) 
@@ -42,10 +42,10 @@ public class ERGQLearningController2 extends AbstractERGQLearningController {
             // WHICH HAVE THE FOUND EXPRESSION
             if (badExp != null) {
                 avoid.add(badExp);
-                System.out.println("Avoid: " + avoid);
+                Log.info("\nAvoid: " + avoid);
                 // update q to lower q values for states that contains one badexp
-                updateQ(model, q, avoid);
-                System.out.println("QTable: \n" + q.toString());
+                updateQTable(model, q, avoid);
+                Log.info("\nQTable: \n" + q.toString());
             }
             //4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
             model = createModel(model, q, avoid);

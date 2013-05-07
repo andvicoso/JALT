@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.iteration.rl.erg.ERGQLearning;
-import org.emast.model.algorithm.iteration.rl.erg.ERGQLearningBlockExpression;
+import org.emast.model.algorithm.actionchooser.NonBlockedActionChooser;
+import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.algorithm.iteration.rl.erg.ERGQLearningStopBadExpression;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.algorithm.table.erg.ERGQTable;
@@ -31,40 +31,51 @@ public class ERGQLearningController4 extends AbstractERGQLearningController {
 
     @Override
     public Policy run(Problem<ERG> pProblem, Object... pParameters) {
+        int iteration = 0;
         Problem<ERG> p = pProblem;
         ERG model = p.getModel();
-        int iterations = 0;
-        Expression badExp;
         ERGQTable q = new ERGQTable(model.getStates(), model.getActions());
+        Expression badExp;
+        Policy policy;
         //start main loop
         do {
-            Log.info("\nITERATION " + iterations++ + ":\n");
+            Log.info("\nITERATION " + iteration++ + ":\n");
             //1. RUN QLEARNING UNTIL A LOW REWARD EXPRESSION IS FOUND (QUICK STOP LEARNING) 
             runQLearning(p, q);
             //2. GET BAD EXPRESSION FROM QLEARNING ITERATIONS
             badExp = ((ERGQLearningStopBadExpression) learning).getBadExpression();
             //3. CHANGE THE Q VALUE FOR STATES THAT WERE VISITED IN QLEARNING EXPLORATION
             // WHICH HAVE THE FOUND EXPRESSION
-            if (badExp != null) {
+            if (isValid(badExp)) {
+                Log.info("\nFound bad expression: " + badExp);
+
                 avoid.add(badExp);
-                System.out.println("Avoid: " + avoid);
+                Log.info("\nAvoid: " + avoid);
 
                 populateBlocked(q);
             }
-        } while (badExp != null);
-        //4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
-        model = createModel(model, q, avoid);
-        //create problem
-        p = new Problem<ERG>(model, p.getInitialStates(), p.getFinalStates());
-        //5. RUN PPFERG FOR THE NEW MODEL
-        final PPFERG ppferg = new PPFERG();
-        //6. GET THE FINAL POLICY FROM PPFERG EXECUTED OVER THE NEW MODEL
-        return ppferg.run(p);
+        } while (isValid(badExp));
+
+        if (!avoid.isEmpty()) {
+            //4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
+            model = createModel(model, q, avoid);
+            //create problem
+            p = new Problem<ERG>(model, p.getInitialStates(), p.getFinalStates());
+            //5. RUN PPFERG FOR THE NEW MODEL
+            final PPFERG ppferg = new PPFERG();
+            //6. GET THE FINAL POLICY FROM PPFERG EXECUTED OVER THE NEW MODEL
+            policy = ppferg.run(p);
+        } else {
+            policy = learning.getQTable().getPolicy();
+        }
+        return policy;
     }
 
     @Override
-    protected ERGQLearning createERGQLearning(ERGQTable q) {
-        return new ERGQLearningBlockExpression(q, BAD_EXP_VALUE, avoid, blocked);
+    protected QLearning createQLearning(ERGQTable q) {
+        QLearning erg = new ERGQLearningStopBadExpression(q, BAD_EXP_VALUE, avoid);
+        erg.setActionChooser(new NonBlockedActionChooser(blocked));
+        return erg;
     }
 
     private void populateBlocked(ERGQTable q) {
@@ -77,5 +88,9 @@ public class ERGQLearningController4 extends AbstractERGQLearningController {
                 }
             }
         }
+    }
+
+    private boolean isValid(Expression exp) {
+        return exp != null && !exp.isEmpty();
     }
 }

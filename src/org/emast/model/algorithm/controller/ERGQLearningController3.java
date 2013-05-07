@@ -3,7 +3,7 @@ package org.emast.model.algorithm.controller;
 import java.util.HashSet;
 import java.util.Set;
 import org.emast.infra.log.Log;
-import org.emast.model.algorithm.iteration.rl.erg.ERGQLearning;
+import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.algorithm.iteration.rl.erg.ERGQLearningStopBadExpression;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.algorithm.table.erg.ERGQTable;
@@ -29,12 +29,12 @@ public class ERGQLearningController3 extends AbstractERGQLearningController {
     public Policy run(Problem<ERG> pProblem, Object... pParameters) {
         Problem<ERG> p = pProblem;
         ERG model = p.getModel();
-        int iterations = 0;
+        int episodes = 0;
         Expression badExp;
         ERGQTable q = new ERGQTable(model.getStates(), model.getActions());
         //start main loop
         do {
-            Log.info("\nITERATION " + iterations++ + ":\n");
+            Log.info("\nEPISODE " + episodes++ + ":\n");
             //1. RUN QLEARNING UNTIL A LOW REWARD EXPRESSION IS FOUND (QUICK STOP LEARNING) 
             runQLearning(p, q);
             //2. GET BAD EXPRESSION FROM QLEARNING ITERATIONS
@@ -43,10 +43,10 @@ public class ERGQLearningController3 extends AbstractERGQLearningController {
             // WHICH HAVE THE FOUND EXPRESSION
             if (badExp != null) {
                 avoid.add(badExp);
-                System.out.println("Avoid: " + avoid);
+                Log.info("\nAvoid: " + avoid);
                 // update q to lower q values for states that contains one badexp
-                updateQ(model, q, avoid);
-                System.out.println("QTable: \n" + q.toString());
+                updateQTable(model, q, avoid);
+                Log.info("\nQTable: \n" + q.toString());
             }
         } while (badExp != null);
         //4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
@@ -59,7 +59,7 @@ public class ERGQLearningController3 extends AbstractERGQLearningController {
     }
 
     @Override
-    protected ERGQLearning createERGQLearning(ERGQTable q) {
+    protected QLearning createQLearning(ERGQTable q) {
         return new ERGQLearningStopBadExpression(q, BAD_EXP_VALUE, avoid);
     }
 }

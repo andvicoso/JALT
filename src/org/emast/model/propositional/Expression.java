@@ -24,10 +24,9 @@ public final class Expression implements Serializable {
     private static final String VARIABLES_DELIMS = " &|!()";
     private static final String EXPS_DELIMS = "&|";
     private static final String EVALUATE_DELIMS = " !()";
-    private String expression;
+    private String expression = "";
 
     public Expression() {
-        this("");
     }
 
     public Expression(final String pExpressionText) {

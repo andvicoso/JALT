@@ -39,11 +39,15 @@ public class CollectionsUtils {
                 vars.add(m);
             }
 
-            double n = random.nextDouble() % sum;
-            for (Double l : limits) {
-                if (n < l) {
-                    return vars.get(limits.indexOf(l));
+            if (sum > 0) {
+                double n = random.nextDouble() % sum;
+                for (Double l : limits) {
+                    if (n < l) {
+                        return vars.get(limits.indexOf(l));
+                    }
                 }
+            } else {
+                return getRandom(vars);
             }
         }
         return null;

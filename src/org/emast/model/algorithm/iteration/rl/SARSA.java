@@ -1,7 +1,9 @@
 package org.emast.model.algorithm.iteration.rl;
 
 import org.emast.model.action.Action;
+import org.emast.model.algorithm.table.QTable;
 import org.emast.model.model.MDP;
+import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 
 /**
@@ -10,16 +12,24 @@ import org.emast.model.state.State;
  */
 public class SARSA<M extends MDP> extends QLearning<M> {
 
+    public SARSA(QTable q) {
+        super(q);
+    }
+
+    public SARSA() {
+    }
+
     @Override
-    protected void updateQTable(State state, Action action, double reward, State nextState) {
+    public double computeQ(State state, Action action, double reward, State nextState) {
+        Policy p = q.getPolicy(true);
         //get next action
-        Action nextAction = getQTable().getPolicy(true).getBestAction(nextState);//model.getTransitionFunction().getAction(model.getActions(), state);
+        Action nextAction = p.getBestAction(nextState);//or epsilon-greedy
         //get current q value
-        double cq = getQTable().get(state, action);
+        double cq = getQTable().getValue(state, action);
         //get new q value
-        double value = reward + (getGama() * getQTable().get(nextState, nextAction)) - cq;
+        double value = reward + (getGama() * getQTable().getValue(nextState, nextAction)) - cq;
         double newq = cq + getAlpha() * value;
         //save q
-        getQTable().put(state, action, newq);
+        return newq;
     }
 }

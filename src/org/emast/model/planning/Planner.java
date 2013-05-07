@@ -3,6 +3,7 @@ package org.emast.model.planning;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
+import org.emast.infra.log.Log;
 import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.model.MDP;
@@ -89,7 +90,7 @@ public class Planner<M extends MDP> implements Algorithm<M, List<ERGAgentIterato
 
     protected void finished() {
         pcs.firePropertyChange(FINISHED_ALL_PROP, 0, 1);
-        System.out.println(printResults());
+        Log.info("\n"+printResults());
     }
 
     public List<ERGAgentIterator> getAgents() {

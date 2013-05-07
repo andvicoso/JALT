@@ -41,8 +41,7 @@ public class Test implements Runnable {
                 Object result = algorithm.run(problem);
                 long diff = System.currentTimeMillis() - initMsecs;
                 //print time
-                print("\nTime: ");
-                print(toTimeString(diff));
+                print("\nTime: " + Utils.toTimeString(diff));
                 //print results
                 print(algorithm.printResults());
                 //if a solution was found...
@@ -53,13 +52,8 @@ public class Test implements Runnable {
             }
             msecs = System.currentTimeMillis() - testInitMsecs;
             //print time
-            print("\nTotal Test Time: ");
-            print(toTimeString(msecs));
+            print("\nTotal Test Time: " + Utils.toTimeString(msecs));
         }
-    }
-
-    public static String toTimeString(final long pMsecs) {
-        return Utils.toTimeString(pMsecs) + "(" + pMsecs + " ms)";
     }
 
     public long getMsecs() {

@@ -1,10 +1,10 @@
-package org.emast.model.planning.rewardcombinator;
+package org.emast.model.combinator;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.emast.model.Combinator;
+import org.emast.model.combinator.Combinator;
 
 /**
  *
@@ -21,25 +21,25 @@ public class MeanValueCombinator<T> implements Combinator<T> {
         final Map<T, Integer> count = new HashMap<T, Integer>();
         //find sums and counts
         for (Map<T, Double> map : pValues) {
-            for (T prop : map.keySet()) {
+            for (T key : map.keySet()) {
                 //count
-                Integer c = count.get(prop);
-                count.put(prop, (c == null ? 0 : c) + 1);
+                Integer c = count.get(key);
+                count.put(key, (c == null ? 0 : c) + 1);
                 //sum
-                Double current = map.get(prop);
-                Double sum = result.get(prop);
+                Double current = map.get(key);
+                Double sum = result.get(key);
                 current = current == null ? 0 : current;
                 sum = sum == null ? 0 : sum;
 
-                result.put(prop, current + sum);
+                result.put(key, current + sum);
             }
         }
         //mean
-        for (T prop : result.keySet()) {
-            Integer c = count.get(prop);
-            Double sum = result.get(prop);
+        for (T key : result.keySet()) {
+            Integer c = count.get(key);
+            Double sum = result.get(key);
 
-            result.put(prop, sum / c);
+            result.put(key, sum / c);
         }
 
         return result;

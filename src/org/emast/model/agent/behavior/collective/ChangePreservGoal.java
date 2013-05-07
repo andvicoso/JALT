@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.emast.infra.log.Log;
-import org.emast.model.Combinator;
+import org.emast.model.combinator.Combinator;
 import org.emast.model.chooser.base.MultiChooser;
 import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.agent.behavior.Collective;
