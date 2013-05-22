@@ -26,7 +26,7 @@ public class NonBlockedActionChooser implements ActionChooser {
         Collection<Action> valid = new HashSet<Action>();
 
         for (Action act : values.keySet()) {
-            if (values.get(act) > 0) {
+            if (values.get(act) != 0) {
                 valid.add(act);
             }
         }

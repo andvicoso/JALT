@@ -53,9 +53,10 @@ public class Problem<M extends MDP> implements Serializable {
         }
 
         if (model instanceof GridModel) {
+            sb.append("\nEnvironment: ");
             final GridPrinter gridPrinter = new GridPrinter();
-            final String grid = gridPrinter.print((GridModel) model, initialStates, null);
-            sb.append("\n").append(grid);
+            final String grid = gridPrinter.print((GridModel) model, initialStates, finalStates, null);
+            sb.append("\n\n").append(grid);
         }
 
         return sb.toString();
@@ -66,7 +67,7 @@ public class Problem<M extends MDP> implements Serializable {
 
         if (model instanceof GridModel) {
             final GridPrinter gridPrinter = new GridPrinter();
-            final String grid = gridPrinter.print((GridModel) model, initialStates, pResult);
+            final String grid = gridPrinter.print((GridModel) model, initialStates, finalStates, pResult);
             sb.append("\n").append(grid);
         } else {
             final String resultName = pResult.getClass().getSimpleName();

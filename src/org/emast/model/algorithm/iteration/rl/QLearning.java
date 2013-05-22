@@ -1,7 +1,6 @@
 package org.emast.model.algorithm.iteration.rl;
 
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.table.QTable;
 import org.emast.model.model.MDP;
 import org.emast.model.state.State;
 
@@ -9,11 +8,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class QLearning<M extends MDP> extends AbstractQLearning<M> {
-
-    public QLearning(QTable q) {
-        super(q);
-    }
+public class QLearning<M extends MDP> extends AbstractRLearning<M> {
 
     public QLearning() {
     }

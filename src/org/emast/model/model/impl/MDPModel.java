@@ -110,11 +110,11 @@ public class MDPModel implements MDP, Serializable {
 
     @Override
     public String toString() {
-        //GridPrinter gp = new GridPrinter();
         StringBuilder sb = new StringBuilder();
         sb.append("\nStates: ").append(states);
         sb.append("\nActions: ").append(actions);
         sb.append("\nAgents: ").append(agents);
+        //GridPrinter gp = new GridPrinter();
         //TODO: sb.append("\nReward function: ").append("\n").append(gp.print(getRewardFunction(), this));
         //TODO: sb.append("\nTransition function: ").append("\n").append(gp.print(getTransitionFunction(), this));
 

@@ -25,6 +25,27 @@ public class FileUtils {
         return getLastModified(path, "", lastModified);
     }
 
+    public static File getFromPreffix(String path, int preffix) {
+        File root = new File(path);
+        File[] list = root.listFiles();
+        File file = null;
+
+        if (list != null) {
+            for (File f : list) {
+                if (f.isDirectory()) {
+                    file = getFromPreffix(f.getAbsolutePath(), preffix);
+                    if (file != null) {
+                        break;
+                    }
+                } else if (f.getName().startsWith(preffix + "")) {
+                    file = f;
+                }
+            }
+        }
+
+        return file;
+    }
+
     public static File getLastModified(String path, String extension, Long lastModified) {
         File root = new File(path);
         File[] list = root.listFiles();
@@ -33,10 +54,8 @@ public class FileUtils {
         if (list != null) {
             for (File f : list) {
                 if (f.isDirectory()) {
-                    File dir_last = getLastModified(f.getAbsolutePath(), lastModified);
-                    f = dir_last;
-                }
-                if (f.lastModified() > lastModified && (extension.isEmpty() || f.getName().endsWith(extension))) {
+                    last = getLastModified(f.getAbsolutePath(), lastModified);
+                } else if (f.lastModified() > lastModified && (extension.isEmpty() || f.getName().endsWith(extension))) {
                     last = f;
                     lastModified = last.lastModified();
                 }

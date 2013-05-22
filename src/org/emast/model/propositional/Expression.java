@@ -82,6 +82,9 @@ public final class Expression implements Serializable {
 
     public Expression negate() {
         String exp = expression;
+        if (isEmpty()) {
+            return this;
+        }
         if (!isPrimitive() && !isParenthesized()) {
             exp = parenthesizeString();
         }
@@ -168,7 +171,7 @@ public final class Expression implements Serializable {
     }
 
     public String parenthesizeString(String pExt) {
-        return "(" + pExt + ")";
+        return pExt.isEmpty() ? pExt : "(" + pExt + ")";
     }
 
     public boolean isParenthesized() {
@@ -286,5 +289,19 @@ public final class Expression implements Serializable {
         codedJEvalExp = codedJEvalExp.replace(OR.getToken(), JEVAL_OR_TOKEN);
 
         return codedJEvalExp;
+    }
+
+    public Expression and(Expression pExp) {
+        return join(pExp, AND);
+    }
+
+    public Expression or(Expression pExp) {
+        return join(pExp, OR);
+    }
+
+    private Expression join(Expression pExp, BinaryOperator bin) {
+        Expression nexp = new Expression(expression);
+        nexp.add(pExp, bin);
+        return nexp;
     }
 }

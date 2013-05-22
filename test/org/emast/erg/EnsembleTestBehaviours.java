@@ -2,7 +2,6 @@ package org.emast.erg;
 
 import java.util.Arrays;
 import java.util.List;
-import org.emast.CurrentProblem;
 import org.emast.model.combinator.Combinator;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.Individual;
@@ -17,7 +16,6 @@ import org.emast.model.algorithm.ensemble.AgentEnsembleBehavior;
 import org.emast.model.chooser.ThresholdChooser;
 import org.emast.model.combinator.MeanValueCombinator;
 import org.emast.model.propositional.Proposition;
-import org.emast.model.test.Test;
 import static org.emast.util.DefaultTestProperties.*;
 
 /**
@@ -25,10 +23,6 @@ import static org.emast.util.DefaultTestProperties.*;
  * @author Anderson
  */
 public class EnsembleTestBehaviours {
-
-    public static void main(String[] args) {
-        new Test(CurrentProblem.create(), createAlgorithm()).run();
-    }
 
     public static Algorithm createAlgorithm() {
         double badRewardValue = -20;

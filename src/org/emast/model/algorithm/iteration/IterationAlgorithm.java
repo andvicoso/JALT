@@ -1,13 +1,10 @@
 package org.emast.model.algorithm.iteration;
 
-import java.util.Map;
-import org.emast.infra.log.Log;
-import org.emast.model.algorithm.DefaultAlgorithm;
+import org.emast.model.algorithm.Algorithm;
 import org.emast.model.model.MDP;
-import org.emast.model.state.State;
 import static org.emast.util.DefaultTestProperties.*;
 
-public abstract class IterationAlgorithm<M extends MDP, R> extends DefaultAlgorithm<M, R> {
+public abstract class IterationAlgorithm<M extends MDP, R> implements Algorithm<M, R> {
 
     /**
      * Discount factor The discount factor determines the importance of future rewards. A factor of 0 will
@@ -19,7 +16,7 @@ public abstract class IterationAlgorithm<M extends MDP, R> extends DefaultAlgori
     protected int episodes = 0;
     protected M model;
 
-    public int getEpisodes() {
+    public int getIterations() {
         return episodes;
     }
 
@@ -35,30 +32,9 @@ public abstract class IterationAlgorithm<M extends MDP, R> extends DefaultAlgori
 
         return sb.toString();
     }
-
-    protected double getError(Map<State, Double> lastv, Map<State, Double> v) {
-        double maxDif = -Double.MAX_VALUE;
-
-        if (episodes == 0) {
-            maxDif = Double.MAX_VALUE;
-        } else {
-            for (State state : lastv.keySet()) {
-                Double val1 = lastv.get(state);
-                Double val2 = v.get(state);
-
-                if (val1 == null || val2 == null) {
-                    break;
-                }
-
-                double dif = Math.abs(val2 - val1);
-                if (dif > maxDif) {
-                    maxDif = dif;
-                }
-            }
-        }
-
-        Log.info("Error: " + String.format("%.4g", maxDif));
-
-        return maxDif;
+    
+    @Override
+    public String getName() {
+        return getClass().getSimpleName();
     }
 }

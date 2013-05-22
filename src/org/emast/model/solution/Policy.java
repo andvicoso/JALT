@@ -11,6 +11,17 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
     private static final int DECIMAL_ACTION = 3;
     private static final String FORMAT = "%1$." + DECIMAL_ACTION + "f";
 
+    public Policy(SinglePolicy single) {
+        for (Entry<State, Action> entry : single.entrySet()) {
+            State state = entry.getKey();
+            Action action = entry.getValue();
+            put(state, Collections.singletonMap(action, 1d));
+        }
+    }
+
+    public Policy() {
+    }
+
     public Set<State> getStates() {
         return keySet();
     }
@@ -127,8 +138,8 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
         return values;
     }
 
-    public SimplePolicy getBestPolicy() {
-        final SimplePolicy policy = new SimplePolicy();
+    public SinglePolicy getBestPolicy() {
+        final SinglePolicy policy = new SinglePolicy();
 
         for (final State state : keySet()) {
             policy.put(state, getBestAction(state));

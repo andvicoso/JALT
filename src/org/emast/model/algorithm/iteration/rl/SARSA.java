@@ -1,7 +1,6 @@
 package org.emast.model.algorithm.iteration.rl;
 
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.table.QTable;
 import org.emast.model.model.MDP;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
@@ -11,10 +10,6 @@ import org.emast.model.state.State;
  * @author Anderson
  */
 public class SARSA<M extends MDP> extends QLearning<M> {
-
-    public SARSA(QTable q) {
-        super(q);
-    }
 
     public SARSA() {
     }

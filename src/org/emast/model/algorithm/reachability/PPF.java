@@ -1,10 +1,7 @@
 package org.emast.model.algorithm.reachability;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.emast.model.action.Action;
-import org.emast.model.agent.behavior.individual.reward.PropRepReward;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.function.transition.TransitionFunction;
@@ -68,18 +65,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
         final TransitionFunction tf = model.getTransitionFunction();
 
         for (final State state : ModelUtils.getStates(pPrune)) {
-            final Map<Action, Double> q = new HashMap<Action, Double>();
-            // search for the Qs values for state
-            for (final Action action : getActions(pPrune, state)) {
-                double sum = 0;
-                for (final State reachableState : tf.getReachableStates(model.getStates(), state, action)) {
-                    final double trans = tf.getValue(state, reachableState, action);
-                    if (pValues.get(reachableState) != null) {
-                        sum += trans * pValues.get(reachableState);
-                    }
-                }
-                q.put(action, gama * sum);
-            }
+            Map<Action, Double> q = getQValue(pPrune, state, tf, pValues);
             //if found something
             if (q.size() > 0) {
                 // get the max value for q
@@ -97,7 +83,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
             return model.getPropositionFunction().intension(model.getStates(),
                     model.getPropositions(), pExpression);
         } catch (InvalidExpressionException ex) {
-            Logger.getLogger(PropRepReward.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         return Collections.emptyList();
     }
@@ -191,5 +177,28 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
         }
 
         return actions;
+    }
+
+    protected Map<Action, Double> getQValue(final Collection<Transition> pPrune,
+            final State state, final TransitionFunction tf, final Map<State, Double> pValues) {
+        final Map<Action, Double> q = new HashMap<Action, Double>();
+        // search for the Qs values for state
+        for (final Action action : getActions(pPrune, state)) {
+            double sum = 0;
+            for (final State reachableState : tf.getReachableStates(model.getStates(), state, action)) {
+                final double trans = tf.getValue(state, reachableState, action);
+                if (pValues.get(reachableState) != null) {
+                    sum += trans * pValues.get(reachableState);
+                }
+            }
+            double v = gama * sum;
+            q.put(action, v);
+        }
+        return q;
+    }
+    
+    @Override
+    public String getName() {
+        return getClass().getSimpleName();
     }
 }

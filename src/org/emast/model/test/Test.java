@@ -2,7 +2,9 @@ package org.emast.model.test;
 
 import org.emast.infra.log.Log;
 import org.emast.model.algorithm.Algorithm;
+import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.problem.Problem;
+import org.emast.util.DefaultTestProperties;
 import org.emast.util.Utils;
 
 /**
@@ -11,60 +13,76 @@ import org.emast.util.Utils;
  */
 public class Test implements Runnable {
 
-    private Problem problem;
-    private Algorithm[] algorithms;
-    private long msecs;
+    protected static final boolean DEBUG = true;
+    protected Algorithm algorithm;
+    protected Problem problem;
 
-    public Test(Problem pProblem, Algorithm... pAlgorithms) {
+    public Test(Problem pProblem, Algorithm pAlgorithm) {
+        this(pProblem);
+        algorithm = pAlgorithm;
+    }
+
+    public Test(Problem pProblem) {
         problem = pProblem;
-        algorithms = pAlgorithms;
     }
 
     @Override
     public void run() {
-        if (problem != null) {
+        print("\n################################");
+        print("\nModel:");
+        print(problem.getModel().toString());
+        print("\nError: " + DefaultTestProperties.ERROR);
+        print("\nProblem:");
+        print(problem.toString());
+        print("\nExecution:");
 
-            print("\nModel:");
-            print(problem.getModel().toString());
-            print("\n\nProblem:");
-            print(problem.toString());
-            print("\nExecution:");
-
-            long testInitMsecs = System.currentTimeMillis();
-            for (Algorithm algorithm : algorithms) {
-                print("\n------------------------------");
-                String algorithmName = algorithm.getClass().getSimpleName();
-                print("\nAlgorithm: " + algorithmName);
-                println();
-                //execute
-                long initMsecs = System.currentTimeMillis();
-                Object result = algorithm.run(problem);
-                long diff = System.currentTimeMillis() - initMsecs;
-                //print time
-                print("\nTime: " + Utils.toTimeString(diff));
-                //print results
-                print(algorithm.printResults());
-                //if a solution was found...
-                if (result != null) {
-                    print("\n\nResult:");
-                    print(problem.toString(result));
-                }
-            }
-            msecs = System.currentTimeMillis() - testInitMsecs;
-            //print time
-            print("\nTotal Test Time: " + Utils.toTimeString(msecs));
-        }
+        createAndRun();
     }
 
-    public long getMsecs() {
-        return msecs;
+    protected Object runAlg(Problem problem, Algorithm algorithm) {
+        //execute
+        long initMsecs = System.currentTimeMillis();
+        Object result = algorithm.run(problem);
+        long diff = System.currentTimeMillis() - initMsecs;
+        //print time
+        print("Time: " + Utils.toTimeString(diff));
+        //print results
+        printNoInitialBreak(algorithm.printResults());
+        //if a solution was found...
+        if (result != null) {
+           print("Result:" + problem.toString(result));
+        }
+        
+        return result;
     }
 
     protected void print(String pMsg) {
-        Log.info(pMsg);
+        if (DEBUG) {
+            Log.info(pMsg);
+        }
     }
 
     protected void println() {
         print("\n");
+    }
+
+    protected void printNoInitialBreak(String str) {
+        print(str.startsWith("\n") ? str.substring(1) : str);
+    }
+
+    protected Algorithm createAlgorithm() {
+        return new QLearning();
+    }
+
+    protected void createAndRun() {
+        if (algorithm == null) {
+            algorithm = createAlgorithm();
+        }
+
+        print("\n------------------------------");
+        String algorithmName = algorithm.getName();
+        print("Algorithm: " + algorithmName);
+        //run
+        runAlg(problem, algorithm);
     }
 }

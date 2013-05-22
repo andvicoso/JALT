@@ -8,7 +8,7 @@ import java.util.Set;
 import org.emast.model.action.Action;
 import org.emast.model.model.MDP;
 import org.emast.model.solution.Policy;
-import org.emast.model.solution.SimplePolicy;
+import org.emast.model.solution.SinglePolicy;
 import org.emast.model.state.State;
 import org.emast.util.grid.GridPrinter;
 import org.emast.util.grid.GridUtils;
@@ -136,8 +136,8 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
         return table;
     }
 
-    public SimplePolicy getSimplePolicy() {
-        final SimplePolicy policy = new SimplePolicy();
+    public SinglePolicy getSimplePolicy() {
+        final SinglePolicy policy = new SinglePolicy();
 
         for (State state : getStates()) {
             double max = 0;

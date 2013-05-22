@@ -8,6 +8,7 @@ import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.agent.AgentFactory;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.Individual;
+import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
@@ -25,7 +26,7 @@ import org.emast.util.CollectionsUtils;
  *
  * @author Anderson
  */
-public class AgentEnsembleBehavior<M extends ERG> implements PolicyGenerator<M>, PropertyChangeListener {
+public class AgentEnsembleBehavior<M extends ERG> implements Algorithm<M, Policy>, PolicyGenerator<M>, PropertyChangeListener {
 
     private final PolicyGenerator<M> policyGenerator;
     private final AgentFactory agentFactory;
@@ -231,5 +232,10 @@ public class AgentEnsembleBehavior<M extends ERG> implements PolicyGenerator<M>,
         Collection<Proposition> props = choose(reps);
         //verify the need to change the preservation goal
         return !props.isEmpty() && changePreservationGoal(pProblem, props);
+    }
+    
+    @Override
+    public String getName() {
+        return getClass().getSimpleName();
     }
 }

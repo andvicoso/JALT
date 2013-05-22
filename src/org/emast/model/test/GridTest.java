@@ -1,10 +1,9 @@
-package org.emast.mdp;
+package org.emast.model.test;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.reward.RewardFunctionState;
 import org.emast.model.model.MDP;
@@ -20,8 +19,8 @@ import org.emast.util.grid.GridUtils;
  */
 public class GridTest extends Test {
 
-    public GridTest() {
-        super(createProblem(), new QLearning());
+    public GridTest(Problem pProblem) {
+        super(pProblem);
     }
 
     private static RewardFunction createRewardFunction(MDP model) {
@@ -55,9 +54,5 @@ public class GridTest extends Test {
         model.setRewardFunction(createRewardFunction(model));
 
         return model;
-    }
-
-    public static void main(String[] args) {
-        new GridTest().run();
     }
 }

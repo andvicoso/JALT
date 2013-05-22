@@ -3,6 +3,7 @@ package org.emast.model.algorithm.controller;
 import java.util.HashSet;
 import java.util.Set;
 import org.emast.infra.log.Log;
+import org.emast.model.algorithm.iteration.rl.AbstractRLearning;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.model.ERG;
@@ -13,11 +14,13 @@ import org.emast.model.solution.Policy;
 import static org.emast.util.DefaultTestProperties.*;
 
 /**
- * 1 - QLearning + PPFERG + pegando todas as expressões de uma vez (sem iteração): Não tem necessidade de
- * atualizar a tabela Q pois essa nova tabela nunca é utilizada. - Parar o QLearning após um número fixo de
- * iterações (difícil de definir um número ideal)
+ * QLearning + PPFERG + baixando o valor de todas as expressões de uma vez
  */
-public class ERGQLearningController extends AbstractERGQLearningController {
+public class ERGLearningLowAllBadExps extends AbstractERGLearning {
+
+    public ERGLearningLowAllBadExps(AbstractRLearning<ERG> learning) {
+        super(learning);
+    }
 
     @Override
     public Policy run(Problem<ERG> pProblem, Object... pParameters) {
@@ -28,7 +31,7 @@ public class ERGQLearningController extends AbstractERGQLearningController {
 
         ERGQTable q = new ERGQTable(model.getStates(), model.getActions());
         //1. RUN QLEARNING UNTIL A HIGH ERROR IS FOUND (QUICK STOP LEARNING) 
-        runQLearning(p, q);
+        learning.run(p, q);
         //2. GET BAD EXPRESSIONS FROM QLEARNING ITERATIONS
         Set<Expression> badExps = badChooser.choose(q.getExpsValues());
         //3. CHANGE THE Q VALUE FOR STATES THAT WERE VISITED IN QLEARNING EXPLORATION

@@ -100,4 +100,9 @@ public class Planner<M extends MDP> implements Algorithm<M, List<ERGAgentIterato
     public PropertyChangeSupport getPropertyChangeSupport() {
         return pcs;
     }
+    
+    @Override
+    public String getName() {
+        return getClass().getSimpleName();
+    }
 }

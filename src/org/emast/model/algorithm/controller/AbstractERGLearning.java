@@ -4,18 +4,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.DefaultAlgorithm;
-import org.emast.model.algorithm.iteration.rl.QLearning;
-import org.emast.model.algorithm.iteration.rl.erg.ERGFactory;
+import org.emast.model.algorithm.Algorithm;
+import org.emast.model.algorithm.iteration.rl.AbstractRLearning;
+import org.emast.model.algorithm.erg.ERGFactory;
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.algorithm.table.erg.ERGQTableItem;
-import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.model.ERG;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.impl.ERGModel;
-import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
@@ -27,26 +25,26 @@ import static org.emast.util.DefaultTestProperties.*;
  *
  * @author Anderson
  */
-public abstract class AbstractERGQLearningController extends DefaultAlgorithm<ERG, Policy> {
+public abstract class AbstractERGLearning implements Algorithm<ERG, Policy> {
 
-    protected QLearning learning;
+    protected AbstractRLearning<ERG> learning;
+
+    public AbstractERGLearning(AbstractRLearning<ERG> learning) {
+        this.learning = learning;
+    }
+
+    public AbstractRLearning<ERG> getLearning() {
+        return learning;
+    }
 
     @Override
     public String printResults() {
-        return learning.printResults();
-    }
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nLearning Algorithm: ").append(learning.getClass().getSimpleName());
+        sb.append("\nBad exp reward: ").append(BAD_EXP_VALUE);
+        sb.append(learning.printResults());
 
-    protected void runQLearning(Problem<ERG> p, ERGQTable q) {
-        //create q learning algorithm with high error
-        learning = createQLearning(q);
-        //really run
-        initTime();
-        learning.run(p);
-        endTime();
-
-//        Log.info("ERGQLearning frequency table: ");
-//        Log.info("\n" + new GridPrinter().printTable((ERGGridModel) p.getModel(),
-//                learning.getQTable().getFrequencyTableModel()));
+        return sb.toString();
     }
 
     protected ERGQTable updateQTable(ERG model, ERGQTable q, Set<Expression> avoid) {
@@ -54,14 +52,9 @@ public abstract class AbstractERGQLearningController extends DefaultAlgorithm<ER
             for (Action action : model.getActions()) {
                 ERGQTableItem item = q.get(state, action);
                 Expression exp = item.getExpression();
-                double value = 0;
-                try {
-                    if (exp != null && !exp.getPropositions().isEmpty()) {
-                        if (matchExpression(exp, avoid)) {
-                            value = BAD_Q_VALUE;
-                        }
-                    }
-                } catch (Exception e) {
+                double value = item.getValue();
+                if (exp != null && !exp.getPropositions().isEmpty() && matchExpression(exp, avoid)) {
+                    value += value * BAD_Q_PERCENT;//BAD_Q_VALUE;
                 }
 
                 q.put(state, action, newItem(item, value));
@@ -77,8 +70,7 @@ public abstract class AbstractERGQLearningController extends DefaultAlgorithm<ER
         return nitem;
     }
 
-    private boolean matchExpression(Expression stateExp, Set<Expression> exps)
-            throws InvalidExpressionException {
+    private boolean matchExpression(Expression stateExp, Set<Expression> exps) {
         for (Expression exp : exps) {
             if (exp.equals(stateExp)) {
                 return true;
@@ -98,7 +90,7 @@ public abstract class AbstractERGQLearningController extends DefaultAlgorithm<ER
         //GET THE SET OF PROPOSITIONS FROM EXPLORATED STATES
         model.setPropositions(getPropositions(q.getExpsValues()));
         //CREATE NEW PRESERVATION GOAL FROM EXPRESSIONS THAT SHOULD BE AVOIDED
-        model.setPreservationGoal(createNewPreservationGoal(avoid));
+        model.setPreservationGoal(createNewPreservationGoal(oldModel.getPreservationGoal(), avoid));
         //CREATE NEW TRANSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
         TransitionFunction tf = ERGFactory.createTransitionFunctionFrequency(q);
         model.setTransitionFunction(tf);
@@ -124,12 +116,13 @@ public abstract class AbstractERGQLearningController extends DefaultAlgorithm<ER
         return props;
     }
 
-    protected QLearning createQLearning(ERGQTable q) {
-        return new QLearning(q);
+    private Expression createNewPreservationGoal(Expression current, Set<Expression> avoid) {
+        Expression badExp = new Expression(BinaryOperator.OR, avoid.toArray(new Expression[avoid.size()]));
+        return current.and(badExp.parenthesize().negate());
     }
 
-    private Expression createNewPreservationGoal(Set<Expression> avoid) {
-        Expression badExp = new Expression(BinaryOperator.OR, avoid.toArray(new Expression[avoid.size()]));
-        return badExp.parenthesize().negate();
+    @Override
+    public String getName() {
+        return getClass().getSimpleName() + "(" + learning.getName() + ")";
     }
 }

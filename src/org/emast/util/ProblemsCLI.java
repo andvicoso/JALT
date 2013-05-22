@@ -34,10 +34,10 @@ public class ProblemsCLI {
             }
 
             Log.info("console: ");
-            String cmds = reader.nextLine().toLowerCase();
+            String cmd = reader.nextLine().toLowerCase();
 
-            for (int i = 0; i < cmds.length(); i++) {
-                String c = cmds.charAt(i) + "";
+            for (int i = 0; i < cmd.length(); i++) {
+                String c = cmd.charAt(i) + "";
 
                 if (c.equals("r")) {
                     break out;
@@ -49,11 +49,13 @@ public class ProblemsCLI {
                     p = getLastExecuted();
                 } else if (c.equals("n")) {
                     p = factory.create();
-                } else if (c.equals("p")) {
-                    p = listFiles();
                 } else if (c.equals("q")) {
                     p = null;
                     break out;
+                } else if (Character.isDigit(c.charAt(0))) {
+                    int filePrefix = Integer.parseInt(cmd);
+                    p = getFileByPrefix(filePrefix);
+                    i += cmd.length();
                 }
             }
         } while (true);
@@ -82,7 +84,7 @@ public class ProblemsCLI {
 
     private Problem getLastExecuted() {
         File last = FileUtils.getLastModified(DEFAULT_DIR + File.separator, "emast", 0l);
-        Log.info(last.toString());
+        if(last != null) Log.info(last.toString());
         return last != null ? FileUtils.fromFile(last.getAbsolutePath()) : null;
     }
 
@@ -109,16 +111,10 @@ public class ProblemsCLI {
 
     }
 
-    private Problem listFiles() {
-//        File root = new File(path);
-//        File[] list = root.listFiles();
-//        
-//        if (list != null) {
-//            for (File f : list) {
-//                if (!f.isDirectory()) {
-//                }
-//                }
-        return new Problem(null, null);
+    private Problem getFileByPrefix(int filePrefix) {
+        File file = FileUtils.getFromPreffix(DEFAULT_DIR, filePrefix);
+        if(file != null) Log.info(file.toString());
+        return file != null ? FileUtils.fromFile(file.getAbsolutePath()) : null;
     }
 
     private static class Command {

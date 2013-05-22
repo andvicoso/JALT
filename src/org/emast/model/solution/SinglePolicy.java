@@ -4,7 +4,7 @@ import java.util.*;
 import org.emast.model.action.Action;
 import org.emast.model.state.State;
 
-public class SimplePolicy extends HashMap<State, Action> {
+public class SinglePolicy extends HashMap<State, Action> {
 
     @Override
     public String toString() {

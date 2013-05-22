@@ -28,7 +28,8 @@ public class GridModelWriter {
 
         if (model instanceof GridModel) {
             final GridPrinter gridPrinter = new GridPrinter();
-            String[][] grid = gridPrinter.getGrid((GridModel) model, problem.getInitialStates());
+            String[][] grid = gridPrinter.getGrid((GridModel) model,
+                    problem.getInitialStates(), problem.getFinalStates());
             String smodel = gridPrinter.toTable(grid);
 
             fw.write(smodel);

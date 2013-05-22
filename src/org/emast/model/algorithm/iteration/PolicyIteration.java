@@ -63,8 +63,9 @@ public class PolicyIteration implements PolicyGenerator<MDP> {
     private Map<State, Double> evaluatePolicy(MDP pModel, Policy policy) {
         final Map<State, Double> values = new HashMap<State, Double>();
         for (final State state : policy.getStates()) {
-            Double x = pModel.getRewardFunction().getValue(state, policy.getBestAction(state));
-            x += getGama() * getSum(pModel, values, state, policy.getBestAction(state));
+            Action bestAction = policy.getBestAction(state);
+            Double x = pModel.getRewardFunction().getValue(state, bestAction);
+            x += getGama() * getSum(pModel, values, state, bestAction);
 
             values.put(state, x);
         }
@@ -97,5 +98,10 @@ public class PolicyIteration implements PolicyGenerator<MDP> {
         sb.append("\nIterations: ").append(iterations);
 
         return sb.toString();
+    }
+    
+    @Override
+    public String getName() {
+        return getClass().getSimpleName();
     }
 }

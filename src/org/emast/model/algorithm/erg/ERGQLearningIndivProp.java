@@ -1,10 +1,9 @@
-package org.emast.model.algorithm.iteration.rl.erg;
+package org.emast.model.algorithm.erg;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.emast.model.algorithm.iteration.rl.QLearning;
-import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.model.ERG;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
@@ -21,7 +20,6 @@ public class ERGQLearningIndivProp extends QLearning<ERG> {
     private Proposition badProp;
 
     public ERGQLearningIndivProp() {
-        super(new ERGQTable(null));//TODO
         propCount = new HashMap<Proposition, Integer>();
         propSum = new HashMap<Proposition, Double>();
     }

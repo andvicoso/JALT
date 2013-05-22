@@ -22,7 +22,6 @@ public class ValidPathFinder {
         for (int i = 0; i < model.getAgents(); i++) {
             //create a new simple agent iterator
             final AgentIterator agent = new AgentIterator<M>(i);
-            agent.setDebug(false);
             //find the plan for the newly created agent
             agent.run(pProblem, pPolicy);
             //get the resulting plan

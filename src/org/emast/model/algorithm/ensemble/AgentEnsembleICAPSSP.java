@@ -1,7 +1,7 @@
 package org.emast.model.algorithm.ensemble;
 
 import java.util.*;
-import org.emast.model.algorithm.DefaultAlgorithm;
+import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.model.ERG;
@@ -12,8 +12,7 @@ import org.emast.model.solution.Policy;
  *
  * @author Anderson
  */
-public class AgentEnsembleICAPSSP extends DefaultAlgorithm<ERG, Policy>
-        implements PolicyGenerator<ERG> {
+public class AgentEnsembleICAPSSP implements Algorithm<ERG, Policy>, PolicyGenerator<ERG> {
 
     private final PolicyGenerator<ERG> policyGenerator;
     private List<QLearning> agentIterators;
@@ -52,5 +51,10 @@ public class AgentEnsembleICAPSSP extends DefaultAlgorithm<ERG, Policy>
         }
 
         return policy;
+    }
+    
+    @Override
+    public String getName() {
+        return getClass().getSimpleName();
     }
 }

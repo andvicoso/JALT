@@ -19,6 +19,7 @@ public class RewardFunctionProposition<M extends ERG> extends DefaultRewardFunct
     }
 
     @Override
+    //TODO: melhorar
     public double getValue(final State pState, final Action pAction) {
         for (Proposition condition : getRewards().keySet()) {
             final PropositionFunction pf = getModel().getPropositionFunction();

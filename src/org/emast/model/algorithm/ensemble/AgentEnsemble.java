@@ -2,9 +2,9 @@ package org.emast.model.algorithm.ensemble;
 
 import java.util.*;
 import org.emast.infra.log.Log;
+import org.emast.model.algorithm.Algorithm;
 import org.emast.model.chooser.base.MultiChooser;
 import org.emast.model.combinator.Combinator;
-import org.emast.model.algorithm.DefaultAlgorithm;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.exception.InvalidExpressionException;
@@ -23,7 +23,7 @@ import org.emast.model.state.State;
  *
  * @author Anderson
  */
-public class AgentEnsemble extends DefaultAlgorithm<ERG, Policy> implements PolicyGenerator<ERG> {
+public class AgentEnsemble implements Algorithm<ERG, Policy>, PolicyGenerator<ERG> {
 
     private final PolicyGenerator<ERG> policyGenerator;
     private List<QLearning> agentIterators;
@@ -130,5 +130,10 @@ public class AgentEnsemble extends DefaultAlgorithm<ERG, Policy> implements Poli
         Collection<Proposition> props = chooser.choose(combined);
         //verify the need to change the preservation goal
         return !props.isEmpty() && changePreservationGoal(pProblem, props);
+    }
+    
+    @Override
+    public String getName() {
+        return getClass().getSimpleName();
     }
 }

@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.iteration.rl.erg;
+package org.emast.model.algorithm.erg;
 
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.algorithm.table.erg.ERGQTableItem;

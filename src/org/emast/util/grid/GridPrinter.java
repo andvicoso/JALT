@@ -14,7 +14,7 @@ import org.emast.model.model.MDP;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.solution.Plan;
 import org.emast.model.solution.Policy;
-import org.emast.model.solution.SimplePolicy;
+import org.emast.model.solution.SinglePolicy;
 import org.emast.model.state.State;
 
 /**
@@ -26,18 +26,19 @@ public class GridPrinter {
     private static final int MAX_STR_SIZE = 3;
 
     public <M extends MDP & Grid> String print(M pModel) {
-        String[][] grid = getGrid(pModel, Collections.EMPTY_MAP);
+        String[][] grid = getGrid(pModel, Collections.EMPTY_MAP, Collections.EMPTY_SET);
         return toTable(grid);
     }
 
-    public <M extends MDP & Grid> String print(M pModel, Map<Integer, State> pInitialStates, Object pResult) {
-        String[][] grid = getGrid(pModel, pInitialStates);
+    public <M extends MDP & Grid> String print(M pModel, Map<Integer, State> pInitialStates,
+            Set<State> pFinalStates, Object pResult) {
+        String[][] grid = getGrid(pModel, pInitialStates, pFinalStates);
 
         if (pResult != null) {
             if (pResult instanceof Policy) {
                 fillWithActions(grid, (Policy) pResult);
-            } else if (pResult instanceof SimplePolicy) {
-                fillWithActions(grid, (SimplePolicy) pResult);
+            } else if (pResult instanceof SinglePolicy) {
+                fillWithActions(grid, (SinglePolicy) pResult);
             } else if (pResult instanceof Plan) {
                 fillWithActions(grid, pInitialStates, (Plan) pResult);
             }
@@ -46,7 +47,8 @@ public class GridPrinter {
         return toTable(grid);
     }
 
-    public <M extends MDP & Grid> String[][] getGrid(M pModel, Map<Integer, State> pInitialStates) {
+    public <M extends MDP & Grid> String[][] getGrid(M pModel, Map<Integer, State> pInitialStates,
+            Set<State> pFinalStates) {
         String[][] grid = createGrid(pModel);
 
         if (pModel instanceof ERG) {
@@ -54,6 +56,7 @@ public class GridPrinter {
         }
 
         addInitialStates(pInitialStates, grid);
+        addFinalStates(pFinalStates, grid);
 
         grid = addIndexes(grid, pModel.getRows(), pModel.getCols());
 
@@ -67,6 +70,16 @@ public class GridPrinter {
             int col = GridUtils.getCol(initState);
             pGrid[row][col] = agent + " " + pGrid[row][col];
             agent++;
+        }
+    }
+
+    private void addFinalStates(Set<State> pFinalStates, String[][] pGrid) {
+        for (State initState : pFinalStates) {
+            int row = GridUtils.getRow(initState);
+            int col = GridUtils.getCol(initState);
+            if (!pGrid[row][col].contains("@")) {
+                pGrid[row][col] = "@ " + pGrid[row][col];
+            }
         }
     }
 
@@ -124,7 +137,7 @@ public class GridPrinter {
         }
     }
 
-    public void fillWithActions(String[][] pGrid, SimplePolicy pPolicy) {
+    public void fillWithActions(String[][] pGrid, SinglePolicy pPolicy) {
         for (State state : pPolicy.getStates()) {
             Action action = pPolicy.get(state);
             getActionSymbol(state, action, pGrid);

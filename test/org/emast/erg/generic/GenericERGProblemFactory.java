@@ -16,7 +16,7 @@ import static org.emast.util.DefaultTestProperties.*;
  */
 public class GenericERGProblemFactory extends ProblemFactory {
 
-    public static final double CHANCE_OF_HAVING_PROP = 0.33;
+    public static final double CHANCE_OF_HAVING_PROP = 0.4;
     public static final int MAX_PROPS_PER_STATE = 4;
     private final int rows;
     private final int cols;

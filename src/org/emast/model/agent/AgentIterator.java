@@ -1,8 +1,9 @@
 package org.emast.model.agent;
 
 import java.util.Map;
+import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.DefaultAlgorithm;
+import org.emast.model.algorithm.Algorithm;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Plan;
@@ -14,7 +15,7 @@ import org.emast.util.CollectionsUtils;
  *
  * @author Anderson
  */
-public class AgentIterator<M extends MDP> extends DefaultAlgorithm<M, Plan> {
+public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
 
     private double totalReward;
     /**
@@ -130,8 +131,14 @@ public class AgentIterator<M extends MDP> extends DefaultAlgorithm<M, Plan> {
         return state;
     }
 
-    @Override
     protected void print(String pMsg) {
-        super.print("Agent " + getAgent() + ": " + pMsg);
+        Log.info("Agent " + getAgent() + ": " + pMsg);
     }
+
+    @Override
+    public String getName() {
+        return getClass().getSimpleName();
+    }
+    
+    
 }

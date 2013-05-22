@@ -36,7 +36,7 @@ public class PPFERG<M extends ERG> extends PPF<M> {
         model = pProblem.getModel();
         //print initial msg
         String modelName = model.getClass().getSimpleName();
-        Log.info("\nRunning PPFERG for " + modelName);
+        //Log.info("\nRunning PPFERG for " + modelName);
         //get the initial state for only one agent
         final Collection<State> preserveIntension = intension(model.getPreservationGoal());
         final Collection<State> goalsIntension = intension(model.getGoal());
