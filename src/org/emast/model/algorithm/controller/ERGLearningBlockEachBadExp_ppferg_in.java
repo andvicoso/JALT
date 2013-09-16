@@ -21,33 +21,28 @@ import org.emast.model.propositional.Expression;
 import org.emast.model.solution.Policy;
 import org.emast.model.solution.SinglePolicy;
 import org.emast.model.state.State;
-import org.emast.model.transition.Transition;
 import org.emast.util.CollectionsUtils;
 import static org.emast.util.DefaultTestProperties.*;
 
 /**
  * Learning + PPFERG + bloqueando a pior expressão de cada vez (com iteração)
  */
-public class ERGLearningBlockEachBadExp extends AbstractERGLearning {
+public class ERGLearningBlockEachBadExp_ppferg_in extends AbstractERGLearning {
 
     private final Set<Expression> avoid = new HashSet<Expression>();
-    private final Set<Transition> blocked = new HashSet<Transition>();
+    private final Map<State, Action> blocked = new HashMap<State, Action>();
     private final NotInChooser<Expression> expFinder =
             new NotInChooser<Expression>(new ThresholdChooser<Expression>(BAD_EXP_VALUE, true), avoid);
 
-    public ERGLearningBlockEachBadExp(AbstractRLearning<ERG> learning) {
+    public ERGLearningBlockEachBadExp_ppferg_in(AbstractRLearning<ERG> learning) {
         super(learning);
-        learning.setActionChooser(new NonBlockedActionChooser(blocked));
         learning.setStoppingCriteria(new StopOnBadExpression(BAD_EXP_VALUE, avoid));
     }
 
     @Override
     public Policy run(Problem<ERG> pProblem, Object... pParameters) {
         avoid.clear();
-        Expression preserv = pProblem.getModel().getPreservationGoal();
-        if (!preserv.isEmpty()) {
-            avoid.add(preserv.negate());
-        }
+        avoid.add(pProblem.getModel().getPreservationGoal().negate());
 
         int iteration = 0;
         Problem<ERG> p = pProblem;
@@ -71,35 +66,17 @@ public class ERGLearningBlockEachBadExp extends AbstractERGLearning {
                 avoid.add(badExp);
                 //Log.info("Avoid: " + avoid);
 
-                populateBlocked(q);
+                //4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
+                model = createModel(model, q, avoid);
+                //create problem
+                p = new Problem<ERG>(model, p.getInitialStates(), p.getFinalStates());
+
+                //5. CREATE PPFERG ALGORITHM
+                final PPFERG ppferg = new PPFERG();
+                //6. GET THE VIABLE POLICIES FROM PPFERG EXECUTED OVER THE NEW MODEL
+                policy = ppferg.run(p);
             }
         } while (isValid(badExp));
-
-        if (!avoid.isEmpty()) {
-            //4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
-            model = createModel(model, q, avoid);
-            //create problem
-            p = new Problem<ERG>(model, p.getInitialStates(), p.getFinalStates());
-            //q learning policy
-            Log.info(p.toString(policy));
-            //q learning policy - best (greater q values) actions
-            Log.info(p.toString(policy.optimize()));
-
-            //5. CREATE PPFERG ALGORITHM
-            final PPFERG ppferg = new PPFERG();
-            //6. GET THE VIABLE POLICIES FROM PPFERG EXECUTED OVER THE NEW MODEL
-            policy = ppferg.run(p);
-            //after ppferg
-            Log.info(p.toString(policy));
-            //6. GET THE FINAL POLICY FROM THE PPFERG VIABLE POLICIES 
-            policy = new Policy(optmize(policy, q));
-            //after optimize
-            Log.info(p.toString(policy));
-        } else {
-            policy = learning.getQTable().getPolicy();
-        }
-
-        Log.info("Preservation goal:" + model.getPreservationGoal());
 
         return policy;
     }
@@ -110,7 +87,7 @@ public class ERGLearningBlockEachBadExp extends AbstractERGLearning {
             for (State state : q.getStates()) {
                 Expression exp = q.get(state, action).getExpression();
                 if (avoid.contains(exp)) {
-                    blocked.add(new Transition(state, action));
+                    blocked.put(state, action);
                     //Log.info("Blocked state:" + state + " and action: " + action);
                 }
             }

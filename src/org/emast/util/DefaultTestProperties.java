@@ -26,5 +26,5 @@ public final class DefaultTestProperties {
     public static final double EPSILON = 0.1;
     public static final double GAMA =  0.9d;
     
-    public static final double ERROR = 0.009;//0.0009
+    public static final double ERROR = 0.009;//0.009
 }

@@ -3,8 +3,10 @@ package org.emast.model.algorithm.actionchooser;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.emast.model.action.Action;
 import org.emast.model.state.State;
+import org.emast.model.transition.Transition;
 
 /**
  *
@@ -12,10 +14,10 @@ import org.emast.model.state.State;
  */
 public class NonBlockedActionChooser implements ActionChooser {
 
-    private final Map<State, Action> blocked;
+    private final Set<Transition> blocked;
     private final ActionChooser delegate;
 
-    public NonBlockedActionChooser(Map<State, Action> blocked) {
+    public NonBlockedActionChooser(Set<Transition> blocked) {
         this.blocked = blocked;
         this.delegate = new RandomActionChooser();
     }
@@ -23,18 +25,18 @@ public class NonBlockedActionChooser implements ActionChooser {
     @Override
     public Action choose(Map<Action, Double> values, State state) {
         Action action = null;
-        Collection<Action> valid = new HashSet<Action>();
+        Collection<Transition> valid = new HashSet<Transition>();
 
         for (Action act : values.keySet()) {
             if (values.get(act) != 0) {
-                valid.add(act);
+                valid.add(new Transition(state, act));
             }
         }
 
-        if (!valid.isEmpty() && !blocked.keySet().containsAll(valid)) {
+        if (!valid.isEmpty() && !blocked.containsAll(valid)) {
             do {
                 action = delegate.choose(values, state);
-            } while (blocked.containsKey(state) && blocked.get(state).equals(action));
+            } while (blocked.contains(new Transition(state, action)));
         }
 
         return action;

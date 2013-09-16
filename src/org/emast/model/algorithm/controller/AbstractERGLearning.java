@@ -13,6 +13,8 @@ import org.emast.model.model.ERG;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.TransitionFunction;
+import org.emast.model.model.Grid;
+import org.emast.model.model.impl.ERGGridModel;
 import org.emast.model.model.impl.ERGModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -81,7 +83,7 @@ public abstract class AbstractERGLearning implements Algorithm<ERG, Policy> {
     }
 
     protected ERG createModel(ERG oldModel, ERGQTable q, Set<Expression> avoid) {
-        ERGModel model = new ERGModel();
+        ERG model = createModel(oldModel);
         //COPY MAIN PROPERTIES
         model.setStates(q.getStates());
         model.setActions(q.getActions());
@@ -90,7 +92,8 @@ public abstract class AbstractERGLearning implements Algorithm<ERG, Policy> {
         //GET THE SET OF PROPOSITIONS FROM EXPLORATED STATES
         model.setPropositions(getPropositions(q.getExpsValues()));
         //CREATE NEW PRESERVATION GOAL FROM EXPRESSIONS THAT SHOULD BE AVOIDED
-        model.setPreservationGoal(createNewPreservationGoal(oldModel.getPreservationGoal(), avoid));
+        Expression newPreservGoal = createNewPreservationGoal(oldModel.getPreservationGoal(), avoid);
+        model.setPreservationGoal(newPreservGoal);
         //CREATE NEW TRANSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
         TransitionFunction tf = ERGFactory.createTransitionFunctionFrequency(q);
         model.setTransitionFunction(tf);
@@ -124,5 +127,12 @@ public abstract class AbstractERGLearning implements Algorithm<ERG, Policy> {
     @Override
     public String getName() {
         return getClass().getSimpleName() + "(" + learning.getName() + ")";
+    }
+
+    private ERG createModel(ERG oldModel) {
+        if (oldModel instanceof Grid) {
+            return new ERGGridModel(((Grid) oldModel).getRows(), ((Grid) oldModel).getCols());
+        }
+        return new ERGModel();
     }
 }

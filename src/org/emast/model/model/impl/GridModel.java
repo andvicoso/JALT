@@ -33,7 +33,7 @@ public class GridModel extends MDPModel implements Grid {
         this.rows = pRows;
         this.cols = pCols;
         setStates(GridUtils.createStates(pRows, pCols));
-        setActions(GridUtils.createGridMovementActions());
+        setActions(GridUtils.GRID_ACTIONS);
         setTransitionFunction(new GridTransitionFunction(rows, cols));
     }
 

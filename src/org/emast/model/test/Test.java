@@ -4,6 +4,8 @@ import org.emast.infra.log.Log;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.problem.Problem;
+import org.emast.model.solution.Policy;
+import org.emast.model.solution.SinglePolicy;
 import org.emast.util.DefaultTestProperties;
 import org.emast.util.Utils;
 
@@ -50,9 +52,11 @@ public class Test implements Runnable {
         printNoInitialBreak(algorithm.printResults());
         //if a solution was found...
         if (result != null) {
-           print("Result:" + problem.toString(result));
+            print("Result:" + problem.toString(result));
+            SinglePolicy sp = ((Policy) result).getBestPolicy();
+            print("Single Result:" + problem.toString(sp));
         }
-        
+
         return result;
     }
 

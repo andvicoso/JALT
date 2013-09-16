@@ -9,7 +9,7 @@ import org.emast.model.chooser.base.SingleChooser;
  *
  * @author anderson
  */
-public class NotInChooser<T> implements SingleChooser<T> {
+public class NotInChooser<T> implements SingleChooser<T>, MultiChooser<T> {
 
     private final Set<T> avoid;
     private final MultiChooser<T> delegate;
@@ -29,5 +29,14 @@ public class NotInChooser<T> implements SingleChooser<T> {
             return objs.iterator().next();
         }
         return null;
+    }
+
+    @Override
+    public Set<T> choose(Map<T, Double> pValues) {
+        Set<T> objs = delegate.choose(pValues);
+        //remove all the current avoidable objects
+        objs.removeAll(avoid);
+
+        return objs;
     }
 }

@@ -16,6 +16,8 @@ import org.emast.model.solution.Plan;
 import org.emast.model.solution.Policy;
 import org.emast.model.solution.SinglePolicy;
 import org.emast.model.state.State;
+import org.emast.util.DefaultTestProperties;
+import static org.emast.util.grid.GridUtils.*;
 
 /**
  *
@@ -24,6 +26,17 @@ import org.emast.model.state.State;
 public class GridPrinter {
 
     private static final int MAX_STR_SIZE = 3;
+    public static final String NORTH_SYMBOL = " ^";
+    public static final String SOUTH_SYMBOL = " v";
+    public static final String WEST_SYMBOL = " <";
+    public static final String EAST_SYMBOL = " >";
+    public static final String VALUE_FORMAT = "%1$.2f";
+    public static final String SPACE = " ";
+    public static final String VALUE_FORMAT_STATE = "%1$.4f";
+    public static final String LINE_BREAK = "|\n";
+    public static final String FORMAT_1 = "%1$";
+    public static final String S = "s";
+    public static final String COLUMN_SEP = "|";
 
     public <M extends MDP & Grid> String print(M pModel) {
         String[][] grid = getGrid(pModel, Collections.EMPTY_MAP, Collections.EMPTY_SET);
@@ -68,7 +81,7 @@ public class GridPrinter {
         for (State initState : pInitialStates.values()) {
             int row = GridUtils.getRow(initState);
             int col = GridUtils.getCol(initState);
-            pGrid[row][col] = agent + " " + pGrid[row][col];
+            pGrid[row][col] = agent + SPACE + pGrid[row][col];
             agent++;
         }
     }
@@ -77,8 +90,8 @@ public class GridPrinter {
         for (State initState : pFinalStates) {
             int row = GridUtils.getRow(initState);
             int col = GridUtils.getCol(initState);
-            if (!pGrid[row][col].contains("@")) {
-                pGrid[row][col] = "@ " + pGrid[row][col];
+            if (!pGrid[row][col].contains(DefaultTestProperties.FINAL_GOAL)) {
+                pGrid[row][col] = DefaultTestProperties.FINAL_GOAL + SPACE + pGrid[row][col];
             }
         }
     }
@@ -94,22 +107,21 @@ public class GridPrinter {
         for (int i = 0; i < pGrid.length; i++) {
             for (int j = 0; j < pGrid[i].length; j++) {
                 Object object = pGrid[i][j];
-                String str = object == null ? " " : object.toString();
-                pGrid[i][j] = str;
-                lengths[j] = Math.max(str.length(), lengths[j]);
+                pGrid[i][j] = object == null ? SPACE : object.toString();
+                lengths[j] = Math.max(pGrid[i][j].length(), lengths[j]);
             }
         }
         // Generate a format string for each column
         String[] formats = new String[lengths.length];
         for (int i = 0; i < lengths.length; i++) {
-            formats[i] = "%1$" + lengths[i] + "s"
-                    + (i + 1 == lengths.length ? "|\n" : "");
+            formats[i] = FORMAT_1 + lengths[i] + S
+                    + (i + 1 == lengths.length ? LINE_BREAK : "");
         }
         // format 'em
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < pGrid.length; i++) {
             for (int j = 0; j < pGrid[i].length; j++) {
-                sb.append("|");
+                sb.append(COLUMN_SEP);
                 sb.append(String.format(formats[j], pGrid[i][j].toString()));
             }
         }
@@ -119,7 +131,7 @@ public class GridPrinter {
 
     public void fillWithActions(String[][] pGrid, Policy pPolicy) {
         for (State state : pPolicy.getStates()) {
-            Collection<Action> actions = pPolicy.getBestActions(state);
+            Collection<Action> actions = pPolicy.get(state).keySet();
             int row = GridUtils.getRow(state) + 1;
             int col = GridUtils.getCol(state) + 1;
 
@@ -146,7 +158,7 @@ public class GridPrinter {
 
     private String[][] addIndexes(String[][] pGrid, int pRows, int pCols) {
         String[][] grid2 = new String[pRows + 1][pCols + 1];
-        grid2[0][0] = " ";
+        grid2[0][0] = SPACE;
 
         for (int j = 1; j < pCols + 1; j++) {
             grid2[0][j] = j - 1 + "";
@@ -173,7 +185,7 @@ public class GridPrinter {
                         str = str.length() < MAX_STR_SIZE
                                 ? str : str.substring(0, MAX_STR_SIZE);
                         sb.append(str);
-                        sb.append(" ");
+                        sb.append(SPACE);
                     }
                 }
 
@@ -202,7 +214,7 @@ public class GridPrinter {
         for (State state : pModel.getStates()) {
             int row = GridUtils.getRow(state);
             int col = GridUtils.getCol(state);
-            grid[row][col] = " ";
+            grid[row][col] = SPACE;
         }
 
         return grid;
@@ -215,11 +227,11 @@ public class GridPrinter {
             int row = GridUtils.getRow(state);
             int col = GridUtils.getCol(state);
             Double value = map.get(state);
-            grid[row][col] = String.format("%1$.4f", value);
+            grid[row][col] = String.format(VALUE_FORMAT_STATE, value);
         }
 
         final String[][] grid2 = new String[pRows + 1][pCols + 1];
-        grid2[0][0] = " ";
+        grid2[0][0] = SPACE;
 
         for (int j = 1; j < pCols + 1; j++) {
             grid2[0][j] = j - 1 + "";
@@ -236,7 +248,7 @@ public class GridPrinter {
     public String print(RewardFunction rf, MDP mdp) {
         int i = 0;
         final String[][] grid = new String[mdp.getStates().size() + 1][mdp.getActions().size() + 1];
-        grid[0][0] = " ";
+        grid[0][0] = SPACE;
 
         for (State state : mdp.getStates()) {
             int j = 0;
@@ -256,7 +268,7 @@ public class GridPrinter {
     public String print(TransitionFunction tf, MDP mdp) {
         int i = 0;
         final String[][] grid = new String[mdp.getStates().size() + 1][mdp.getActions().size() + 1];
-        grid[0][0] = " ";
+        grid[0][0] = SPACE;
 
         for (State state : mdp.getStates()) {
             int j = 0;
@@ -267,11 +279,11 @@ public class GridPrinter {
                 j++;
                 grid[0][j] = action.getName();
                 State best = tf.getBestReachableState(mdp.getStates(), state, action);
-                String value = " ";
+                String value = SPACE;
 
                 if (best != null) {
-                    value = String.format("%1$.2f", tf.getValue(state, best, action));
-                    value = best.getName() + " " + value;
+                    value = String.format(VALUE_FORMAT, tf.getValue(state, best, action));
+                    value = best.getName() + SPACE + value;
                 }
 
                 grid[i][j] = value;
@@ -284,7 +296,7 @@ public class GridPrinter {
     public String print(PropositionFunction pf, MDP mdp) {
         int i = 0;
         final String[][] grid = new String[mdp.getStates().size() + 1][mdp.getActions().size() + 1];
-        grid[0][0] = " ";
+        grid[0][0] = SPACE;
 
         for (State state : mdp.getStates()) {
             int j = 0;
@@ -308,14 +320,14 @@ public class GridPrinter {
     }
 
     private void getActionSymbol(Action action, String[][] pGrid, int row, int col) {
-        if (action.getName().equals("north")) {
-            pGrid[row][col] = pGrid[row][col] + " ^";
-        } else if (action.getName().equals("south")) {
-            pGrid[row][col] = pGrid[row][col] + " v";
-        } else if (action.getName().equals("west")) {
-            pGrid[row][col] = pGrid[row][col] + " <";
-        } else if (action.getName().equals("east")) {
-            pGrid[row][col] = pGrid[row][col] + " >";
+        if (action.equals(north)) {
+            pGrid[row][col] = pGrid[row][col] + NORTH_SYMBOL;
+        } else if (action.equals(south)) {
+            pGrid[row][col] = pGrid[row][col] + SOUTH_SYMBOL;
+        } else if (action.equals(west)) {
+            pGrid[row][col] = pGrid[row][col] + WEST_SYMBOL;
+        } else if (action.equals(east)) {
+            pGrid[row][col] = pGrid[row][col] + EAST_SYMBOL;
         }
     }
 

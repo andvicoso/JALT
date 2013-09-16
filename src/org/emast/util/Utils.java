@@ -14,6 +14,9 @@ public class Utils {
 
     private static final String DEFAULT_DATE_FORMAT_PATTERN = "dd/MM/yy";
     public static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN);
+    public static final String D_MIN_D_SEC = "%d min, %d sec";
+    public static final String _MS = " ms)";
+    public static final String PAR = "(";
 
     private Utils() {
     }
@@ -47,7 +50,7 @@ public class Utils {
         long sec = TimeUnit.MILLISECONDS.toSeconds(millis)
                 - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
 
-        return String.format("%d min, %d sec", min, sec) + "(" + millis + " ms)";
+        return String.format(D_MIN_D_SEC, min, sec) + PAR + millis + _MS;
     }
 
     public static String toFileTimeString(long millis) {

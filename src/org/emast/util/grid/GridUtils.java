@@ -12,6 +12,25 @@ import org.emast.model.state.State;
 public class GridUtils {
 
     private static final String GRID_STATE_SEP = "x";
+    public static final String GRID_STATE_FORMAT_PREFFIX = "%0";
+    public static final String GRID_STATE_FORMAT_SUFFIX = "d";
+    public static final String ZERO = "0";
+    public static final String NORTH = "north";
+    public static final String SOUTH = "south";
+    public static final String WEST = "west";
+    public static final String EAST = "east";
+    public static final Action south = new Action("south");
+    public static final Action east = new Action("east");
+    public static final Action west = new Action("west");
+    public static final Action north = new Action("north");
+    public static final List<Action> GRID_ACTIONS = new ArrayList<Action>();
+
+    static {
+        GRID_ACTIONS.add(north);
+        GRID_ACTIONS.add(south);
+        GRID_ACTIONS.add(west);
+        GRID_ACTIONS.add(east);
+    }
 
     private GridUtils() {
     }
@@ -35,19 +54,9 @@ public class GridUtils {
         String srow = Integer.toString(pRow);
         String scol = Integer.toString(pCol);
         int size = Math.max(srow.length(), scol.length());
-        String format = "%0" + size + "d";
+        String format = GRID_STATE_FORMAT_PREFFIX + size + GRID_STATE_FORMAT_SUFFIX;
 
         return String.format(format, pRow) + GRID_STATE_SEP + String.format(format, pCol);
-    }
-
-    public static List<Action> createGridMovementActions() {
-        final List<Action> actions = new ArrayList<Action>();
-        actions.add(new Action("north"));
-        actions.add(new Action("south"));
-        actions.add(new Action("west"));
-        actions.add(new Action("east"));
-
-        return actions;
     }
 
     public static int getRow(final State pState) {

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.emast.model.action.Action;
 import org.emast.model.state.State;
+import static org.emast.util.grid.GridUtils.*;
 import org.emast.util.grid.GridUtils;
 
 /**
@@ -14,10 +15,6 @@ public class GridTransitionFunction extends TransitionFunction {
 
     private final int rows;
     private final int cols;
-    private static final Action south = new Action("south");
-    private static final Action east = new Action("east");
-    private static final Action west = new Action("west");
-    private static final Action north = new Action("north");
 
     public GridTransitionFunction(int pRows, int pCols) {
         rows = pRows;

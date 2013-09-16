@@ -89,8 +89,8 @@ public abstract class AbstractRLearning<M extends MDP>
                         //go to next state
                         state = nextState;
                     }
+                    currentSteps++;
                 }
-                currentSteps++;
                 //while there is a valid state to go to
             } while (!isStopSteps(action, state, pProblem));
             steps.add(currentSteps);

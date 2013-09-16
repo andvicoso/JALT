@@ -44,6 +44,33 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
         return sb.toString();
     }
 
+    public Map<Action, Double> getBestMapActions(State state) {
+        Map<Action, Double> map = get(state);
+        if (map != null && !map.isEmpty()) {
+            Map<Action, Double> temp = new HashMap<Action, Double>(map);
+            Double max = Collections.max(temp.values());
+            Set<Action> actions = CollectionsUtils.getKeysForValue(temp, max);
+            if (max == 0) {
+                for (Action action : actions) {
+                    temp.remove(action);
+                }
+                if (temp.isEmpty()) {
+                    return Collections.EMPTY_MAP;
+                }
+                max = Collections.max(temp.values());
+                actions = CollectionsUtils.getKeysForValue(temp, max);
+            }
+
+            Map<Action, Double> result = new HashMap<Action, Double>();
+            for (Action action : actions) {
+                result.put(action, max);
+            }
+
+            return result;
+        }
+        return Collections.EMPTY_MAP;
+    }
+
     public Collection<Action> getBestActions(State state) {
         Map<Action, Double> map = get(state);
         if (map != null && !map.isEmpty()) {
@@ -143,6 +170,16 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
 
         for (final State state : keySet()) {
             policy.put(state, getBestAction(state));
+        }
+
+        return policy;
+    }
+
+    public Policy optimize() {
+        final Policy policy = new Policy();
+
+        for (final State state : keySet()) {
+            policy.put(state, getBestMapActions(state));
         }
 
         return policy;
