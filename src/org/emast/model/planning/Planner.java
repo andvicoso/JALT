@@ -3,6 +3,8 @@ package org.emast.model.planning;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.emast.infra.log.Log;
 import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.algorithm.Algorithm;
@@ -34,7 +36,7 @@ public class Planner<M extends MDP> implements Algorithm<M, List<ERGAgentIterato
     }
 
     @Override
-    public List<ERGAgentIterator> run(final Problem<M> pProblem, Object... pParameters) {
+    public List<ERGAgentIterator> run(final Problem<M> pProblem, Map<String, Object> pParameters) {
         //execute them all
         for (final ERGAgentIterator agentIterator : agentIterators) {
             agentIterator.run(pProblem, policy);//createThread(agentIterator, pProblem).start();

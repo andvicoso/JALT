@@ -103,8 +103,8 @@ public class ProblemsCLI {
         commands.add(new Command("s", "save", "Store in a file the current environment"));
         commands.add(new Command("l", "last", "Retrieve the last executed environment"));
         commands.add(new Command("n", "new", "Create a new random environment"));
-        commands.add(new Command("q", "quit", "Quit program"));
         commands.add(new Command("p", "list", "List problem files"));
+        commands.add(new Command("q", "quit", "Quit program"));
 
         return commands;
 

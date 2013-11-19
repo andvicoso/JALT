@@ -14,279 +14,275 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
 import org.emast.model.NamedObject;
 
 /**
- *
+ * 
  * @author Anderson
  */
 public class CollectionsUtils {
 
-    private static final Random random = new Random();
+	private static final Random random = new Random();
 
-    private CollectionsUtils() {
-    }
+	private CollectionsUtils() {
+	}
 
-    public static <M> M draw(Map<M, Double> pValues) {
-        if (!pValues.isEmpty()) {
-            double sum = 0;
-            List<Double> limits = new ArrayList<Double>(pValues.size());
-            List<M> vars = new ArrayList<M>(pValues.size());
+	public static <M> M draw(Map<M, Double> pValues) {
+		if (!pValues.isEmpty()) {
+			double sum = 0;
+			List<Double> limits = new ArrayList<Double>(pValues.size());
+			List<M> vars = new ArrayList<M>(pValues.size());
 
-            for (M m : pValues.keySet()) {
-                sum += pValues.get(m);
-                limits.add(sum);
-                vars.add(m);
-            }
+			for (M m : pValues.keySet()) {
+				sum += pValues.get(m);
+				limits.add(sum);
+				vars.add(m);
+			}
 
-            if (sum > 0) {
-                double n = random.nextDouble() % sum;
-                for (Double l : limits) {
-                    if (n < l) {
-                        return vars.get(limits.indexOf(l));
-                    }
-                }
-            } else {
-                return getRandom(vars);
-            }
-        }
-        return null;
-    }
+			if (sum > 0) {
+				double n = random.nextDouble() % sum;
+				for (Double l : limits) {
+					if (n < l) {
+						return vars.get(limits.indexOf(l));
+					}
+				}
+			} else {
+				return getRandom(vars);
+			}
+		}
+		return null;
+	}
 
-    public static <S> Map<String, S> asStringMap(S[] pParameters) {
-        assert pParameters.length % 2 == 0;
-        final Map<String, S> map = new HashMap<String, S>();
-        for (int i = 0; i < pParameters.length; i += 2) {
-            String key = pParameters[i].toString();
-            S value = pParameters[i + 1];
-            map.put(key, value);
-        }
+	public static <S> Map<String, S> asStringMap(S[] pParameters) {
+		assert pParameters.length % 2 == 0;
+		final Map<String, S> map = new HashMap<String, S>();
+		for (int i = 0; i < pParameters.length; i += 2) {
+			String key = pParameters[i].toString();
+			S value = pParameters[i + 1];
+			map.put(key, value);
+		}
 
-        return map;
-    }
+		return map;
+	}
 
-    public static <S> Map<Integer, S> asIndexMap(List<S> pList) {
-        final HashMap<Integer, S> map = new HashMap<Integer, S>(pList.size());
-        for (final S s : pList) {
-            map.put(pList.indexOf(s), s);
-        }
-        return map;
-    }
+	public static Map<String, Object> asMap(String str, Object obj) {
+		final HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put(str, obj);
+		return map;
+	}
 
-    public static <T> Map<T, Double> createMap(Collection<T> pKeys, Double pValue) {
-        final Map map = new HashMap();
-        for (Object object : pKeys) {
-            map.put(object, pValue);
-        }
-        return map;
-    }
+	public static <S> Map<Integer, S> asIndexMap(List<S> pList) {
+		final HashMap<Integer, S> map = new HashMap<Integer, S>(pList.size());
+		for (final S s : pList) {
+			map.put(pList.indexOf(s), s);
+		}
+		return map;
+	}
 
-    public static <E extends NamedObject> Set<E> createSet(Class<E> pClass, String[] pNames) {
-        final Set<E> set = new HashSet<E>(pNames.length);
-        for (String name : pNames) {
-            try {
-                final E e = pClass.getConstructor(String.class).newInstance(name);
-                set.add(e);
-            } catch (Exception e) {
-            }
-        }
+	public static <T> Map<T, Double> createMap(Collection<T> pKeys, Double pValue) {
+		final Map map = new HashMap();
+		for (Object object : pKeys) {
+			map.put(object, pValue);
+		}
+		return map;
+	}
 
-        return set;
-    }
+	public static <E extends NamedObject> Set<E> createSet(Class<E> pClass, String[] pNames) {
+		final Set<E> set = new HashSet<E>(pNames.length);
+		for (String name : pNames) {
+			try {
+				final E e = pClass.getConstructor(String.class).newInstance(name);
+				set.add(e);
+			} catch (Exception e) {
+			}
+		}
 
-    public static <E extends NamedObject> List<E> createList(Class<E> pClass, String[] pNames) {
-        final List<E> list = new ArrayList<E>(pNames.length);
-        for (String name : pNames) {
-            try {
-                final E e = pClass.getConstructor(String.class).newInstance(name);
-                list.add(e);
-            } catch (Exception e) {
-            }
-        }
+		return set;
+	}
 
-        return list;
-    }
+	public static <E extends NamedObject> List<E> createList(Class<E> pClass, String[] pNames) {
+		final List<E> list = new ArrayList<E>(pNames.length);
+		for (String name : pNames) {
+			try {
+				final E e = pClass.getConstructor(String.class).newInstance(name);
+				list.add(e);
+			} catch (Exception e) {
+			}
+		}
 
-    public static <E extends NamedObject> List<E> createList(final Class<E> pClass,
-            final int pN) {
-        final List<E> list = new ArrayList<E>(pN);
-        for (int i = 0; i < pN; i++) {
-            try {
-                final E e = pClass.getConstructor(int.class).newInstance(i);
-                list.add(e);
-            } catch (Exception e) {
-            }
-        }
+		return list;
+	}
 
-        return list;
-    }
+	public static <E extends NamedObject> List<E> createList(final Class<E> pClass, final int pN) {
+		final List<E> list = new ArrayList<E>(pN);
+		for (int i = 0; i < pN; i++) {
+			try {
+				final E e = pClass.getConstructor(int.class).newInstance(i);
+				list.add(e);
+			} catch (Exception e) {
+			}
+		}
 
-    public static <E extends NamedObject> Set<E> createSet(final Class<E> pClass,
-            final int pN) {
-        final Set<E> list = new HashSet<E>(pN);
-        for (int i = 0; i < pN; i++) {
-            try {
-                final E e = pClass.getConstructor(int.class).newInstance(i);
-                list.add(e);
-            } catch (Exception e) {
-            }
-        }
+		return list;
+	}
 
-        return list;
-    }
+	public static <E extends NamedObject> Set<E> createSet(final Class<E> pClass, final int pN) {
+		final Set<E> list = new HashSet<E>(pN);
+		for (int i = 0; i < pN; i++) {
+			try {
+				final E e = pClass.getConstructor(int.class).newInstance(i);
+				list.add(e);
+			} catch (Exception e) {
+			}
+		}
 
-    public static <K, V> Set<K> getKeysForValue(Map<K, V> hm, V value) {
-        Set<K> list = new HashSet<K>();
-        for (K o : hm.keySet()) {
-            if (hm.get(o).equals(value)) {
-                list.add(o);
-            }
-        }
-        return list;
-    }
+		return list;
+	}
 
-    public static <K, V> Map<K, V> sortByValue(Map<K, V> map) {
-        final List<V> list = new LinkedList(map.entrySet());
-        Collections.sort(list, new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue());
-            }
-        });
+	public static <K, V> Set<K> getKeysForValue(Map<K, V> hm, V value) {
+		Set<K> list = new HashSet<K>();
+		for (K o : hm.keySet()) {
+			if (hm.get(o).equals(value)) {
+				list.add(o);
+			}
+		}
+		return list;
+	}
 
-        final Map<K, V> result = new LinkedHashMap<K, V>(list.size());
-        for (final Iterator it = list.iterator(); it.hasNext();) {
-            Map.Entry<K, V> entry = (Map.Entry<K, V>) it.next();
-            result.put(entry.getKey(), entry.getValue());
-        }
-        return result;
-    }
+	public static <K, V> Map<K, V> sortByValue(Map<K, V> map) {
+		final List<V> list = new LinkedList(map.entrySet());
+		Collections.sort(list, new Comparator() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2))
+						.getValue());
+			}
+		});
 
-    /**
-     * Gets the elements of received type within the received list.
-     *
-     * @param pList the list
-     * @param pType the type to search for
-     *
-     * @return the elements of the received type
-     */
-    @SuppressWarnings("unchecked")
-    public static <C> List<C> getElementsOfType(final Collection pList,
-            final Class<C> pType) {
-        final List<C> list = new ArrayList<C>();
+		final Map<K, V> result = new LinkedHashMap<K, V>(list.size());
+		for (final Iterator it = list.iterator(); it.hasNext();) {
+			Map.Entry<K, V> entry = (Map.Entry<K, V>) it.next();
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
+	}
 
-        if (pList != null && pList.size() > 0) {
-            synchronized (pList) {
-                for (final Object obj : pList) {
-                    if (pType.isAssignableFrom(obj.getClass())) {
-                        list.add((C) obj);
-                    }
-                }
-            }
-        }
+	/**
+	 * Gets the elements of received type within the received list.
+	 * 
+	 * @param pList
+	 *            the list
+	 * @param pType
+	 *            the type to search for
+	 * 
+	 * @return the elements of the received type
+	 */
+	@SuppressWarnings("unchecked")
+	public static <C> List<C> getElementsOfType(final Collection pList, final Class<C> pType) {
+		final List<C> list = new ArrayList<C>();
 
-        return list;
-    }
+		if (pList != null && pList.size() > 0) {
+			synchronized (pList) {
+				for (final Object obj : pList) {
+					if (pType.isAssignableFrom(obj.getClass())) {
+						list.add((C) obj);
+					}
+				}
+			}
+		}
 
-    public static <C> boolean containsElementOfType(final Collection pList,
-            final Class<C> pType) {
-        return getElementsOfType(pList, pType).size() > 0;
-    }
+		return list;
+	}
 
-    public static <E> Set<E> asSet(final E... pEs) {
-        return new HashSet<E>(Arrays.asList(pEs));
-    }
+	public static <C> boolean containsElementOfType(final Collection pList, final Class<C> pType) {
+		return getElementsOfType(pList, pType).size() > 0;
+	}
 
-    public static <T> List<List<T>> createListsFromList(final List<T> pList) {
-        final List<List<T>> result = new ArrayList<List<T>>();
-        for (final T item : pList) {
-            result.add(Collections.singletonList(item));
-        }
+	public static <E> Set<E> asSet(final E... pEs) {
+		return new HashSet<E>(Arrays.asList(pEs));
+	}
 
-        return result;
-    }
+	public static <T> List<List<T>> createListsFromList(final List<T> pList) {
+		final List<List<T>> result = new ArrayList<List<T>>();
+		for (final T item : pList) {
+			result.add(Collections.singletonList(item));
+		}
 
-    public static <T extends Comparable<? super T>> List<List<T>> getAllCombinations(
-            final List<T> pList, final int pSize) {
-        assert (pSize < pList.size());
-        final List<List<T>> result = new ArrayList<List<T>>();
+		return result;
+	}
 
-        if (pSize == 0) {
-            result.add(new ArrayList<T>());
-            return result;
-        }
+	public static <T extends Comparable<? super T>> List<List<T>> getAllCombinations(
+			final List<T> pList, final int pSize) {
+		assert (pSize < pList.size());
+		final List<List<T>> result = new ArrayList<List<T>>();
 
-        final List<List<T>> combinations = getAllCombinations(pList, pSize - 1);
-        for (final List<T> combination : combinations) {
-            for (final T element : pList) {
-                if (combination.contains(element)) {
-                    continue;
-                }
+		if (pSize == 0) {
+			result.add(new ArrayList<T>());
+			return result;
+		}
 
-                final List<T> list = new ArrayList<T>();
-                list.addAll(combination);
+		final List<List<T>> combinations = getAllCombinations(pList, pSize - 1);
+		for (final List<T> combination : combinations) {
+			for (final T element : pList) {
+				if (combination.contains(element)) {
+					continue;
+				}
 
-                if (list.contains(element)) {
-                    continue;
-                }
+				final List<T> list = new ArrayList<T>();
+				list.addAll(combination);
 
-                list.add(element);
-                Collections.sort(list);
+				if (list.contains(element)) {
+					continue;
+				}
 
-                if (result.contains(list)) {
-                    continue;
-                }
+				list.add(element);
+				Collections.sort(list);
 
-                result.add(list);
-            }
-        }
+				if (result.contains(list)) {
+					continue;
+				}
 
-        return result;
-    }
+				result.add(list);
+			}
+		}
 
-    public static <T> List<List<T>> getAllCombinations(final List<T> pList) {
-        final List<List<T>> result = new ArrayList<List<T>>(pList.size());
-        //if it has only one element, the resulting list
-        //is a list with the single element
-        if (pList.size() == 1) {
-            final List<T> temp = new ArrayList<T>();
-            temp.add(pList.get(0));
-            result.add(temp);
-        } else {
-            for (final T element : pList) {
-                //create a new sublist
-                final List<T> temp = new ArrayList<T>(pList);
-                //remove the current item
-                temp.remove(element);
-                //get the all combinations for the sublist
-                final List<List<T>> sublist = getAllCombinations(temp);
-                for (final List<T> item : sublist) {
-                    item.add(element);
-                }
+		return result;
+	}
 
-                result.addAll(sublist);
-            }
-        }
+	public static <T> List<List<T>> getAllCombinations(final List<T> pList) {
+		final List<List<T>> result = new ArrayList<List<T>>(pList.size());
+		// if it has only one element, the resulting list
+		// is a list with the single element
+		if (pList.size() == 1) {
+			final List<T> temp = new ArrayList<T>();
+			temp.add(pList.get(0));
+			result.add(temp);
+		} else {
+			for (final T element : pList) {
+				// create a new sublist
+				final List<T> temp = new ArrayList<T>(pList);
+				// remove the current item
+				temp.remove(element);
+				// get the all combinations for the sublist
+				final List<List<T>> sublist = getAllCombinations(temp);
+				for (final List<T> item : sublist) {
+					item.add(element);
+				}
 
-        return result;
-    }
+				result.addAll(sublist);
+			}
+		}
 
-    public static <O> O getRandom(final Collection<O> pObjects) {
-        int r = Math.abs(random.nextInt() % pObjects.size());
-        O obj = null;
+		return result;
+	}
 
-        if (pObjects instanceof List) {
-            obj = ((List<O>) pObjects).get(r);
-        } else {
-            int i = 0;
-            for (O o : pObjects) {
-                obj = o;
-                if (i++ == r) {
-                    break;
-                }
-            }
-        }
+	public static <O> O getRandom(final Collection<O> pObjects) {
+		int r = Math.abs(random.nextInt() % pObjects.size());
+		List<O> objects = !(pObjects instanceof List) 
+				? new ArrayList<>(pObjects)
+				: (List<O>) pObjects;
 
-        return obj;
-    }
+		return objects.get(r);
+	}
 }

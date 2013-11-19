@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import org.emast.infra.log.Log;
 import org.emast.model.combinator.Combinator;
-import org.emast.model.chooser.base.MultiChooser;
+import org.emast.model.chooser.Chooser;
 import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.individual.reward.PropReward;
@@ -29,7 +30,7 @@ public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
 
     private final PreservationGoalFactory factory;
     private final PolicyGenerator<ERG> algorithm;
-    private final MultiChooser<Proposition> chooser;
+    private final Chooser<Proposition> chooser;
     private final Combinator<Proposition> combinator;
     private final boolean acceptOnePath;
 
@@ -40,7 +41,7 @@ public class ChangePreservGoal implements Collective<ERG>, ChangeModel<ERG> {
      * @param pAcceptOnePath Indicates if the algorithm should accept at least one valid path to the final
      * goal for one agent
      */
-    public ChangePreservGoal(PolicyGenerator<ERG> pAlgorithm, MultiChooser<Proposition> pChooser, Combinator<Proposition> pCombinator,
+    public ChangePreservGoal(PolicyGenerator<ERG> pAlgorithm, Chooser<Proposition> pChooser, Combinator<Proposition> pCombinator,
             boolean pAcceptOnePath) {
         algorithm = pAlgorithm;
         chooser = pChooser;

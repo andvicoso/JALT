@@ -2,10 +2,18 @@ package org.emast.model.algorithm.ensemble;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.emast.infra.log.Log;
-import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.agent.AgentFactory;
+import org.emast.model.agent.ERGAgentIterator;
 import org.emast.model.agent.behavior.Collective;
 import org.emast.model.agent.behavior.Individual;
 import org.emast.model.algorithm.Algorithm;
@@ -30,12 +38,12 @@ public class AgentEnsembleBehavior<M extends ERG> implements Algorithm<M, Policy
 
     private final PolicyGenerator<M> policyGenerator;
     private final AgentFactory agentFactory;
-    private final List<Individual<M>> agentBehaviors;
-    private final List<Collective<M>> behaviors;
+    private final List<Individual> agentBehaviors;
+    private final List<Collective> behaviors;
     private List<ERGAgentIterator> agentIterators;
 
-    public AgentEnsembleBehavior(PolicyGenerator<M> pPolicyGenerator, List<Collective<M>> pBehaviors,
-            List<Individual<M>> pAgentBehaviors) {
+    public AgentEnsembleBehavior(PolicyGenerator pPolicyGenerator, List<Collective> pBehaviors,
+            List<Individual> pAgentBehaviors) {
         policyGenerator = pPolicyGenerator;
         agentFactory = new AgentFactory();
         behaviors = pBehaviors;
@@ -52,7 +60,7 @@ public class AgentEnsembleBehavior<M extends ERG> implements Algorithm<M, Policy
     }
 
     @Override
-    public Policy run(Problem<M> pProblem, Object... pParameters) {
+    public Policy run(Problem<M> pProblem, Map<String, Object> pParameters) {
         Problem<M> problem = pProblem;
         M model = problem.getModel();
         Policy policy;
@@ -67,7 +75,7 @@ public class AgentEnsembleBehavior<M extends ERG> implements Algorithm<M, Policy
             //create planner
             Planner planner = createPlanner(policy);
             //run planner (that runs the problem for each agent)
-            planner.run(problem);
+            planner.run(problem, Collections.emptyMap());
             //wait to be awakened from the planner notification
             //(when it finished running all agents)
             //wait(planner);
@@ -92,7 +100,7 @@ public class AgentEnsembleBehavior<M extends ERG> implements Algorithm<M, Policy
 
     public Map<Proposition, Double> combine(final Collection<Map<Proposition, Double>> pReputations) {
         if (pReputations.isEmpty()) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
         final Map<Proposition, Double> result = new HashMap<Proposition, Double>();
         final Map<Proposition, Integer> count = new HashMap<Proposition, Integer>();
@@ -135,7 +143,7 @@ public class AgentEnsembleBehavior<M extends ERG> implements Algorithm<M, Policy
                 && existValidFinalState(model, newPreservGoal)) {
             //create a new cloned problem
             ERG newModel = cloneModel(model, newPreservGoal);
-            Problem newProblem = new Problem(newModel, pProblem.getInitialStates());
+            Problem newProblem = new Problem<ERG>(newModel, pProblem.getInitialStates());
             //Execute the base algorithm (PPFERG) over the new model (with new preservation goal)
             //if there are paths for all to reach the goal
             Log.info("Trying to find a valid plan for preserv: " + model.getPreservationGoal());
@@ -199,12 +207,12 @@ public class AgentEnsembleBehavior<M extends ERG> implements Algorithm<M, Policy
     }
 
     public void behave(Class<? extends Collective> pClass,
-            Problem<M> pProblem, Object... pParameters) {
+            Problem pProblem, Object... pParameters) {
         behave(pClass, pProblem, CollectionsUtils.asStringMap(pParameters));
     }
 
     private void behave(Class<? extends Collective> pClass,
-            Problem<M> pProblem, Map<String, Object> pParameters) {
+            Problem pProblem, Map<String, Object> pParameters) {
         for (final Collective b : behaviors) {
             if (pClass.isAssignableFrom(b.getClass())) {
                 b.behave(agentIterators, pProblem, pParameters);
@@ -213,14 +221,14 @@ public class AgentEnsembleBehavior<M extends ERG> implements Algorithm<M, Policy
     }
 
     private Planner createPlanner(Policy policy) {
-        Planner planner = new Planner<M>(policy, agentIterators);
+        Planner planner = new Planner(policy, agentIterators);
         //listen to changes of planner properties
         planner.getPropertyChangeSupport().addPropertyChangeListener(this);
 
         return planner;
     }
 
-    private boolean changePreservGoal(Problem<M> pProblem) {
+    private boolean changePreservGoal(Problem pProblem) {
         //run change model behaviors
         //behave(ChangeModel.class, problem);
         Collection<Map<Proposition, Double>> reps = new ArrayList<Map<Proposition, Double>>();

@@ -1,5 +1,7 @@
 package org.emast.model.algorithm;
 
+import java.util.Map;
+
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
 
@@ -9,7 +11,7 @@ import org.emast.model.problem.Problem;
  */
 public interface Algorithm<M extends MDP, R> {
 
-    R run(Problem<M> pProblem, Object... pParameters);
+    R run(Problem<M> pProblem, Map<String, Object> pParameters);
 
     String printResults();
 

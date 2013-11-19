@@ -74,7 +74,7 @@ public class ERGQTable extends QTable<ERGQTableItem> {
     }
 
     @Override
-    public QTable clone() {
+    public QTable<ERGQTableItem> clone() {
         return new ERGQTable(this);
     }
 

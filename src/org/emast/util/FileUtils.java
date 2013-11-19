@@ -33,8 +33,9 @@ public class FileUtils {
         if (list != null) {
             for (File f : list) {
                 if (f.isDirectory()) {
-                    file = getFromPreffix(f.getAbsolutePath(), preffix);
-                    if (file != null) {
+                    File inner = getFromPreffix(f.getAbsolutePath(), preffix);
+                    if (inner != null) {
+                    	file = inner;
                         break;
                     }
                 } else if (f.getName().startsWith(preffix + "")) {

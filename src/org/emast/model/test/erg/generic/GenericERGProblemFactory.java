@@ -27,11 +27,15 @@ public class GenericERGProblemFactory extends ProblemFactory {
     private final int numberOfPropositions;
 
     public static ProblemFactory createDefaultFactory() {
+    	return createDefaultFactory(1);
+    }
+    
+    public static ProblemFactory createDefaultFactory(int agents) {
         //double agentsRatio = 0.02;
+    	//agents = (int) Math.ceil(rows * cols * agentsRatio);
         int rows = 10;
         int cols = rows;
         int props = (int) Math.ceil(rows / 5);
-        int agents = 1;//(int) Math.ceil(rows * cols * agentsRatio);
         int numberOfBadProps = (int) Math.ceil(rows / 5);
 
         return new GenericERGProblemFactory(rows, cols, agents, props, numberOfBadProps,
@@ -50,7 +54,7 @@ public class GenericERGProblemFactory extends ProblemFactory {
     }
 
     @Override
-    public Problem doCreate() {
+    public Problem<ERG> doCreate() {
         final GenericERGProblem model = new GenericERGProblem(rows, cols, agents, numberOfPropositions,
                 numberOfBadProps, badReward, otherwiseReward);
         final PropositionFunction pf = new PropositionFunction();

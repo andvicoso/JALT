@@ -2,10 +2,11 @@ package org.emast.model.algorithm.erg;
 
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.algorithm.table.erg.ERGQTableItem;
+
 import java.util.Map;
 import java.util.Set;
+
 import org.emast.infra.log.Log;
-import org.emast.model.chooser.base.MultiChooser;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.exception.InvalidExpressionException;
@@ -15,6 +16,7 @@ import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.model.impl.ERGModel;
 import org.emast.model.planning.PreservationGoalFactory;
+import org.emast.model.chooser.Chooser;
 import org.emast.model.chooser.MinValueChooser;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
@@ -154,7 +156,7 @@ public class ERGFactory {
     }
 
     public static Set<Expression> getBadExpressions(Map<Expression, Double> expsValues) {
-        MultiChooser<Expression> chooser = new MinValueChooser<Expression>();
+        Chooser<Expression> chooser = new MinValueChooser<Expression>();
         return chooser.choose(expsValues);
     }
 

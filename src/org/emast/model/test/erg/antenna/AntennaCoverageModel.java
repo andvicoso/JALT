@@ -9,7 +9,7 @@ import org.emast.util.CollectionsUtils;
 import static org.emast.util.DefaultTestProperties.*;
 
 /**
- * Problem that represents a grid with holes, stones and antennas. The agent must find the path to exit up,
+ * Problem that represents a grid with propositions. The agent must find the path to exit up,
  * avoid the obstacles and keep itself inside an antenna coverage signal.
  *
  * Grid Caption: 0-9: Initial agent x position h: hole s: stone w: water a: antenna c: antenna coverage u:
@@ -23,8 +23,8 @@ public class AntennaCoverageModel extends ERGGridModel {
         super(pRows, pCols);
         setAgents(pAgents);
         //set props
-        String[] propss = {"hole", "stone", "water", "exit", "up", "down", "antenna", "coverage"};
-        Set<Proposition> props = CollectionsUtils.createSet(Proposition.class, propss);
+        String[] propsStr = {"hole", "stone", "water", "exit", "up", "down", "antenna", "coverage"};
+        Set<Proposition> props = CollectionsUtils.createSet(Proposition.class, propsStr);
         setPropositions(props);
         //set goals
         setGoal(new Expression("up & exit"));

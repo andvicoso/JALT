@@ -2,70 +2,87 @@ package org.emast.model.test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.emast.model.algorithm.Algorithm;
+import org.emast.model.algorithm.AlgorithmFactory;
 import org.emast.model.algorithm.controller.AbstractERGLearning;
-import org.emast.model.algorithm.iteration.rl.AbstractRLearning;
+import org.emast.model.algorithm.controller.MultiAgentERGLearning;
+import org.emast.model.algorithm.iteration.rl.ReinforcementLearning;
+import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.util.CalcUtils;
 import org.emast.util.Utils;
 
 /**
- *
+ * 
  * @author Anderson
  */
 public class BatchTest extends Test {
 
-    private int n = 30;
+	private static final int MAX_ITERATIONS = 30;
 
-    public BatchTest(Problem pProblem) {
-        super(pProblem);
-    }
+	public BatchTest(Problem pProblem, AlgorithmFactory pFactory) {
+		super(pProblem, pFactory);
+	}
 
-    public BatchTest(Problem pProblem, Algorithm pAlgorithm) {
-        super(pProblem, pAlgorithm);
-    }
+	public BatchTest(Problem pProblem, Algorithm pAlgorithm) {
+		super(pProblem, pAlgorithm);
+	}
 
-    @Override
-    protected void createAndRun() {
-        long timeSum = 0;
-        Collection<Integer> episodes = new ArrayList<Integer>();
-        Collection<Double> steps = new ArrayList<Double>();
-        Object result = null;
-        
-        for (int i = 0; i < n; i++) {
-            print("Repetition: " + i);
-            algorithm = createAlgorithm();
-            //execute
-            long initMsecs = System.currentTimeMillis();
-            result = runAlg(problem, algorithm);
-            long diff = System.currentTimeMillis() - initMsecs;
-            timeSum += diff;
+	@Override
+	protected void createAndRun(Map<String, Object> pParameters) {
+		long timeSum = 0;
+		Collection<Integer> episodies = new ArrayList<Integer>();
+		Collection<Double> steps = new ArrayList<Double>();
+		Object result = null;
 
-            if (algorithm instanceof AbstractERGLearning) {
-                algorithm = ((AbstractERGLearning) algorithm).getLearning();
-            }
+		for (int i = 0; i < MAX_ITERATIONS; i++) {
+			print("Repetition: " + i);
+			algorithm = getAlgorithm();
+			// execute
+			long initMsecs = System.currentTimeMillis();
+			result = runAlgorithm(problem, algorithm, pParameters);
+			long diff = System.currentTimeMillis() - initMsecs;
+			timeSum += diff;
 
-            if (algorithm instanceof AbstractRLearning) {
-                final AbstractRLearning ql = (AbstractRLearning) algorithm;
-                episodes.add(ql.getIterations());
-                steps.add(ql.getMeanSteps());
-            }
-        }
+			if (algorithm instanceof AbstractERGLearning) {
+				algorithm = ((AbstractERGLearning) algorithm).getLearning();
+			}
 
-        double meanEps = CalcUtils.getMean(episodes);
-        double meanSteps = CalcUtils.getMean(steps);
+			if (algorithm instanceof ReinforcementLearning) {
+				storeExecutionMeans((ReinforcementLearning) algorithm, episodies, steps);
+			} else if (algorithm instanceof MultiAgentERGLearning) {
+				List<ReinforcementLearning<ERG>> algs = ((MultiAgentERGLearning) algorithm)
+						.getLearnings();
+				for (ReinforcementLearning<ERG> rl : algs) {
+					storeExecutionMeans(rl, episodies, steps);
+				}
+			}
+		}
 
-        print("Repetitions: " + n);
-        print("Means: ");
-        print("-Time: " + Utils.toTimeString(timeSum / n));
-        print("-Episodes: " + meanEps);
-        print("-Episodes (std deviation): " + CalcUtils.getStandardDeviation(meanEps, episodes));
-        print("-Steps per episode: " + meanSteps);
-        print("-Steps per episode (std deviation): " + CalcUtils.getStandardDeviation(meanSteps, steps));
-//        //print results
-//        printNoInitialBreak(algorithm.printResults());
-//        if (result != null) {
-//            print("Result:" + problem.toString(result));
-//        }
-    }
+		double meanEps = CalcUtils.getMean(episodies);
+		double meanSteps = CalcUtils.getMean(steps);
+
+		print("Repetitions: " + MAX_ITERATIONS);
+		print("Means: ");
+		print("-Time: " + Utils.toTimeString(timeSum / MAX_ITERATIONS));
+		print("-Episodies: " + meanEps);
+		print("-Episodies (std deviation): " + CalcUtils.getStandardDeviation(meanEps, episodies));
+		print("-Steps per episode: " + meanSteps);
+		print("-Steps per episode (std deviation): "
+				+ CalcUtils.getStandardDeviation(meanSteps, steps));
+		// //print results
+		// printNoInitialBreak(algorithm.printResults());
+		// if (result != null) {
+		// print("Result:" + problem.toString(result));
+		// }
+	}
+
+	protected void storeExecutionMeans(ReinforcementLearning rl, Collection<Integer> episodies,
+			Collection<Double> steps) {
+		episodies.add(rl.getIterations());
+		steps.add(rl.getMeanSteps());
+	}
 }

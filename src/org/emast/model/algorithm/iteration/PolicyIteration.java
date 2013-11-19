@@ -3,6 +3,7 @@ package org.emast.model.algorithm.iteration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.model.MDP;
@@ -17,7 +18,7 @@ public class PolicyIteration implements PolicyGenerator<MDP> {
     private int iterations = 0;
 
     @Override
-    public Policy run(Problem<MDP> pProblem, Object... pParameters) {
+    public Policy run(Problem<MDP> pProblem, Map<String, Object> pParameters) {
         MDP model = pProblem.getModel();
         boolean changed;
         final Policy pi = PolicyUtils.createRandom(model);

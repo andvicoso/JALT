@@ -1,8 +1,10 @@
 package org.emast.model.test;
 
+import java.util.Map;
+
 import org.emast.infra.log.Log;
 import org.emast.model.algorithm.Algorithm;
-import org.emast.model.algorithm.iteration.rl.QLearning;
+import org.emast.model.algorithm.AlgorithmFactory;
 import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
 import org.emast.model.solution.SinglePolicy;
@@ -10,83 +12,90 @@ import org.emast.util.DefaultTestProperties;
 import org.emast.util.Utils;
 
 /**
- *
- * @author And
+ * 
+ * @author Anderson
  */
-public class Test implements Runnable {
+public class Test {
 
-    protected static final boolean DEBUG = true;
-    protected Algorithm algorithm;
-    protected Problem problem;
+	protected static final boolean DEBUG = true;
+	protected Algorithm algorithm;
+	protected AlgorithmFactory factory;
+	protected Problem problem;
 
-    public Test(Problem pProblem, Algorithm pAlgorithm) {
-        this(pProblem);
-        algorithm = pAlgorithm;
-    }
+	public Test(Problem pProblem, Algorithm pAlgorithm) {
+		problem = pProblem;
+		algorithm = pAlgorithm;
+	}
 
-    public Test(Problem pProblem) {
-        problem = pProblem;
-    }
+	public Test(Problem pProblem, AlgorithmFactory pFactory) {
+		problem = pProblem;
+		factory = pFactory;
+	}
 
-    @Override
-    public void run() {
-        print("\n################################");
-        print("\nModel:");
-        print(problem.getModel().toString());
-        print("\nError: " + DefaultTestProperties.ERROR);
-        print("\nProblem:");
-        print(problem.toString());
-        print("\nExecution:");
+	public void run(Map<String, Object> pParameters) {
+		printHeader();
+		createAndRun(pParameters);
+	}
 
-        createAndRun();
-    }
+	protected void printHeader() {
+		print("\n################################");
+		print("\nModel:");
+		print(problem.getModel().toString());
+		print("\nError: " + DefaultTestProperties.ERROR);
+		print("\nProblem:");
+		print(problem.toString());
+		print("\nExecution:");
+	}
 
-    protected Object runAlg(Problem problem, Algorithm algorithm) {
-        //execute
-        long initMsecs = System.currentTimeMillis();
-        Object result = algorithm.run(problem);
-        long diff = System.currentTimeMillis() - initMsecs;
-        //print time
-        print("Time: " + Utils.toTimeString(diff));
-        //print results
-        printNoInitialBreak(algorithm.printResults());
-        //if a solution was found...
-        if (result != null) {
-            print("Result:" + problem.toString(result));
-            SinglePolicy sp = ((Policy) result).getBestPolicy();
-            print("Single Result:" + problem.toString(sp));
-        }
+	protected void createAndRun(Map<String, Object> pParameters) {
+		algorithm = getAlgorithm();
 
-        return result;
-    }
+		print("\n------------------------------");
+		print("Algorithm: " + algorithm.getName());
+		// run
+		runAlgorithm(problem, algorithm, pParameters);
+	}
 
-    protected void print(String pMsg) {
-        if (DEBUG) {
-            Log.info(pMsg);
-        }
-    }
+	protected Algorithm getAlgorithm() {
+		if (factory != null) {
+			return factory.create();
+		} else if (algorithm != null) {
+			return algorithm;
+		}
+		throw new RuntimeException("Algorithm and factory are not defined for test!");
+	}
 
-    protected void println() {
-        print("\n");
-    }
+	protected Object runAlgorithm(Problem problem, Algorithm algorithm,
+			Map<String, Object> pParameters) {
+		// execute
+		long initMsecs = System.currentTimeMillis();
+		Object result = algorithm.run(problem, pParameters);
+		long diff = System.currentTimeMillis() - initMsecs;
+		// print time
+		print("Time: " + Utils.toTimeString(diff));
+		// print results
+		printNoInitialBreak(algorithm.printResults());
+		// if a solution was found...
+		if (result != null) {
+			print("Result:" + problem.toString(result));
+			// SinglePolicy sp = ((Policy) result).getBestPolicy();
+			// print("Single Result:" + problem.toString(sp));
+		}
 
-    protected void printNoInitialBreak(String str) {
-        print(str.startsWith("\n") ? str.substring(1) : str);
-    }
+		return result;
+	}
 
-    protected Algorithm createAlgorithm() {
-        return new QLearning();
-    }
+	protected void print(String pMsg) {
+		if (DEBUG) {
+			Log.info(pMsg);
+		}
+	}
 
-    protected void createAndRun() {
-        if (algorithm == null) {
-            algorithm = createAlgorithm();
-        }
+	protected void println() {
+		print("\n");
+	}
 
-        print("\n------------------------------");
-        String algorithmName = algorithm.getName();
-        print("Algorithm: " + algorithmName);
-        //run
-        runAlg(problem, algorithm);
-    }
+	protected void printNoInitialBreak(String str) {
+		print(str.startsWith("\n") ? str.substring(1) : str);
+	}
 }

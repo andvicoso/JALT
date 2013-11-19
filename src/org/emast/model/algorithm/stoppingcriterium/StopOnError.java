@@ -1,6 +1,8 @@
-package org.emast.model.algorithm.stoppingcriteria;
+package org.emast.model.algorithm.stoppingcriterium;
 
 import org.emast.model.algorithm.iteration.IterationError;
+import org.emast.model.algorithm.iteration.IterationValues;
+
 import static org.emast.util.DefaultTestProperties.*;
 
 /**
@@ -19,7 +21,7 @@ public class StopOnError implements StoppingCriterium {
     }
 
     @Override
-    public boolean isStopEpisodes(IterationValues values) {
+    public boolean isStop(IterationValues values) {
         double currentError = IterationError.getError(values.getIterations(),
                 values.getLastValues(), values.getCurrentValues());
         return currentError < error;

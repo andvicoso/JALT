@@ -61,14 +61,14 @@ public abstract class ProblemFactory {
         return (State) pModel.getStates().toArray()[index];
     }
 
-    protected abstract Problem doCreate();
+    protected abstract Problem<?> doCreate();
 
-    public Problem create() {
+    public Problem<?> create() {
         usedStates = new ArrayList<State>();
         return doCreate();
     }
 
-    public static Problem create(Problem pProblem, MDP pModel) {
-        return new Problem(pModel, pProblem.getInitialStates(), pProblem.getFinalStates());
+    public static Problem<MDP> create(Problem<?> pProblem, MDP pModel) {
+        return new Problem<MDP>(pModel, pProblem.getInitialStates(), pProblem.getFinalStates());
     }
 }
