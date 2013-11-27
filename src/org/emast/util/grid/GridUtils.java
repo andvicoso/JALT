@@ -1,8 +1,11 @@
 package org.emast.util.grid;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.emast.model.action.Action;
+import org.emast.model.state.GridState;
 import org.emast.model.state.State;
 
 /**
@@ -12,6 +15,7 @@ import org.emast.model.state.State;
 public class GridUtils {
 
     private static final String GRID_STATE_SEP = "x";
+    public static final int GRID_MAX_SIZE = 100;
     public static final String GRID_STATE_FORMAT_PREFFIX = "%0";
     public static final String GRID_STATE_FORMAT_SUFFIX = "d";
     public static final String ZERO = "0";
@@ -23,7 +27,17 @@ public class GridUtils {
     public static final Action east = new Action("east");
     public static final Action west = new Action("west");
     public static final Action north = new Action("north");
-    public static final List<Action> GRID_ACTIONS = new ArrayList<Action>();
+    public static final List<Action> GRID_ACTIONS = new ArrayList<>();
+    public static final GridState[][] STATES_CACHE = new GridState[GRID_MAX_SIZE][GRID_MAX_SIZE];
+    private static final Map<Integer, String> FORMATS_CACHE = new HashMap<>();
+
+    static {
+        for (int i = 0; i < GRID_MAX_SIZE; i++) {
+            for (int j = 0; j < GRID_MAX_SIZE; j++) {
+                STATES_CACHE[i][j] = new GridState(i, j);
+            }
+        }
+    }
 
     static {
         GRID_ACTIONS.add(north);
@@ -36,27 +50,29 @@ public class GridUtils {
     }
 
     public static List<State> createStates(final int pRows, final int pCols) {
-        final List<State> states = new ArrayList<State>();
+        final List<State> states = new ArrayList<>();
         for (int i = 0; i < pRows; i++) {
             for (int j = 0; j < pCols; j++) {
-                String stName = getGridStateName(i, j);
-                states.add(new State(stName));
+                states.add(STATES_CACHE[i][j]);
             }
         }
         return states;
-    }
-
-    public static State createGridState(final int pRow, final int pCol) {
-        return new State(getGridStateName(pRow, pCol));
     }
 
     public static String getGridStateName(final int pRow, final int pCol) {
         String srow = Integer.toString(pRow);
         String scol = Integer.toString(pCol);
         int size = Math.max(srow.length(), scol.length());
-        String format = GRID_STATE_FORMAT_PREFFIX + size + GRID_STATE_FORMAT_SUFFIX;
+        String format = getGridStateNameFormat(size);
 
-        return String.format(format, pRow) + GRID_STATE_SEP + String.format(format, pCol);
+        return new StringBuilder(String.format(format, pRow)).append(GRID_STATE_SEP).append(String.format(format, pCol)).toString();
+    }
+
+    private static String getGridStateNameFormat(int size) {
+        if (!FORMATS_CACHE.containsKey(size)) {
+            FORMATS_CACHE.put(size, new StringBuilder(GRID_STATE_FORMAT_PREFFIX).append(size).append(GRID_STATE_FORMAT_SUFFIX).toString());
+        }
+        return FORMATS_CACHE.get(size);
     }
 
     public static int getRow(final State pState) {

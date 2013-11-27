@@ -3,7 +3,6 @@ package org.emast.model.algorithm.controller;
 import java.util.Map;
 
 import org.emast.infra.log.Log;
-import org.emast.model.algorithm.actionchooser.NonBlockedActionChooser;
 import org.emast.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.algorithm.table.QTable;
@@ -21,13 +20,10 @@ public class ERGLearningBlockEachBadExp extends AbstractERGLearningBlockExp {
 
 	public ERGLearningBlockEachBadExp(ReinforcementLearning<ERG> learning) {
 		super(learning);
-		learning.setActionChooser(new NonBlockedActionChooser(blocked));
 	}
 
 	@Override
 	public Policy run(Problem<ERG> pProblem, Map<String, Object> pParameters) {
-		avoid.clear();
-		blocked.clear();
 		int iteration = 0;
 		Problem<ERG> prob = pProblem;
 		ERG model = prob.getModel();
@@ -35,6 +31,8 @@ public class ERGLearningBlockEachBadExp extends AbstractERGLearningBlockExp {
 		Expression badExp;
 		Policy policy;
 		pParameters.put(QTable.NAME, q);
+		
+		initilize(model);
 		// start main loop
 		do {
 			iteration++;

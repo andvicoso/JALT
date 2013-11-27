@@ -16,9 +16,9 @@ import org.emast.model.model.impl.GridModel;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
+import org.emast.model.state.GridState;
 import org.emast.model.state.State;
 import static org.emast.util.DefaultTestProperties.*;
-import org.emast.util.grid.GridUtils;
 
 /**
  *
@@ -31,7 +31,7 @@ public class SuttonDynaMazeTests {
         int cols = 9;
 
         final ERG model = new ERGGridModel(rows, cols);
-        final State goalState = GridUtils.createGridState(0, 8);
+        final State goalState = new GridState(0, 8);
 
         final PropositionFunction pf = new PropositionFunction();
         final Proposition wall = new Proposition("wall");
@@ -47,7 +47,7 @@ public class SuttonDynaMazeTests {
         pf.add(goalState, goal);
 
         final Map<Integer, State> initialStates = new HashMap<Integer, State>();
-        initialStates.put(0, GridUtils.createGridState(2, 0));
+        initialStates.put(0, new GridState(2, 0));
 
         final Set<State> finalStates = new HashSet<State>();
         finalStates.add(goalState);
@@ -68,10 +68,10 @@ public class SuttonDynaMazeTests {
     public static Problem getMDPFigure95Example() {
         int rows = 6;
         int cols = 9;
-        final State goalState = GridUtils.createGridState(0, 8);
+        final State goalState = new GridState(0, 8);
         final Set<State> obstacles = getObstacles();
 
-        final Map<Integer, State> initialStates = Collections.singletonMap(0, GridUtils.createGridState(2, 0));
+        final Map<Integer, ? extends State> initialStates = Collections.singletonMap(0, new GridState(2, 0));
         final Set<State> finalStates = Collections.singleton(goalState);
         final Map<State, Double> map = Collections.singletonMap(goalState, 1d);
 
@@ -84,13 +84,13 @@ public class SuttonDynaMazeTests {
 
     protected static Set<State> getObstacles() {
         final Set<State> obstacles = new HashSet<State>();
-        obstacles.add(GridUtils.createGridState(1, 2));
-        obstacles.add(GridUtils.createGridState(2, 2));
-        obstacles.add(GridUtils.createGridState(3, 2));
-        obstacles.add(GridUtils.createGridState(4, 5));
-        obstacles.add(GridUtils.createGridState(0, 7));
-        obstacles.add(GridUtils.createGridState(1, 7));
-        obstacles.add(GridUtils.createGridState(2, 7));
+        obstacles.add(new GridState(1, 2));
+        obstacles.add(new GridState(2, 2));
+        obstacles.add(new GridState(3, 2));
+        obstacles.add(new GridState(4, 5));
+        obstacles.add(new GridState(0, 7));
+        obstacles.add(new GridState(1, 7));
+        obstacles.add(new GridState(2, 7));
         return obstacles;
     }
 }

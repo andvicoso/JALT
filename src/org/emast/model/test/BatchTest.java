@@ -34,7 +34,7 @@ public class BatchTest extends Test {
 	@Override
 	protected void createAndRun(Map<String, Object> pParameters) {
 		long timeSum = 0;
-		Collection<Integer> episodies = new ArrayList<Integer>();
+		Collection<Integer> episodes = new ArrayList<Integer>();
 		Collection<Double> steps = new ArrayList<Double>();
 		Object result = null;
 
@@ -52,24 +52,24 @@ public class BatchTest extends Test {
 			}
 
 			if (algorithm instanceof ReinforcementLearning) {
-				storeExecutionMeans((ReinforcementLearning) algorithm, episodies, steps);
+				storeExecutionMeans((ReinforcementLearning) algorithm, episodes, steps);
 			} else if (algorithm instanceof MultiAgentERGLearning) {
 				List<ReinforcementLearning<ERG>> algs = ((MultiAgentERGLearning) algorithm)
 						.getLearnings();
 				for (ReinforcementLearning<ERG> rl : algs) {
-					storeExecutionMeans(rl, episodies, steps);
+					storeExecutionMeans(rl, episodes, steps);
 				}
 			}
 		}
 
-		double meanEps = CalcUtils.getMean(episodies);
+		double meanEps = CalcUtils.getMean(episodes);
 		double meanSteps = CalcUtils.getMean(steps);
 
 		print("Repetitions: " + MAX_ITERATIONS);
 		print("Means: ");
 		print("-Time: " + Utils.toTimeString(timeSum / MAX_ITERATIONS));
-		print("-Episodies: " + meanEps);
-		print("-Episodies (std deviation): " + CalcUtils.getStandardDeviation(meanEps, episodies));
+		print("-Episodes: " + meanEps);
+		print("-Episodes (std deviation): " + CalcUtils.getStandardDeviation(meanEps, episodes));
 		print("-Steps per episode: " + meanSteps);
 		print("-Steps per episode (std deviation): "
 				+ CalcUtils.getStandardDeviation(meanSteps, steps));
@@ -80,9 +80,9 @@ public class BatchTest extends Test {
 		// }
 	}
 
-	protected void storeExecutionMeans(ReinforcementLearning rl, Collection<Integer> episodies,
+	protected void storeExecutionMeans(ReinforcementLearning rl, Collection<Integer> episodes,
 			Collection<Double> steps) {
-		episodies.add(rl.getIterations());
+		episodes.add(rl.getIterations());
 		steps.add(rl.getMeanSteps());
 	}
 }

@@ -11,9 +11,6 @@ import org.emast.model.state.State;
  */
 public class SARSA<M extends MDP> extends QLearning<M> {
 
-    public SARSA() {
-    }
-
     @Override
     public double computeQ(State state, Action action, double reward, State nextState) {
         Policy p = q.getPolicy(true);

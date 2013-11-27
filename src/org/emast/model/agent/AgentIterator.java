@@ -70,7 +70,7 @@ public class AgentIterator<M extends MDP> implements Algorithm<M, Plan> {
 			// if has somewhere to go to
 			if (action != null) {
 				// get the state that the action points to
-				State nextState = model.getTransitionFunction().getBestReachableState(
+				State nextState = model.getTransitionFunction().getNextState(
 						model.getStates(), state, action);
 				// is there a state pointed by the action?
 				if (nextState != null) {

@@ -17,7 +17,7 @@ public class NamedObject implements Comparable<NamedObject>, Serializable {
         name = pName;
     }
 
-    private void setName(String name) {
+    protected void setName(String name) {
         this.name = name;
     }
 

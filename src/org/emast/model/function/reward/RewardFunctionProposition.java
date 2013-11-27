@@ -25,7 +25,7 @@ public class RewardFunctionProposition<M extends ERG> extends DefaultRewardFunct
             final PropositionFunction pf = getModel().getPropositionFunction();
             final Collection<State> rewardStates = pf.getStatesWithProposition(condition);
             //any state that leads to a bad proposition gives a getBadReward()
-            final State nextState = getModel().getTransitionFunction().getBestReachableState(
+            final State nextState = getModel().getTransitionFunction().getNextState(
                     getModel().getStates(), pState, pAction);
             if (rewardStates.contains(nextState)) {
                 return getRewards().get(condition);

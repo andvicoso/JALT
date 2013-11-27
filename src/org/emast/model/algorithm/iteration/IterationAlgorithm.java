@@ -13,11 +13,11 @@ public abstract class IterationAlgorithm<M extends MDP, R> implements Algorithm<
      * diverge.
      */
     protected double gama = GAMA;
-    protected int episodies = 0;
+    protected int episodes = 0;
     protected M model;
 
     public int getIterations() {
-        return episodies;
+        return episodes;
     }
 
     public double getGama() {
@@ -27,7 +27,7 @@ public abstract class IterationAlgorithm<M extends MDP, R> implements Algorithm<
     @Override
     public String printResults() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\nEpisodes: ").append(episodies);
+        sb.append("\nEpisodes: ").append(episodes);
         //sb.append("\nGama: ").append(gama);//TODO:descomentar em produção
 
         return sb.toString();

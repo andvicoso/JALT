@@ -1,13 +1,14 @@
 package org.emast.model.algorithm.actionchooser;
 
+import static org.emast.util.DefaultTestProperties.EPSILON;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import org.emast.model.action.Action;
+
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
-import static org.emast.util.DefaultTestProperties.*;
 
 /**
  * The agent chooses the action with the highest Q-value epsilon factor times
@@ -15,7 +16,7 @@ import static org.emast.util.DefaultTestProperties.*;
  * @author Anderson
  * 
  */
-public class EpsilonGreedy implements ActionChooser {
+public class EpsilonGreedy<T> implements ValuedObjectChooser<T> {
 
 	private double epsilon = EPSILON;
 	private Random rand = new Random();
@@ -28,16 +29,16 @@ public class EpsilonGreedy implements ActionChooser {
 	}
 
 	@Override
-	public Action choose(Map<Action, Double> pActionsValues, State state) {
-		Action action;
+	public T choose(Map<T, Double> pValues, State state) {
+		T action;
 		double rnd = rand.nextDouble();
 		if (rnd < epsilon) {
 			// select random
-			action = CollectionsUtils.draw(pActionsValues);
+			action = CollectionsUtils.draw(pValues);
 		} else {
 			// select max action
-			double max = Collections.max(pActionsValues.values());
-			Set<Action> maxActions = CollectionsUtils.getKeysForValue(pActionsValues, max);
+			double max = Collections.max(pValues.values());
+			Set<T> maxActions = CollectionsUtils.getKeysForValue(pValues, max);
 			action = CollectionsUtils.getRandom(maxActions);
 		}
 

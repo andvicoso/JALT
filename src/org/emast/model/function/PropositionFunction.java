@@ -111,7 +111,7 @@ public class PropositionFunction implements Serializable {
             props.add(new Proposition(propName));
         }
 
-        add(GridUtils.createGridState(pRow, pCol), props.toArray(new Proposition[props.size()]));
+        add(GridUtils.STATES_CACHE[pRow][pCol], props.toArray(new Proposition[props.size()]));
     }
 
     public Expression getExpressionForState(State pState) {
@@ -120,7 +120,7 @@ public class PropositionFunction implements Serializable {
     }
 
     public void addGridStatePropositions(int pRow, int pCol, Proposition... pProps) {
-        add(GridUtils.createGridState(pRow, pCol), pProps);
+        add(GridUtils.STATES_CACHE[pRow][pCol], pProps);
     }
 
     @Override

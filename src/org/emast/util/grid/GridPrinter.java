@@ -278,7 +278,7 @@ public class GridPrinter {
             for (Action action : mdp.getActions()) {
                 j++;
                 grid[0][j] = action.getName();
-                State best = tf.getBestReachableState(mdp.getStates(), state, action);
+                State best = tf.getNextState(mdp.getStates(), state, action);
                 String value = SPACE;
 
                 if (best != null) {

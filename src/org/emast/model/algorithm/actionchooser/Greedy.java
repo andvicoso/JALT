@@ -4,27 +4,27 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.emast.model.action.Action;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
 
 /**
- * The agent always choose the action with the highest Q-value
+ * The implmentation returns a random action from those with the highest Q-value
  * 
  * @author Anderson
  * 
  */
-public class Greedy implements ActionChooser {
+public class Greedy<T> implements ValuedObjectChooser<T> {
 
 	public Greedy() {
 	}
 
 	@Override
-	public Action choose(Map<Action, Double> pActionsValues, State state) {
-		// select max action
-		double max = Collections.max(pActionsValues.values());
-		Set<Action> maxActions = CollectionsUtils.getKeysForValue(pActionsValues, max);
-
+	public T choose(Map<T, Double> pValues, State pState) {
+		// select max
+		double max = Collections.max(pValues.values());
+		Set<T> maxActions = CollectionsUtils.getKeysForValue(pValues, max);
+		// get any of them
 		return CollectionsUtils.getRandom(maxActions);
 	}
+
 }

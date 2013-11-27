@@ -6,8 +6,6 @@ import org.emast.infra.log.Log;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.AlgorithmFactory;
 import org.emast.model.problem.Problem;
-import org.emast.model.solution.Policy;
-import org.emast.model.solution.SinglePolicy;
 import org.emast.util.DefaultTestProperties;
 import org.emast.util.Utils;
 
@@ -38,7 +36,7 @@ public class Test {
 	}
 
 	protected void printHeader() {
-		print("\n################################");
+		print("################################");
 		print("\nModel:");
 		print(problem.getModel().toString());
 		print("\nError: " + DefaultTestProperties.ERROR);
@@ -73,6 +71,9 @@ public class Test {
 		long diff = System.currentTimeMillis() - initMsecs;
 		// print time
 		print("Time: " + Utils.toTimeString(diff));
+		if (problem.getInitialStates().size() > 1)
+			print("Mean Time per Agent: "
+					+ Utils.toTimeString(diff / problem.getInitialStates().size()));
 		// print results
 		printNoInitialBreak(algorithm.printResults());
 		// if a solution was found...

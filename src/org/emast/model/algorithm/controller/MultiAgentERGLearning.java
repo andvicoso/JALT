@@ -26,10 +26,32 @@ public abstract class MultiAgentERGLearning implements Algorithm<ERG, Policy> {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\nBad exp reward param: ").append(BAD_EXP_VALUE);
 
+		 for (ReinforcementLearning<ERG> learning : learnings) {
+		 sb.append("\nLearning algorithm: ").append(learning.getClass().getSimpleName());
+		 sb.append(learning.printResults());
+		 }
+
+		sb.append(printMeanResults());
+
+		return sb.toString();
+	}
+
+	private String printMeanResults() {
+		double steps = 0;
+		double episodes = 0;
+		
 		for (ReinforcementLearning<ERG> learning : learnings) {
-			sb.append("\nLearning algorithm: ").append(learning.getClass().getSimpleName());
-			sb.append(learning.printResults());
+			steps += learning.getMeanSteps();
+			episodes += learning.getIterations();
 		}
+		
+		steps = steps / learnings.size();
+		episodes = episodes / learnings.size();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("\nMulti Means: ");
+		sb.append("\nSteps (mean): ").append(steps);
+		sb.append("\nEpisodes: ").append(episodes);
 
 		return sb.toString();
 	}

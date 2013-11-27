@@ -25,8 +25,6 @@ public class ERGLearningBlockEachBadExp_ppferg_in extends AbstractERGLearningBlo
 
 	@Override
 	public Policy run(Problem<ERG> pProblem, Map<String, Object> pParameters) {
-		avoid.clear();
-		// avoid.add(pProblem.getModel().getPreservationGoal().negate());
 		int iteration = 0;
 		Problem<ERG> p = pProblem;
 		ERG model = p.getModel();
@@ -34,6 +32,7 @@ public class ERGLearningBlockEachBadExp_ppferg_in extends AbstractERGLearningBlo
 		Expression badExp;
 		Policy policy;
 		// start main loop
+		initilize(model);
 		do {
 			iteration++;
 			// Log.info("\nITERATION " + iteration + ":");

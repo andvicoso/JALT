@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.emast.model.action.Action;
+import org.emast.model.algorithm.actionchooser.EpsilonGreedy;
 import org.emast.model.algorithm.table.QTableItem;
 import org.emast.model.model.MDP;
 import org.emast.model.problem.Problem;
@@ -19,32 +20,26 @@ public class DynaQ<M extends MDP> extends QLearning<M> {
 	private double EPSILON = 0.1;
 	private int n = 5;
 
-	public DynaQ() {
-	}
-
 	@Override
 	protected void init(Problem<M> pProblem, Map<String, Object> pParameters) {
 		super.init(pProblem, pParameters);
-		// setActionChooser(new EGreedy(EPSILON));
+		setActionChooser(new EpsilonGreedy<Action>(EPSILON));
 	}
 
 	@Override
 	protected void updateQ(State state, Action action, double reward, State nextState) {
 		super.updateQ(state, action, reward, nextState);
-		if (episodies > 0) {
-			planning();
+		if (episodes > 0) {
+			plan();
 		}
 	}
 
 	@Override
 	protected Map<Action, Double> getActionValues(State pState) {
-		if (episodies > 0) {
-			return q.getDoubleValues(pState);
-		}
-		return super.getActionValues(pState);
+		return episodes > 0 ? q.getDoubleValues(pState) : super.getActionValues(pState);
 	}
 
-	private void planning() {
+	private void plan() {
 		Set<State> states = q.getAllValidStates();
 
 		for (int i = 0; i < n; i++) {

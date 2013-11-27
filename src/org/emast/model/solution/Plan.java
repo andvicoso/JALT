@@ -16,7 +16,7 @@ public class Plan extends ArrayList<Action> {
         State state = pInitialState;
         for (final Action action : this) {
             value += pModel.getRewardFunction().getValue(state, action);
-            state = pModel.getTransitionFunction().getBestReachableState(pModel.getStates(), state, action);
+            state = pModel.getTransitionFunction().getNextState(pModel.getStates(), state, action);
         }
 
         return value;

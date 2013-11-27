@@ -8,8 +8,11 @@ public class State extends NamedObject implements Serializable {
     public static final String NAME_PREFIX = "s";
     public static final State ANY = new State("*");
 
-    public State(final int pI) {
-        super(pI);
+    public State() {
+    }
+
+    public State(final int pInt) {
+        super(pInt);
     }
 
     public State(final String pString) {

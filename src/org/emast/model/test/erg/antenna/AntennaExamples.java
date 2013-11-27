@@ -12,8 +12,8 @@ import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
+import org.emast.model.state.GridState;
 import org.emast.model.state.State;
-import org.emast.util.grid.GridUtils;
 import org.emast.util.grid.distancemeasure.CityBlock;
 
 /**
@@ -42,16 +42,16 @@ public class AntennaExamples {
 		final Proposition up = new Proposition("up");
 		// spread obstacles over the grid
 		final PropositionFunction pf = new PropositionFunction();
-		pf.add(GridUtils.createGridState(1, 0), hole);
-		pf.add(GridUtils.createGridState(1, 1), hole);
-		pf.add(GridUtils.createGridState(0, 3), water);
-		pf.add(GridUtils.createGridState(2, 4), stone);
-		pf.add(GridUtils.createGridState(3, 1), stone);
-		pf.add(GridUtils.createGridState(0, 4), exit);
-		pf.add(GridUtils.createGridState(0, 4), up);
+		pf.add(new GridState(1, 0), hole);
+		pf.add(new GridState(1, 1), hole);
+		pf.add(new GridState(0, 3), water);
+		pf.add(new GridState(2, 4), stone);
+		pf.add(new GridState(3, 1), stone);
+		pf.add(new GridState(0, 4), exit);
+		pf.add(new GridState(0, 4), up);
 		// distribute antennas over the grid
-		pf.add(GridUtils.createGridState(2, 0), antenna);
-		pf.add(GridUtils.createGridState(0, 3), antenna);
+		pf.add(new GridState(2, 0), antenna);
+		pf.add(new GridState(0, 3), antenna);
 
 		model.setPropositionFunction(pf);
 
@@ -59,7 +59,7 @@ public class AntennaExamples {
 				ANTENNA_SIGNAL, new CityBlock());
 
 		final Set<State> finalStates = new HashSet<State>();
-		finalStates.add(GridUtils.createGridState(0, 4));
+		finalStates.add(new GridState(0, 4));
 
 		model.setRewardFunction(ToRL.convertRewardFunction(model, BAD_REWARD,
 				Arrays.asList(water, stone, hole)));
@@ -69,16 +69,16 @@ public class AntennaExamples {
 
 	public static Problem<ERG> getSMC13() {
 		final Map<Integer, State> initialStates = new HashMap<Integer, State>();
-		initialStates.put(0, GridUtils.createGridState(4, 0));
+		initialStates.put(0, new GridState(4, 0));
 
 		return getSMC13(initialStates);
 	}
 
 	public static Problem<ERG> getSMC13Multi() {
 		final Map<Integer, State> initialStates = new HashMap<Integer, State>();
-		initialStates.put(0, GridUtils.createGridState(4, 0));
-		initialStates.put(1, GridUtils.createGridState(0, 0));
-		initialStates.put(2, GridUtils.createGridState(4, 4));
+		initialStates.put(0, new GridState(4, 0));
+		initialStates.put(1, new GridState(0, 0));
+		initialStates.put(2, new GridState(4, 4));
 
 		return getSMC13(initialStates);
 	}

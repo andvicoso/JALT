@@ -1,14 +1,11 @@
 package org.emast.model.algorithm.actionchooser;
 
-import java.util.Map;
 import org.emast.model.action.Action;
-import org.emast.model.state.State;
 
 /**
- *
+ * 
  * @author Anderson
  */
-public interface ActionChooser {
+public interface ActionChooser extends ValuedObjectChooser<Action> {
 
-    Action choose(Map<Action, Double> pActionsValues, State state);
 }

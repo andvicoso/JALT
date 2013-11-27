@@ -32,7 +32,7 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy>
 		// the best policy is found
 		do {
 			lastv = v;
-			episodies++;
+			episodes++;
 			// set initial v
 			v = new HashMap<State, Double>();
 			// create the policy
@@ -53,7 +53,7 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy>
 			// Log.info("\n"+printResults());
 			Log.info("\n" + new GridPrinter().toTable(v, 10, 10));
 			// Log.info("\n"+pProblem.toString(pi));
-			Log.info(episodies);
+			Log.info(episodes);
 		} while (stoppingCriterium.isStop(null));
 
 		// Log.info("\n"+printResults());

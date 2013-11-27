@@ -9,8 +9,8 @@ import java.util.Map;
 
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.PolicyGenerator;
-import org.emast.model.algorithm.actionchooser.ActionChooser;
 import org.emast.model.algorithm.actionchooser.RandomActionChooser;
+import org.emast.model.algorithm.actionchooser.ValuedObjectChooser;
 import org.emast.model.algorithm.iteration.IterationAlgorithm;
 import org.emast.model.algorithm.iteration.IterationValues;
 import org.emast.model.algorithm.stoppingcriterium.StopOnError;
@@ -42,7 +42,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	private List<Integer> steps;
 	protected QTable<? extends QTableItem> q;
 	private QTable<? extends QTableItem> lastq;
-	private ActionChooser actionChooser = new RandomActionChooser();
+	private ValuedObjectChooser<Action> actionChooser = new RandomActionChooser();
 	private StoppingCriterium stoppingCriterium = new StopOnError();
 
 	@Override
@@ -52,10 +52,14 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	}
 
 	protected void init(Problem<M> pProblem, Map<String, Object> pParameters) {
-		episodies = 0;
+		episodes = 0;
 		steps = new ArrayList<Integer>();
 		model = pProblem.getModel();
 
+		initializeQTable(pParameters);
+	}
+
+	protected void initializeQTable(Map<String, Object> pParameters) {
 		if (q == null) {
 			// try to find a table in the parameters
 			q = (QTable<?>) pParameters.get(QTable.NAME);
@@ -76,19 +80,17 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 		do {
 			int currentSteps = 0;
 			lastq = q.clone();
-			Integer agent = pParameters.containsKey(AGENT_NAME) ? (Integer) pParameters
-					.get(AGENT_NAME) : 0;
+			Integer agent = getAgent(pParameters);
 			// get initial state
 			State state = pProblem.getInitialStates().get(agent);
 			Action action;
 			// environment iteration loop
 			do {
 				// get action for state
-				action = actionChooser.choose(getActionValues(state), state);
+				action = getNextAction(state);
 				if (action != null) {
 					// get next state
-					State nextState = model.getTransitionFunction().getBestReachableState(
-							model.getStates(), state, action);
+					State nextState = getNextState(state, action);
 					// if nextState eq null, stay in the same state and try a
 					// different action
 					if (nextState != null) {
@@ -103,12 +105,25 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 				}
 				// while there is a valid state to go to
 			} while (!isStopSteps(action, state, pProblem));
+			// increment
 			steps.add(currentSteps);
-			episodies++;
+			episodes++;
 			// Log.info("episodes: " + episodes + ". steps: " + steps);
 		} while (!stoppingCriterium.isStop(this));
 
 		return q.getPolicy(false);
+	}
+
+	protected Action getNextAction(State state) {
+		return actionChooser.choose(getActionValues(state), state);
+	}
+
+	protected int getAgent(Map<String, Object> pParameters) {
+		return pParameters.containsKey(AGENT_NAME) ? (Integer) pParameters.get(AGENT_NAME) : 0;
+	}
+
+	protected State getNextState(State state, Action action) {
+		return model.getTransitionFunction().getNextState(model.getStates(), state, action);
 	}
 
 	protected double getMax(State pState) {
@@ -182,11 +197,11 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 		return stoppingCriterium;
 	}
 
-	public void setActionChooser(ActionChooser actionChooser) {
+	public void setActionChooser(ValuedObjectChooser<Action> actionChooser) {
 		this.actionChooser = actionChooser;
 	}
 
-	public ActionChooser getActionChooser() {
+	public ValuedObjectChooser<Action> getActionChooser() {
 		return actionChooser;
 	}
 

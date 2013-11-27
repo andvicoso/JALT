@@ -37,12 +37,12 @@ public class ERGLearningLowEachBadExp extends AbstractERGLearningLowExp {
 	public Policy run(Problem<ERG> pProblem, Map<String, Object> pParameters) {
 		Problem<ERG> p = pProblem;
 		ERG model = p.getModel();
-		int episodies = 0;
+		int episodes = 0;
 		Expression badExp;
 		ERGQTable q = new ERGQTable(model.getStates(), model.getActions());
 		// start main loop
 		do {
-			Log.info("\nEPISODE " + episodies++ + ":\n");
+			Log.info("\nEPISODE " + episodes++ + ":\n");
 			pParameters.put(QTable.NAME, q);
 			// 1. RUN QLEARNING UNTIL A LOW REWARD EXPRESSION IS FOUND (QUICK STOP LEARNING)
 			learning.run(p, pParameters);

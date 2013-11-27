@@ -11,8 +11,6 @@ import java.util.Set;
 
 import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.actionchooser.ActionChooser;
-import org.emast.model.algorithm.actionchooser.NonBlockedActionChooser;
 import org.emast.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.algorithm.stoppingcriterium.StopOnBadExpression;
@@ -22,12 +20,12 @@ import org.emast.model.algorithm.table.QTable;
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.chooser.BadExpressionChooser;
 import org.emast.model.chooser.Chooser;
+import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
-import org.emast.model.transition.Transition;
 import org.emast.util.ERGLearningUtils;
 
 /**
@@ -36,23 +34,20 @@ import org.emast.util.ERGLearningUtils;
 public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 
 	protected final Set<Expression> avoid = new HashSet<Expression>();
-	protected final Set<Transition> blocked = new HashSet<Transition>();
+	protected final Map<State, Set<Action>> blocked = new HashMap<State, Set<Action>>();
 	protected final Chooser<Expression> expFinder = new BadExpressionChooser(BAD_EXP_VALUE, avoid);
 
 	public MultiERGLearningBlockEachBadExp(List<ReinforcementLearning<ERG>> learnings) {
 		super(learnings);
 		StoppingCriteria stop = new StoppingCriteria(new StopOnBadExpression(BAD_EXP_VALUE, avoid),
 				new StopOnError());
-		ActionChooser actionChooser = new NonBlockedActionChooser(blocked);
 		for (ReinforcementLearning<ERG> learning : learnings) {
 			learning.setStoppingCriterium(stop);
-			learning.setActionChooser(actionChooser);
 		}
 	}
 
 	@Override
 	public Policy run(Problem<ERG> pProblem, Map<String, Object> pParameters) {
-		avoid.clear();
 		int iteration = 0;
 		Problem<ERG> prob = pProblem;
 		ERG model = prob.getModel();
@@ -60,6 +55,8 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 		Expression badExp;
 		Policy policy;
 		pParameters.put(QTable.NAME, q);
+
+		initilize(model);
 		// start main loop
 		do {
 			iteration++;
@@ -78,7 +75,7 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 				populateBlocked(q);
 			}
 		} while (isValid(badExp));
-		
+
 		policy = q.getPolicy();
 
 		if (!avoid.isEmpty()) {
@@ -87,19 +84,19 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 			// create problem
 			prob = new Problem<ERG>(model, prob.getInitialStates(), prob.getFinalStates());
 			// learning policy
-			//Log.info(prob.toString(policy));
+			// Log.info(prob.toString(policy));
 			// learning policy - best (greater q values) actions
-			//Log.info(prob.toString(policy.optimize()));
+			// Log.info(prob.toString(policy.optimize()));
 			// 5. CREATE PPFERG ALGORITHM
 			final PPFERG<ERG> ppferg = new PPFERG<ERG>();
 			// 6. GET THE VIABLE POLICIES FROM PPFERG EXECUTED OVER THE NEW MODEL
 			policy = ppferg.run(prob, pParameters);
 			// after ppferg
-			//Log.info(prob.toString(policy));
+			// Log.info(prob.toString(policy));
 			// 7. GET THE FINAL POLICY FROM THE PPFERG VIABLE POLICIES
 			policy = new Policy(ERGLearningUtils.optmize(policy, q));
 			// after optimize
-			//Log.info(prob.toString(policy));
+			// Log.info(prob.toString(policy));
 		}
 
 		Log.info("Preservation goal:" + model.getPreservationGoal());
@@ -143,11 +140,32 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 			for (State state : q.getStates()) {
 				Expression exp = q.get(state, action).getExpression();
 				if (avoid.contains(exp)) {
-					blocked.add(new Transition(state, action));
+					if (!blocked.containsKey(state))
+						blocked.put(state, new HashSet<Action>());
+					if (!blocked.get(state).contains(action))
+						blocked.get(state).add(action);
 					// Log.info("Blocked state:" + state + " and action: " + action);
 				}
 			}
 		}
+	}
+
+	protected void initilize(ERG model) {
+		avoid.clear();
+		blocked.clear();
+
+		final TransitionFunction oldtf = model.getTransitionFunction();
+		TransitionFunction tf = new TransitionFunction() {
+
+			@Override
+			public double getValue(State pState, State pFinalState, Action pAction) {
+				boolean isBlocked = blocked.containsKey(pState)
+						&& blocked.get(pState).contains(pAction);
+				return isBlocked ? 0.0 : oldtf.getValue(pState, pFinalState, pAction);
+			}
+		};
+
+		model.setTransitionFunction(tf);
 	}
 
 	protected boolean isValid(Expression exp) {
