@@ -20,8 +20,9 @@ import org.emast.model.algorithm.table.QTable;
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.chooser.BadExpressionChooser;
 import org.emast.model.chooser.Chooser;
-import org.emast.model.function.transition.TransitionFunction;
+import org.emast.model.function.transition.BlockedGridTransitionFunction;
 import org.emast.model.model.ERG;
+import org.emast.model.model.impl.GridModel;
 import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.solution.Policy;
@@ -52,11 +53,19 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 		Problem<ERG> prob = pProblem;
 		ERG model = prob.getModel();
 		ERGQTable q = new ERGQTable(model.getStates(), model.getActions());
+		// POG
+		if (model instanceof GridModel) {
+			GridModel gridModel = (GridModel) model;
+			int rows = gridModel.getRows();
+			int cols = gridModel.getCols();
+			model.setTransitionFunction(new BlockedGridTransitionFunction(rows, cols, blocked));
+		}
 		Expression badExp;
 		Policy policy;
 		pParameters.put(QTable.NAME, q);
-
-		initilize(model);
+		// initialize
+		avoid.clear();
+		blocked.clear();
 		// start main loop
 		do {
 			iteration++;
@@ -72,7 +81,7 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 				// avoid bad exp
 				avoid.add(badExp);
 				// Log.info("Avoid: " + avoid);
-				populateBlocked(q);
+				populateBlocked(model, badExp);
 			}
 		} while (isValid(badExp));
 
@@ -133,39 +142,19 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 		}.start();
 	}
 
-	protected void populateBlocked(ERGQTable q) {
-		// mark as blocked all visited states that contains one of the "avoid"
-		// expressions
-		for (Action action : q.getActions()) {
-			for (State state : q.getStates()) {
-				Expression exp = q.get(state, action).getExpression();
-				if (avoid.contains(exp)) {
-					if (!blocked.containsKey(state))
-						blocked.put(state, new HashSet<Action>());
-					if (!blocked.get(state).contains(action))
-						blocked.get(state).add(action);
-					// Log.info("Blocked state:" + state + " and action: " + action);
-				}
+	protected void populateBlocked(ERG model, Expression toBlock) {
+		// mark as blocked all states that contains one of the "avoid" expressions
+		for (State state : model.getStates()) {
+			Expression exp = model.getPropositionFunction().getExpressionForState(state);
+			if (toBlock.equals(exp)) {
+				Map<State, Action> sources = model.getTransitionFunction().getSources(
+						model.getStates(), model.getActions(), state);
+				if (!blocked.containsKey(state))
+					blocked.put(state, new HashSet<Action>());
+				blocked.get(state).add(sources.get(state));
+				// Log.info("Blocked state:" + state + " and action: " + action);
 			}
 		}
-	}
-
-	protected void initilize(ERG model) {
-		avoid.clear();
-		blocked.clear();
-
-		final TransitionFunction oldtf = model.getTransitionFunction();
-		TransitionFunction tf = new TransitionFunction() {
-
-			@Override
-			public double getValue(State pState, State pFinalState, Action pAction) {
-				boolean isBlocked = blocked.containsKey(pState)
-						&& blocked.get(pState).contains(pAction);
-				return isBlocked ? 0.0 : oldtf.getValue(pState, pFinalState, pAction);
-			}
-		};
-
-		model.setTransitionFunction(tf);
 	}
 
 	protected boolean isValid(Expression exp) {

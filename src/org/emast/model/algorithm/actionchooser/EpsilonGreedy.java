@@ -30,12 +30,12 @@ public class EpsilonGreedy<T> implements ValuedObjectChooser<T> {
 
 	@Override
 	public T choose(Map<T, Double> pValues, State state) {
-		T action;
+		T action = null;
 		double rnd = rand.nextDouble();
 		if (rnd < epsilon) {
 			// select random
 			action = CollectionsUtils.draw(pValues);
-		} else {
+		} else if (!pValues.isEmpty()){
 			// select max action
 			double max = Collections.max(pValues.values());
 			Set<T> maxActions = CollectionsUtils.getKeysForValue(pValues, max);

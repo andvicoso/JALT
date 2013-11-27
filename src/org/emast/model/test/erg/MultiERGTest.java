@@ -22,7 +22,7 @@ import org.emast.util.ProblemsCLI;
  * @author anderson
  */
 public class MultiERGTest {
-	private static int agents = 2;
+	private static int agents = 3;
 
 	private static Problem createFromCLI() {
 		ProblemFactory factory = GenericERGProblemFactory.createDefaultFactory(agents);

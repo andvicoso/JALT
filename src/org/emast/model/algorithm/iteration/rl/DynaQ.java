@@ -34,10 +34,10 @@ public class DynaQ<M extends MDP> extends QLearning<M> {
 		}
 	}
 
-	@Override
-	protected Map<Action, Double> getActionValues(State pState) {
-		return episodes > 0 ? q.getDoubleValues(pState) : super.getActionValues(pState);
-	}
+//	@Override
+//	protected Map<Action, Double> getActionValues(State pState) {
+//		return episodes > 0 ? q.getDoubleValues(pState) : super.getActionValues(pState);
+//	}
 
 	private void plan() {
 		Set<State> states = q.getAllValidStates();

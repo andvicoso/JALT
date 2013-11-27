@@ -9,6 +9,7 @@ import org.emast.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.problem.ProblemFactory;
+import org.emast.model.test.BatchTest;
 import org.emast.model.test.Test;
 import org.emast.model.test.erg.generic.GenericERGProblemFactory;
 import org.emast.util.CollectionsUtils;
@@ -46,7 +47,7 @@ public class ERGTest {
 		// for (Problem<ERG> p : ps) {
 		Log.info("\n################################");
 		Log.info("TEST RUN + " + count++);
-		Test test = new Test(p, createAlgorithmFactory());
+		Test test = new BatchTest(p, createAlgorithmFactory());
 		test.run(CollectionsUtils.asMap(ReinforcementLearning.AGENT_NAME, 0));
 		// }
 	}

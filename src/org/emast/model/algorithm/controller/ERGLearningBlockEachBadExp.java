@@ -31,7 +31,7 @@ public class ERGLearningBlockEachBadExp extends AbstractERGLearningBlockExp {
 		Expression badExp;
 		Policy policy;
 		pParameters.put(QTable.NAME, q);
-		
+
 		initilize(model);
 		// start main loop
 		do {
@@ -48,7 +48,7 @@ public class ERGLearningBlockEachBadExp extends AbstractERGLearningBlockExp {
 				// avoid bad exp
 				avoid.add(badExp);
 				// Log.info("Avoid: " + avoid);
-				populateBlocked(q);
+				populateBlocked(model, badExp);
 			}
 		} while (isValid(badExp));
 
@@ -75,7 +75,7 @@ public class ERGLearningBlockEachBadExp extends AbstractERGLearningBlockExp {
 			policy = learning.getQTable().getPolicy();
 		}
 
-		 Log.info("Preservation goal:" + model.getPreservationGoal());
+		Log.info("Preservation goal:" + model.getPreservationGoal());
 
 		return policy;
 	}

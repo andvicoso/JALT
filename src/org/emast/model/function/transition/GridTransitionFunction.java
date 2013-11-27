@@ -58,18 +58,17 @@ public class GridTransitionFunction extends TransitionFunction {
 	@Override
 	public double getValue(State pState, State pFinalState, Action pAction) {
 		final Map<State, Action> targets = getTransitions(pState);
-		int valid = 0;
-
+		
 		for (Map.Entry<State, Action> entry : targets.entrySet()) {
 			State state = entry.getKey();
 			Action action = entry.getValue();
 
 			if (Action.isValid(pAction, action) && State.isValid(state, pFinalState)) {
-				valid++;
+				return 1d / targets.size();
 			}
 		}
 
-		return valid == 0 ? valid : 1d / valid;
+		return 0;
 	}
 
 	public int getRows() {

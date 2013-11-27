@@ -44,6 +44,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	private QTable<? extends QTableItem> lastq;
 	private ValuedObjectChooser<Action> actionChooser = new RandomActionChooser();
 	private StoppingCriterium stoppingCriterium = new StopOnError();
+	private int maxSteps;
 
 	@Override
 	public Policy run(Problem<M> pProblem, Map<String, Object> pParameters) {
@@ -104,14 +105,27 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 					currentSteps++;
 				}
 				// while there is a valid state to go to
-			} while (!isStopSteps(action, state, pProblem));
+			} while (!isStopSteps(pProblem, action, state, currentSteps));
 			// increment
+			if (currentSteps > maxSteps)
+				maxSteps = currentSteps;
 			steps.add(currentSteps);
 			episodes++;
 			// Log.info("episodes: " + episodes + ". steps: " + steps);
 		} while (!stoppingCriterium.isStop(this));
 
 		return q.getPolicy(false);
+	}
+
+	protected abstract double computeQ(State state, Action action, double reward, State nextState);
+
+	protected void updateQ(State state, Action action, double reward, State nextState) {
+		double qValue = computeQ(state, action, reward, nextState);
+		q.updateQ(model, qValue, state, action, reward, nextState);
+	}
+
+	protected Map<Action, Double> getActionValues(State pState) {
+		return model.getTransitionFunction().getActionValues(model.getActions(), pState);
 	}
 
 	protected Action getNextAction(State state) {
@@ -150,25 +164,20 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	public String printResults() {
 		StringBuilder sb = new StringBuilder(super.printResults());
 		// sb.append("\nAlpha: ").append(alpha);//TODO:descomentar em produção
+		sb.append("\nSteps (max): ").append(maxSteps);
 		sb.append("\nSteps (mean): ").append(getMeanSteps());
 		return sb.toString();
 	}
 
 	// Verify if agent is blocked (no action or state) or reached a final goal
 	// state
-	protected boolean isStopSteps(Action action, State state, Problem<M> pProblem) {
+	private boolean isStopSteps(Problem<M> pProblem, Action action, State state, int currentSteps) {
+		int states = pProblem.getModel().getStates().size();
+		if (currentSteps > (states * states)) {
+			String msg = "ERROR: Agent possibly blocked. State: %s. Action: %s. Steps: %d";
+			throw new RuntimeException(String.format(msg, state, action, currentSteps));
+		}
 		return action == null || state == null || pProblem.getFinalStates().contains(state);
-	}
-
-	protected Map<Action, Double> getActionValues(State pState) {
-		return model.getTransitionFunction().getActionValues(model.getActions(), pState);
-	}
-
-	protected abstract double computeQ(State state, Action action, double reward, State nextState);
-
-	protected void updateQ(State state, Action action, double reward, State nextState) {
-		double qValue = computeQ(state, action, reward, nextState);
-		q.updateQ(model, qValue, state, action, reward, nextState);
 	}
 
 	public double getMeanSteps() {

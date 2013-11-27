@@ -51,17 +51,31 @@ public abstract class TransitionFunction implements Serializable {
 		return map;
 	}
 
-	public Map<State, Double> getStatesValuesThatReach(final Collection<State> pModelStates,
-			final State pState, final Action pActions) {
-		final Map<State, Double> map = new HashMap<State, Double>();
+	public Map<State, Action> getSources(final Collection<State> pModelStates,
+			final Collection<Action> pModelActions, final State pState) {
+		final Map<State, Action> map = new HashMap<>();
 		for (final State state : pModelStates) {
-			final double value = getValue(state, pState, pActions);
-			if (value > 0) {
-				map.put(state, value);
+			for (final Action action : pModelActions) {
+				final double value = getValue(state, pState, action);
+				if (value > 0) {
+					map.put(state, action);
+				}
 			}
 		}
 		return map;
 	}
+
+	// public Map<State, Double> getStatesValuesThatReach(final Collection<State> pModelStates,
+	// final State pState, final Action pAction) {
+	// final Map<State, Double> map = new HashMap<State, Double>();
+	// for (final State state : pModelStates) {
+	// final double value = getValue(state, pState, pAction);
+	// if (value > 0) {
+	// map.put(state, value);
+	// }
+	// }
+	// return map;
+	// }
 
 	public Set<State> getReachableStates(final Collection<State> pModelStates, final State pState,
 			final Action pAction) {

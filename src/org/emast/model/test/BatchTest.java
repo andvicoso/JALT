@@ -21,7 +21,7 @@ import org.emast.util.Utils;
  */
 public class BatchTest extends Test {
 
-	private static final int MAX_ITERATIONS = 30;
+	private static final int MAX_ITERATIONS = 10;
 
 	public BatchTest(Problem pProblem, AlgorithmFactory pFactory) {
 		super(pProblem, pFactory);
