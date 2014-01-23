@@ -14,7 +14,6 @@ import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.emast.model.algorithm.reachability.PPFERG;
 import org.emast.model.algorithm.stoppingcriterium.StopOnBadExpression;
-import org.emast.model.algorithm.stoppingcriterium.StopOnError;
 import org.emast.model.algorithm.stoppingcriterium.StoppingCriteria;
 import org.emast.model.algorithm.table.QTable;
 import org.emast.model.algorithm.table.erg.ERGQTable;
@@ -27,6 +26,7 @@ import org.emast.model.problem.Problem;
 import org.emast.model.propositional.Expression;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
+import org.emast.util.DefaultTestProperties;
 import org.emast.util.ERGLearningUtils;
 
 /**
@@ -34,14 +34,16 @@ import org.emast.util.ERGLearningUtils;
  */
 public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 
+	private static final int MAX_IT = 600;
 	protected final Set<Expression> avoid = new HashSet<Expression>();
 	protected final Map<State, Set<Action>> blocked = new HashMap<State, Set<Action>>();
 	protected final Chooser<Expression> expFinder = new BadExpressionChooser(BAD_EXP_VALUE, avoid);
 
 	public MultiERGLearningBlockEachBadExp(List<ReinforcementLearning<ERG>> learnings) {
 		super(learnings);
+		// replace the default stopping criterium for all learning algorithms
 		StoppingCriteria stop = new StoppingCriteria(new StopOnBadExpression(BAD_EXP_VALUE, avoid),
-				new StopOnError());
+				DefaultTestProperties.DEFAULT_STOPON);
 		for (ReinforcementLearning<ERG> learning : learnings) {
 			learning.setStoppingCriterium(stop);
 		}
@@ -52,7 +54,7 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 		int iteration = 0;
 		Problem<ERG> prob = pProblem;
 		ERG model = prob.getModel();
-		ERGQTable q = new ERGQTable(model.getStates(), model.getActions());
+		ERGQTable q;
 		// POG
 		if (model instanceof GridModel) {
 			GridModel gridModel = (GridModel) model;
@@ -62,12 +64,13 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 		}
 		Expression badExp;
 		Policy policy;
-		pParameters.put(QTable.NAME, q);
 		// initialize
 		avoid.clear();
 		blocked.clear();
 		// start main loop
 		do {
+			q = new ERGQTable(model.getStates(), model.getActions());
+			pParameters.put(QTable.NAME, q);
 			iteration++;
 			// Log.info("\nITERATION " + iteration + ":");
 			// 1. RUN QLEARNING UNTIL A BAD REWARD EXPRESSION IS FOUND
@@ -115,12 +118,15 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 
 	private void runAll(Problem<ERG> pProblem, Map<String, Object> pParameters) {
 		int count = 0;
-		List<Policy> policies = new ArrayList<>();
+		List<Policy> policies = new ArrayList<>(learnings.size());
 		for (ReinforcementLearning<ERG> learning : learnings) {
 			runThread(pProblem, pParameters, learning, policies, count++);
 		}
 
+		int it = 0;
 		while (policies.size() < learnings.size()) {
+			if (it++ > MAX_IT)
+				throw new RuntimeException("Tired of waiting thread " + it + " to finish.");
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -135,9 +141,14 @@ public class MultiERGLearningBlockEachBadExp extends MultiAgentERGLearning {
 		new Thread() {
 			@Override
 			public void run() {
+				// Log.info("Started thread " + i);
 				Map<String, Object> map = new HashMap<>(pParameters);
 				map.put(ReinforcementLearning.AGENT_NAME, i);
-				policies.add(learning.run(pProblem, map));
+				Policy p = learning.run(pProblem, map);
+				synchronized (policies) {
+					policies.add(p);
+				}
+				// Log.info("Finished thread " + i);
 			}
 		}.start();
 	}

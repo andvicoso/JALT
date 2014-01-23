@@ -1,11 +1,19 @@
 package org.emast.model.solution;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.emast.model.action.Action;
 import org.emast.model.state.State;
 import org.emast.util.CollectionsUtils;
+import org.emast.util.grid.GridPrinter;
 
 public class Policy extends HashMap<State, Map<Action, Double>> {
 
@@ -26,6 +34,35 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
 	public Set<State> getStates() {
 		return keySet();
 	}
+
+//	public String[][] getBestValueTableStr() {
+//		String[][] table = new String[getStates().size()/2 + 1][getStates().size()/2 + 1];
+//		table[0][0] = "";
+//		int i = 1;
+//		for (State state : getStates()) {
+//			table[i++][0] = state.getName();
+//		}
+//		int j = 1;
+//		for (State state : getStates()) {
+//			table[0][j++] = state.getName();
+//		}
+//
+//		i = 1;
+//		for (State state : getStates()) {
+//			j = 1;
+//			for (State state2 : getStates()) {
+//				table[i][j] = (getBestValue(state)) + "";
+//				j++;
+//			}
+//			i++;
+//		}
+//
+//		return table;
+//	}
+//
+//	public String toBestValueString() {
+//		return new GridPrinter().toTable(getBestValueTableStr());
+//	}
 
 	@Override
 	public String toString() {

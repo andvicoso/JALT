@@ -1,6 +1,7 @@
 package org.emast.model.algorithm.iteration;
 
 import java.util.Map;
+
 import org.emast.model.state.State;
 
 /**

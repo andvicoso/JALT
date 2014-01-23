@@ -6,6 +6,8 @@ import org.emast.infra.log.Log;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.AlgorithmFactory;
 import org.emast.model.problem.Problem;
+import org.emast.model.solution.Policy;
+import org.emast.model.solution.SinglePolicy;
 import org.emast.util.DefaultTestProperties;
 import org.emast.util.Utils;
 
@@ -78,9 +80,9 @@ public class Test {
 		printNoInitialBreak(algorithm.printResults());
 		// if a solution was found...
 		if (result != null) {
-			print("Result:" + problem.toString(result));
-			// SinglePolicy sp = ((Policy) result).getBestPolicy();
-			// print("Single Result:" + problem.toString(sp));
+			//print("Result:" + problem.toString(result));
+			 SinglePolicy sp = ((Policy) result).getBestPolicy();
+			 print("Single Result:" + problem.toString(sp));
 		}
 
 		return result;

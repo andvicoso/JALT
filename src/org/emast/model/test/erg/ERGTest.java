@@ -1,11 +1,14 @@
 package org.emast.model.test.erg;
 
+import java.util.List;
+import java.util.Map;
+
 import org.emast.infra.log.Log;
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.AlgorithmFactory;
 import org.emast.model.algorithm.controller.ERGLearningBlockEachBadExp;
-import org.emast.model.algorithm.iteration.rl.DynaQ;
 import org.emast.model.algorithm.iteration.rl.ReinforcementLearning;
+import org.emast.model.algorithm.iteration.rl.SARSA;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.problem.ProblemFactory;
@@ -36,19 +39,21 @@ public class ERGTest {
 	}
 
 	private static ReinforcementLearning<ERG> createAlgorithm() {
-		return new DynaQ<ERG>();
+		return new SARSA<ERG>();
 	}
 
 	public static void main(final String[] pArgs) {
 		// AntennaCoverageProblemFactory.createDefaultFactory();
-		Problem<ERG> p = createFromCLI();// AntennaExamples.getSMC13();//
+		// Problem<ERG> p = createFromCLI();// AntennaExamples.getSMC13();//
 		int count = 0;
-		// List<Problem<ERG>> ps = ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\single");
-		// for (Problem<ERG> p : ps) {
-		Log.info("\n################################");
-		Log.info("TEST RUN + " + count++);
-		Test test = new BatchTest(p, createAlgorithmFactory());
-		test.run(CollectionsUtils.asMap(ReinforcementLearning.AGENT_NAME, 0));
-		// }
+		List<Problem<ERG>> ps = ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\one");
+		for (Problem<ERG> p : ps) {
+			Map<String, Object> params = CollectionsUtils
+					.asMap(ReinforcementLearning.AGENT_NAME, 0);
+			Log.info("\n################################");
+			Log.info("TEST RUN " + count++);
+			Test test = new BatchTest(p, createAlgorithmFactory());
+			test.run(params);
+		}
 	}
 }

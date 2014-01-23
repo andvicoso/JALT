@@ -8,5 +8,5 @@
 	<classpathentry kind="lib" path="lib/batik-util.jar"/>
 	<classpathentry kind="lib" path="lib/jeval.jar"/>
 	<classpathentry kind="lib" path="lib/surfaceplotter-2.0.1.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -19,6 +19,7 @@ import org.emast.model.propositional.Expression;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.model.transition.Transition;
+import org.emast.util.DefaultTestProperties;
 import org.emast.util.ModelUtils;
 
 /**
@@ -31,7 +32,7 @@ import org.emast.util.ModelUtils;
 public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 
 	protected M model;
-	private double gama = 0.9;
+	private double gama = DefaultTestProperties.GAMA;
 	protected int iterations = 0;
 	protected static final Double INITIAL_VALUE = 1d;
 

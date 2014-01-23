@@ -27,15 +27,20 @@ public class ERGLearningBlockEachBadExp extends AbstractERGLearningBlockExp {
 		int iteration = 0;
 		Problem<ERG> prob = pProblem;
 		ERG model = prob.getModel();
-		ERGQTable q = new ERGQTable(model.getStates(), model.getActions());
 		Expression badExp;
 		Policy policy;
-		pParameters.put(QTable.NAME, q);
-
+		ERGQTable q;
+		//ValueIteration<MDP> it = new ValueIteration<>();
 		initilize(model);
 		// start main loop
 		do {
 			iteration++;
+			q = new ERGQTable(model.getStates(), model.getActions());
+			pParameters.put(QTable.NAME, q);
+			// best -> policy after running VI over the real/complete model to compare later
+			//Policy best = it.run(new Problem<MDP>(model, null), null);
+			//pParameters.put("policy", best.getBestPolicyValue());
+			// Log.info(prob.toString(best.getBestPolicy()));
 			// Log.info("\nITERATION " + iteration + ":");
 			// 1. RUN QLEARNING UNTIL A BAD REWARD EXPRESSION IS FOUND
 			policy = learning.run(prob, pParameters);

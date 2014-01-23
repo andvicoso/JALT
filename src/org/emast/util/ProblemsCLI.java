@@ -2,6 +2,7 @@ package org.emast.util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -62,7 +63,7 @@ public class ProblemsCLI {
 				}
 			}
 		} while (true);
-		
+
 		reader.close();
 
 		return p;
@@ -91,6 +92,7 @@ public class ProblemsCLI {
 	public static List<Problem<ERG>> getAllFromDir(String dir) {
 		List<Problem<ERG>> ps = new ArrayList<>();
 		List<File> files = FileUtils.getAllFromDir(DEFAULT_DIR + File.separator + dir);
+		Collections.sort(files);
 		for (File file : files) {
 			ps.add(FileUtils.fromFile(file.getAbsolutePath()));
 		}

@@ -11,12 +11,7 @@ import org.emast.model.action.Action;
 import org.emast.model.algorithm.erg.ERGFactory;
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.function.PropositionFunction;
-import org.emast.model.function.reward.RewardFunction;
-import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
-import org.emast.model.model.Grid;
-import org.emast.model.model.impl.ERGGridModel;
-import org.emast.model.model.impl.ERGModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.propositional.operator.BinaryOperator;
@@ -27,29 +22,16 @@ import org.emast.model.state.State;
 public class ERGLearningUtils {
 
 	public static ERG createModel(ERG oldModel, ERGQTable q, Set<Expression> avoid) {
-		ERG model = createModel(oldModel);
-		// COPY MAIN PROPERTIES
-		model.setStates(q.getStates());
-		model.setActions(q.getActions());
+		ERG model = ModelUtils.createModel(oldModel, q);
 		model.setGoal(oldModel.getGoal());
-		model.setAgents(oldModel.getAgents());
 		// GET THE SET OF PROPOSITIONS FROM EXPLORATED STATES
 		model.setPropositions(getPropositions(q.getExpsValues()));
 		// CREATE NEW PRESERVATION GOAL FROM EXPRESSIONS THAT SHOULD BE AVOIDED
 		Expression newPreservGoal = createNewPreservationGoal(oldModel.getPreservationGoal(), avoid);
 		model.setPreservationGoal(newPreservGoal);
-		// CREATE NEW TRANSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
-		TransitionFunction tf = ERGFactory.createTransitionFunctionFrequency(q);
-		model.setTransitionFunction(tf);
 		// CREATE NEW PROPOSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
 		PropositionFunction pf = ERGFactory.createPropositionFunction(q);
 		model.setPropositionFunction(pf);
-		// CREATE NEW REWARD FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
-		RewardFunction rf = ERGFactory.createRewardFunction(q);
-		model.setRewardFunction(rf);
-
-		// Log.info("\nTransition Function\n" + new GridPrinter().print(tf,
-		// model));
 
 		return model;
 	}
@@ -68,13 +50,6 @@ public class ERGLearningUtils {
 		Expression badExp = new Expression(BinaryOperator.OR, pAvoid.toArray(new Expression[pAvoid
 				.size()]));
 		return pCurrent.and(badExp.parenthesize().negate());
-	}
-
-	private static ERG createModel(ERG oldModel) {
-		if (oldModel instanceof Grid) {
-			return new ERGGridModel(((Grid) oldModel).getRows(), ((Grid) oldModel).getCols());
-		}
-		return new ERGModel();
 	}
 
 	public static SinglePolicy optmize(Policy policy, ERGQTable q) {
@@ -97,7 +72,7 @@ public class ERGLearningUtils {
 			}
 		}
 
-		return best.iterator().next();
+		return CollectionsUtils.getRandom(best);
 	}
 
 	public static Collection<Action> getBestAction(Map<Action, Double> map, Set<Action> keySet) {

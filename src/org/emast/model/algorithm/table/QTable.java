@@ -19,7 +19,7 @@ import org.emast.util.grid.GridUtils;
  * @author Anderson
  */
 public class QTable<I extends QTableItem> extends StateActionTable<I> {
-	public static final String NAME = QTable.NAME;
+	public static final String NAME = "qtable";
 
 	public QTable(Collection<State> states, Collection<Action> actions, I initialValue) {
 		super(states, actions, initialValue);
@@ -51,6 +51,10 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		}
 
 		return policy;
+	}
+
+	public Policy getPolicy() {
+		return getPolicy(true);
 	}
 
 	public Set<State> getAllValidStates() {
@@ -160,27 +164,13 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		return policy;
 	}
 
-	public Policy getPolicy() {
-		final Policy policy = new Policy();
-
-		for (State state : getStates()) {
-			Map<Action, Double> map = new HashMap<Action, Double>();
-			for (Action action : getActions()) {
-				Double value = getValue(state, action);
-				map.put(action, value);
-			}
-			policy.put(state, map);
-		}
-
-		return policy;
-	}
-
 	public double getTotal(State pState) {
 		int count = 0;
 
 		Map<Action, I> v = getValues().get(pState);
 		for (Map.Entry<Action, I> entry : v.entrySet()) {
-			count += entry.getValue().getFrequency();
+			if (entry.getValue() != null)
+				count += entry.getValue().getFrequency();
 		}
 		return count;
 	}

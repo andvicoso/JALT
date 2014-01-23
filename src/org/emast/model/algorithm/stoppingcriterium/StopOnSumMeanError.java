@@ -9,21 +9,20 @@ import static org.emast.util.DefaultTestProperties.*;
  *
  * @author Anderson
  */
-public class StopOnError implements StoppingCriterium {
+public class StopOnSumMeanError implements StoppingCriterium {
 
     private double error = ERROR;
 
-    public StopOnError() {
+    public StopOnSumMeanError() {
     }
 
-    public StopOnError(double pError) {
+    public StopOnSumMeanError(double pError) {
         error = pError;
     }
 
     @Override
     public boolean isStop(IterationValues values) {
-        double currentError = IterationError.getError(values.getIterations(),
-                values.getLastValues(), values.getCurrentValues());
+        double currentError = IterationError.getSumMeanError(values.getLastValues(), values.getCurrentValues());
         return currentError < error;
     }
 }

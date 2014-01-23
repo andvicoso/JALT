@@ -1,14 +1,15 @@
 package org.emast.model.algorithm.erg;
 
-import org.emast.model.algorithm.table.erg.ERGQTable;
-import org.emast.model.algorithm.table.erg.ERGQTableItem;
-
 import java.util.Map;
 import java.util.Set;
 
 import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.rl.QLearning;
+import org.emast.model.algorithm.table.erg.ERGQTable;
+import org.emast.model.algorithm.table.erg.ERGQTableItem;
+import org.emast.model.chooser.Chooser;
+import org.emast.model.chooser.MinValueChooser;
 import org.emast.model.exception.InvalidExpressionException;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.function.reward.RewardFunction;
@@ -16,11 +17,10 @@ import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.model.impl.ERGModel;
 import org.emast.model.planning.PreservationGoalFactory;
-import org.emast.model.chooser.Chooser;
-import org.emast.model.chooser.MinValueChooser;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;
+import org.emast.util.ModelUtils;
 
 /**
  *
@@ -43,7 +43,7 @@ public class ERGFactory {
         Map<Expression, Double> expsValues = qt.getExpsValues();
         if (!expsValues.isEmpty()) {
             RewardFunction rf = model.getRewardFunction();//createRewardFunction(qt);
-            TransitionFunction tf = createTransitionFunctionFrequency(qt);
+            TransitionFunction tf = ModelUtils.createTransitionFunctionFrequency(qt);
             Expression newPreservGoal = createPresevationGoal(model, expsValues, null);
 
             if (newPreservGoal != null) {
@@ -64,32 +64,6 @@ public class ERGFactory {
             }
         }
         return null;
-    }
-
-    public static TransitionFunction createTransitionFunctionFrequency(final ERGQTable q) {
-        TransitionFunction tf = new TransitionFunction() {
-            @Override
-            public double getValue(State pState, State pFinalState, Action pAction) {
-                ERGQTableItem item = q.get(pState, pAction);
-                State fstate = item.getFinalState();
-                if (State.isValid(pFinalState, fstate)) {
-                    double total = q.getTotal(pState);
-                    return total != 0 ? item.getFrequency() / total : 0;
-                }
-                return 0d;
-            }
-        };
-
-        return tf;
-    }
-
-    public static RewardFunction createRewardFunction(final ERGQTable q) {
-        return new RewardFunction() {
-            @Override
-            public double getValue(State pState, Action pAction) {
-                return q.get(pState, pAction).getReward();
-            }
-        };
     }
 
     private static boolean existValidFinalState(PropositionFunction pf, Expression newPreservGoal,

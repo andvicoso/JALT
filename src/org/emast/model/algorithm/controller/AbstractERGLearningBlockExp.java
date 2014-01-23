@@ -10,7 +10,6 @@ import java.util.Set;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.emast.model.algorithm.stoppingcriterium.StopOnBadExpression;
-import org.emast.model.algorithm.stoppingcriterium.StopOnError;
 import org.emast.model.algorithm.stoppingcriterium.StoppingCriteria;
 import org.emast.model.chooser.BadExpressionChooser;
 import org.emast.model.chooser.Chooser;
@@ -19,6 +18,7 @@ import org.emast.model.model.ERG;
 import org.emast.model.model.impl.GridModel;
 import org.emast.model.propositional.Expression;
 import org.emast.model.state.State;
+import org.emast.util.DefaultTestProperties;
 
 public abstract class AbstractERGLearningBlockExp extends AbstractERGLearning {
 
@@ -28,8 +28,9 @@ public abstract class AbstractERGLearningBlockExp extends AbstractERGLearning {
 
 	public AbstractERGLearningBlockExp(ReinforcementLearning<ERG> learning) {
 		super(learning);
+		// replace the default stopping criterium of the learning algorithm
 		learning.setStoppingCriterium(new StoppingCriteria(new StopOnBadExpression(BAD_EXP_VALUE,
-				avoid), new StopOnError()));
+				avoid), DefaultTestProperties.DEFAULT_STOPON));// 
 	}
 
 	protected void initilize(ERG model) {
@@ -49,6 +50,7 @@ public abstract class AbstractERGLearningBlockExp extends AbstractERGLearning {
 		for (State state : model.getStates()) {
 			Expression exp = model.getPropositionFunction().getExpressionForState(state);
 			if (toBlock.equals(exp)) {
+				// values.remove(state);
 				Map<State, Action> sources = model.getTransitionFunction().getSources(
 						model.getStates(), model.getActions(), state);
 				for (State source : sources.keySet()) {

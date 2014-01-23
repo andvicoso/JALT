@@ -13,7 +13,6 @@ import org.emast.model.algorithm.actionchooser.RandomActionChooser;
 import org.emast.model.algorithm.actionchooser.ValuedObjectChooser;
 import org.emast.model.algorithm.iteration.IterationAlgorithm;
 import org.emast.model.algorithm.iteration.IterationValues;
-import org.emast.model.algorithm.stoppingcriterium.StopOnError;
 import org.emast.model.algorithm.stoppingcriterium.StoppingCriterium;
 import org.emast.model.algorithm.table.QTable;
 import org.emast.model.algorithm.table.QTableItem;
@@ -24,6 +23,7 @@ import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.util.CalcUtils;
+import org.emast.util.DefaultTestProperties;
 
 /**
  * 
@@ -43,7 +43,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	protected QTable<? extends QTableItem> q;
 	private QTable<? extends QTableItem> lastq;
 	private ValuedObjectChooser<Action> actionChooser = new RandomActionChooser();
-	private StoppingCriterium stoppingCriterium = new StopOnError();
+	private StoppingCriterium stoppingCriterium = DefaultTestProperties.DEFAULT_STOPON;
 	private int maxSteps;
 
 	@Override
@@ -61,13 +61,12 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	}
 
 	protected void initializeQTable(Map<String, Object> pParameters) {
-		if (q == null) {
-			// try to find a table in the parameters
+		// try to find a table in the parameters
+		if (pParameters != null)
 			q = (QTable<?>) pParameters.get(QTable.NAME);
-			// not found, create
-			if (q == null) {
-				q = createQTable();
-			}
+		// not found, create
+		if (q == null) {
+			q = createQTable();
 		}
 	}
 
@@ -113,6 +112,9 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 			episodes++;
 			// Log.info("episodes: " + episodes + ". steps: " + steps);
 		} while (!stoppingCriterium.isStop(this));
+
+		// && IterationError.comparePolicies((Map<State, Double>) parameters.get("policy"), q,
+		// model, (Collection<State>) parameters.get("blocked"))
 
 		return q.getPolicy(false);
 	}
@@ -170,11 +172,11 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	}
 
 	// Verify if agent is blocked (no action or state) or reached a final goal
-	// state
 	private boolean isStopSteps(Problem<M> pProblem, Action action, State state, int currentSteps) {
 		int states = pProblem.getModel().getStates().size();
 		if (currentSteps > (states * states)) {
 			String msg = "ERROR: Agent possibly blocked. State: %s. Action: %s. Steps: %d";
+
 			throw new RuntimeException(String.format(msg, state, action, currentSteps));
 		}
 		return action == null || state == null || pProblem.getFinalStates().contains(state);
@@ -190,7 +192,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 
 	@Override
 	public Map<State, Double> getLastValues() {
-		return lastq.getStateValue();
+		return lastq.getStateValue(); // (Map<State, Double>) parameters.get("values");
 	}
 
 	@Override
