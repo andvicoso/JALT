@@ -1,7 +1,7 @@
 ALT
 ===
 
-Agent Learning Toolbox
+Java Agent Reinforcement Learning Toolbox
 
 - Framework free e open source;
 - Desenvolvido em Java;
