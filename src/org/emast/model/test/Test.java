@@ -15,6 +15,7 @@ import org.emast.util.Utils;
  * 
  * @author Anderson
  */
+@SuppressWarnings("rawtypes")
 public class Test {
 
 	protected static final boolean DEBUG = true;

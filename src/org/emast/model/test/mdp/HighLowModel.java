@@ -34,7 +34,7 @@ public class HighLowModel extends MDPModel {
 
         final RewardFunction rf = new RewardFunction() {
             @Override
-            public double getValue(State pState, Action pAction) {
+			public double getValue(State pState, Action pAction) {
                 return 0.0;
             }
         };

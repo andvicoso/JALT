@@ -4,7 +4,7 @@ import org.emast.model.NamedObject;
 
 public class Observation extends NamedObject {
 
-    public static final Observation ANY = new Observation("*");
+    public static final Observation ANY = new Observation(STAR);
 
     public Observation(String pName) {
         super(pName);

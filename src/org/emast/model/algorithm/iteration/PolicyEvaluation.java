@@ -9,11 +9,13 @@ import org.emast.model.problem.Problem;
 import org.emast.model.solution.SinglePolicy;
 import org.emast.model.state.State;
 import org.emast.util.DefaultTestProperties;
+import org.emast.util.PolicyUtils;
 
 /**
  * Policy evaluation in sutton and barto introduction book. Figure 4.1.
+ * 
  * @author andvicoso
- *
+ * 
  */
 public class PolicyEvaluation extends IterationAlgorithm<MDP, Map<State, Double>> {
 
@@ -25,7 +27,7 @@ public class PolicyEvaluation extends IterationAlgorithm<MDP, Map<State, Double>
 		for (final State state : model.getStates()) {
 			lastv.put(state, 0d);
 		}
-		final SinglePolicy pi = (SinglePolicy) pParameters.get("policy");
+		final SinglePolicy pi = (SinglePolicy) pParameters.get(PolicyUtils.POLICY_STR);
 		double delta;
 		// Start the main loop
 		do {
@@ -33,8 +35,9 @@ public class PolicyEvaluation extends IterationAlgorithm<MDP, Map<State, Double>
 			values = new HashMap<State, Double>();
 			// for each state
 			for (final State state : model.getStates()) {
+				Action action = pi.get(state);
 				double v = lastv.get(state);
-				double current = getValue(model, pi, lastv, state);
+				double current = getValue(model, state, action, lastv);
 				double diff = Math.abs(v - current);
 				values.put(state, current);
 
@@ -46,19 +49,5 @@ public class PolicyEvaluation extends IterationAlgorithm<MDP, Map<State, Double>
 		} while (delta > DefaultTestProperties.ERROR);
 
 		return values;
-	}
-
-	private double getValue(MDP model, SinglePolicy policy, Map<State, Double> values, State state) {
-		Action action = policy.get(state);
-		double r = model.getRewardFunction().getValue(state, action);
-		double v = r + getGama()
-				* getSum(model.getTransitionFunction(), model.getStates(), state, action, values);
-
-		return v;
-	}
-
-	@Override
-	public String getName() {
-		return getClass().getSimpleName();
 	}
 }

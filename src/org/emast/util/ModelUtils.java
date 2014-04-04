@@ -108,7 +108,8 @@ public class ModelUtils {
 		TransitionFunction tf = createTransitionFunctionFrequency(q);
 		model.setTransitionFunction(tf);
 
-		// Log.info("\nTransition Function\n" + new GridPrinter().print(tf, model));
+		// Log.info("\nTransition Function\n" + new GridPrinter().print(tf,
+		// model));
 
 		return (M) model;
 	}

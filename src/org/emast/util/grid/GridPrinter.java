@@ -43,6 +43,15 @@ public class GridPrinter {
 	public static final String S = "s";
 	public static final String COLUMN_SEP = "|";
 
+	public String toGrid(MDP model, Map<State, Double> map) {
+		if (model instanceof Grid) {
+			int rows = ((Grid) model).getRows();
+			int cols = ((Grid) model).getCols();
+			return toTable(map, rows, cols);
+		}
+		return map.toString();
+	}
+
 	public <M extends MDP & Grid> String print(M pModel) {
 		String[][] grid = getGrid(pModel, Collections.<Integer, State> emptyMap(),
 				Collections.<State> emptySet());
@@ -112,8 +121,8 @@ public class GridPrinter {
 		int[] lengths = new int[maxColumns];
 		for (int i = 0; i < pGrid.length; i++) {
 			for (int j = 0; j < pGrid[i].length; j++) {
-				Object object = pGrid[i][j];
-				pGrid[i][j] = object == null ? SPACE : object.toString();
+				String value = pGrid[i][j];
+				pGrid[i][j] = value == null ? SPACE : value;
 				lengths[j] = Math.max(pGrid[i][j].length(), lengths[j]);
 			}
 		}
@@ -127,7 +136,7 @@ public class GridPrinter {
 		for (int i = 0; i < pGrid.length; i++) {
 			for (int j = 0; j < pGrid[i].length; j++) {
 				sb.append(COLUMN_SEP);
-				sb.append(String.format(formats[j], pGrid[i][j].toString()));
+				sb.append(String.format(formats[j], pGrid[i][j]));
 			}
 		}
 
@@ -263,12 +272,24 @@ public class GridPrinter {
 			for (Action action : mdp.getActions()) {
 				j++;
 				grid[0][j] = action.getName();
-				grid[i][j] = rf.getValue(state, action) + "";
+				grid[i][j] = rf.getValue(state, action) + "";//maxReward(state, action, rf, mdp.getStates()) + "";
 			}
 		}
 
 		return toTable(grid);
 	}
+
+//	private Double maxReward(State state, Action action, RewardFunction rf, Collection<State> states) {
+//		double max = 0;
+//		for (State state2 : states) {
+//			Double rew = rf.getValue(state, state2, action);
+//			if (rew != null && rew > max) {
+//				max = rew;
+//			}
+//		}
+//
+//		return max;
+//	}
 
 	public String print(TransitionFunction tf, MDP mdp) {
 		int i = 0;
@@ -325,14 +346,16 @@ public class GridPrinter {
 	}
 
 	private void getActionSymbol(Action action, String[][] pGrid, int row, int col) {
-		if (action.equals(north)) {
-			pGrid[row][col] = pGrid[row][col] + NORTH_SYMBOL;
-		} else if (action.equals(south)) {
-			pGrid[row][col] = pGrid[row][col] + SOUTH_SYMBOL;
-		} else if (action.equals(west)) {
-			pGrid[row][col] = pGrid[row][col] + WEST_SYMBOL;
-		} else if (action.equals(east)) {
-			pGrid[row][col] = pGrid[row][col] + EAST_SYMBOL;
+		if (action != null) {
+			if (action.equals(north)) {
+				pGrid[row][col] = pGrid[row][col] + NORTH_SYMBOL;
+			} else if (action.equals(south)) {
+				pGrid[row][col] = pGrid[row][col] + SOUTH_SYMBOL;
+			} else if (action.equals(west)) {
+				pGrid[row][col] = pGrid[row][col] + WEST_SYMBOL;
+			} else if (action.equals(east)) {
+				pGrid[row][col] = pGrid[row][col] + EAST_SYMBOL;
+			}
 		}
 	}
 

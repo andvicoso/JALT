@@ -14,7 +14,7 @@ public class ModelProblem9_26 extends GridModel {
 	public ModelProblem9_26() {
 		super(3, 3);
 
-		Map<State, Double> rew = new HashMap<>();
+		Map<State, Double> rew = new HashMap<State, Double>();
 		rew.put(new GridState(2, 0), -1d);
 		rew.put(new GridState(2, 1), -1d);
 		rew.put(new GridState(2, 2), -1d);

@@ -7,9 +7,9 @@ import java.util.Map;
 
 import org.emast.model.algorithm.Algorithm;
 import org.emast.model.algorithm.AlgorithmFactory;
-import org.emast.model.algorithm.controller.AbstractERGLearning;
-import org.emast.model.algorithm.controller.MultiAgentERGLearning;
 import org.emast.model.algorithm.iteration.rl.ReinforcementLearning;
+import org.emast.model.algorithm.iteration.rl.erg.MultiERGLearning;
+import org.emast.model.algorithm.iteration.rl.erg.SingleERGLearning;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.util.CalcUtils;
@@ -19,6 +19,7 @@ import org.emast.util.Utils;
  * 
  * @author Anderson
  */
+@SuppressWarnings("rawtypes")
 public class BatchTest extends Test {
 
 	private static final int MAX_ITERATIONS = 10;
@@ -47,14 +48,14 @@ public class BatchTest extends Test {
 			long diff = System.currentTimeMillis() - initMsecs;
 			timeSum += diff;
 
-			if (algorithm instanceof AbstractERGLearning) {
-				algorithm = ((AbstractERGLearning) algorithm).getLearning();
+			if (algorithm instanceof SingleERGLearning) {
+				algorithm = ((SingleERGLearning) algorithm).getLearning();
 			}
 
 			if (algorithm instanceof ReinforcementLearning) {
 				storeExecutionMeans((ReinforcementLearning) algorithm, episodes, steps);
-			} else if (algorithm instanceof MultiAgentERGLearning) {
-				List<ReinforcementLearning<ERG>> algs = ((MultiAgentERGLearning) algorithm)
+			} else if (algorithm instanceof MultiERGLearning) {
+				List<ReinforcementLearning<ERG>> algs = ((MultiERGLearning) algorithm)
 						.getLearnings();
 				for (ReinforcementLearning<ERG> rl : algs) {
 					storeExecutionMeans(rl, episodes, steps);

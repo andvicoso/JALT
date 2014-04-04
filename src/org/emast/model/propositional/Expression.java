@@ -42,8 +42,7 @@ public final class Expression implements Serializable {
 		this(pProposition.getName());
 	}
 
-	public Expression(final BinaryOperator pGlueOperator,
-			final Expression... pExpressions) {
+	public Expression(final BinaryOperator pGlueOperator, final Expression... pExpressions) {
 		for (final Expression exp : pExpressions) {
 			add(exp, pGlueOperator);
 		}
@@ -58,8 +57,7 @@ public final class Expression implements Serializable {
 		optimize();
 	}
 
-	public Expression(final BinaryOperator pGlueOperator,
-			final Proposition... pPropositions) {
+	public Expression(final BinaryOperator pGlueOperator, final Proposition... pPropositions) {
 		this(pGlueOperator, Arrays.asList(pPropositions));
 	}
 
@@ -101,18 +99,22 @@ public final class Expression implements Serializable {
 		return expression.isEmpty();
 	}
 
-	public boolean evaluate(final Set<Proposition> pTrueProps)
-			throws InvalidExpressionException {
+	public boolean evaluate(final Set<Proposition> pTrueProps) throws InvalidExpressionException {
 		if (pTrueProps == null) {
 			return false;
 		}
 		// create propositions values for expression
 		Set<Proposition> expProps = getPropositions();
 		Map<String, String> map = new HashMap<String, String>(expProps.size());
-
+		// all in param are true
+		for (final Proposition proposition : pTrueProps) {
+			map.put(proposition.getName(), getValue(true));
+		}
+		// all the rest is false
 		for (final Proposition proposition : expProps) {
-			boolean value = pTrueProps.contains(proposition);
-			map.put(proposition.getName(), getValue(value));
+			if (!pTrueProps.contains(proposition)) {
+				map.put(proposition.getName(), getValue(false));
+			}
 		}
 
 		try {
@@ -122,8 +124,7 @@ public final class Expression implements Serializable {
 		}
 	}
 
-	private boolean evaluate(final Map<String, String> pMap)
-			throws EvaluationException {
+	private boolean evaluate(final Map<String, String> pMap) throws EvaluationException {
 		// code vars
 		String jEvalExp = codeJEvalVariables(pMap);
 		// replace operators tokens
@@ -151,8 +152,7 @@ public final class Expression implements Serializable {
 		} else {
 			String newExp = " " + pOperator + " ";
 
-			if (isPrimitive() || isParenthesized(pExpression)
-					|| pExpression.isPrimitive()) {
+			if (isPrimitive() || isParenthesized(pExpression) || pExpression.isPrimitive()) {
 				newExp += pExpression;
 			} else {
 				newExp += parenthesize(pExpression);
@@ -243,8 +243,7 @@ public final class Expression implements Serializable {
 
 	public Collection<String> getPropositionsNames() {
 		final Collection<String> propositions = new HashSet<String>();
-		final StringTokenizer st = new StringTokenizer(expression,
-				VARIABLES_DELIMS);
+		final StringTokenizer st = new StringTokenizer(expression, VARIABLES_DELIMS);
 
 		while (st.hasMoreTokens()) {
 			final String token = st.nextToken();
@@ -259,8 +258,8 @@ public final class Expression implements Serializable {
 
 	private Collection<String> getTerms() {
 		final Collection<String> terms = new HashSet<String>();
-		final StringTokenizer st = new StringTokenizer(expression.replaceAll(
-				" ", ""), EXPS_DELIMS, false);
+		final StringTokenizer st = new StringTokenizer(expression.replaceAll(" ", ""), EXPS_DELIMS,
+				false);
 		while (st.hasMoreTokens()) {
 			final String token = st.nextToken();
 			terms.add(token);
@@ -282,8 +281,7 @@ public final class Expression implements Serializable {
 
 	private String codeJEvalVariables(Map<String, String> pMap) {
 		final StringBuilder sb = new StringBuilder();
-		final StringTokenizer st = new StringTokenizer(expression,
-				EVALUATE_DELIMS, true);
+		final StringTokenizer st = new StringTokenizer(expression, EVALUATE_DELIMS, true);
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();
 			if (pMap.containsKey(token)) {
@@ -297,8 +295,7 @@ public final class Expression implements Serializable {
 	}
 
 	private String replaceJEvalOperators(String pJEvalExp) {
-		String codedJEvalExp = pJEvalExp.replace(AND.getToken(),
-				JEVAL_AND_TOKEN);
+		String codedJEvalExp = pJEvalExp.replace(AND.getToken(), JEVAL_AND_TOKEN);
 		codedJEvalExp = codedJEvalExp.replace(OR.getToken(), JEVAL_OR_TOKEN);
 
 		return codedJEvalExp;

@@ -280,7 +280,7 @@ public class CollectionsUtils {
 	public static <O> O getRandom(final Collection<O> pObjects) {
 		int r = Math.abs(random.nextInt() % pObjects.size());
 		List<O> objects = !(pObjects instanceof List) 
-				? new ArrayList<>(pObjects)
+				? new ArrayList<O>(pObjects)
 				: (List<O>) pObjects;
 
 		return objects.get(r);

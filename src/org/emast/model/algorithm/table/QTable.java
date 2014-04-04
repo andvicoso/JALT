@@ -217,4 +217,8 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		put(state, action, (I) new QTableItem(qValue, reward, incFrequency(state, action),
 				nextState));
 	}
+
+	public String toString(MDP model) {
+		return new GridPrinter().toGrid(model, getStateValue());
+	}
 }

@@ -1,4 +1,4 @@
-package org.emast.model.planning;
+package org.emast.util.erg;
 
 import java.util.Collection;
 import org.emast.model.propositional.Expression;

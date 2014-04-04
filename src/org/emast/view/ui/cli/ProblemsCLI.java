@@ -1,4 +1,4 @@
-package org.emast.util;
+package org.emast.view.ui.cli;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import java.util.Scanner;
 import org.emast.model.model.ERG;
 import org.emast.model.problem.Problem;
 import org.emast.model.problem.ProblemFactory;
+import org.emast.util.FileUtils;
 
 /**
  * 
@@ -16,6 +17,7 @@ import org.emast.model.problem.ProblemFactory;
  */
 public class ProblemsCLI {
 
+	private static final String EMAST = "emast";
 	public static final String DEFAULT_SUFFIX = "problem.emast";
 	public static final String DEFAULT_DIR = "problems";
 	private final ProblemFactory factory;
@@ -90,7 +92,7 @@ public class ProblemsCLI {
 	}
 
 	public static List<Problem<ERG>> getAllFromDir(String dir) {
-		List<Problem<ERG>> ps = new ArrayList<>();
+		List<Problem<ERG>> ps = new ArrayList<Problem<ERG>>();
 		List<File> files = FileUtils.getAllFromDir(DEFAULT_DIR + File.separator + dir);
 		Collections.sort(files);
 		for (File file : files) {
@@ -101,7 +103,7 @@ public class ProblemsCLI {
 	}
 
 	private Problem getLastExecuted() {
-		File last = FileUtils.getLastModified(DEFAULT_DIR + File.separator, "emast", 0l);
+		File last = FileUtils.getLastModified(DEFAULT_DIR + File.separator, EMAST, 0l);
 		if (last != null)
 			print(last.toString());
 		return last != null ? FileUtils.fromFile(last.getAbsolutePath()) : null;

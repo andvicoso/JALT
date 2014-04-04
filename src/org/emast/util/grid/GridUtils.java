@@ -27,9 +27,9 @@ public class GridUtils {
 	public static final Action east = new Action("east");
 	public static final Action west = new Action("west");
 	public static final Action north = new Action("north");
-	public static final List<Action> GRID_ACTIONS = new ArrayList<>();
+	public static final List<Action> GRID_ACTIONS = new ArrayList<Action>();
 	public static final GridState[][] STATES_CACHE = new GridState[GRID_MAX_SIZE][GRID_MAX_SIZE];
-	private static final Map<Integer, String> FORMATS_CACHE = new HashMap<>();
+	private static final Map<Integer, String> FORMATS_CACHE = new HashMap<Integer, String>();
 
 	static {
 		for (int i = 0; i < GRID_MAX_SIZE; i++) {
@@ -48,7 +48,7 @@ public class GridUtils {
 	}
 
 	public static List<State> createStates(final int pRows, final int pCols) {
-		final List<State> states = new ArrayList<>();
+		final List<State> states = new ArrayList<State>();
 		for (int i = 0; i < pRows; i++) {
 			for (int j = 0; j < pCols; j++) {
 				states.add(STATES_CACHE[i][j]);

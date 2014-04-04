@@ -1,4 +1,4 @@
-package org.emast.util;
+package org.emast.util.erg;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.emast.model.action.Action;
-import org.emast.model.algorithm.erg.ERGFactory;
 import org.emast.model.algorithm.table.erg.ERGQTable;
 import org.emast.model.function.PropositionFunction;
 import org.emast.model.model.ERG;
@@ -18,6 +17,8 @@ import org.emast.model.propositional.operator.BinaryOperator;
 import org.emast.model.solution.Policy;
 import org.emast.model.solution.SinglePolicy;
 import org.emast.model.state.State;
+import org.emast.util.CollectionsUtils;
+import org.emast.util.ModelUtils;
 
 public class ERGLearningUtils {
 

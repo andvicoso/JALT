@@ -197,7 +197,7 @@ public class FileUtils {
 		if (root.isDirectory()) {
 			files = Arrays.asList(root.listFiles());
 		} else {
-			files = new ArrayList<>();
+			files = new ArrayList<File>();
 		}
 
 		return files;

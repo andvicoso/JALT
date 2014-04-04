@@ -11,16 +11,9 @@ public class GridState extends State {
 	private final int col;
 
 	public GridState(int row, int col) {
+		super(GridUtils.getGridStateName(row, col));
 		this.row = row;
 		this.col = col;
-	}
-
-	@Override
-	public String getName() {
-		if (super.getName() == null) {
-			setName(GridUtils.getGridStateName(row, col));
-		}
-		return super.getName();
 	}
 
 	public int getRow() {

@@ -3,13 +3,13 @@ package org.emast.model.algorithm.iteration.rl;
 import static org.emast.util.DefaultTestProperties.ALPHA;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.PolicyGenerator;
-import org.emast.model.algorithm.actionchooser.RandomActionChooser;
+import org.emast.model.algorithm.actionchooser.RandomChooser;
 import org.emast.model.algorithm.actionchooser.ValuedObjectChooser;
 import org.emast.model.algorithm.iteration.IterationAlgorithm;
 import org.emast.model.algorithm.iteration.IterationValues;
@@ -24,6 +24,7 @@ import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.util.CalcUtils;
 import org.emast.util.DefaultTestProperties;
+import org.emast.util.PolicyUtils;
 
 /**
  * 
@@ -34,17 +35,19 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 
 	public static final String AGENT_NAME = "agent";
 	/**
-	 * The learning rate. The learning rate determines to what extent the newly acquired information
-	 * will override the old information. A factor of 0 will make the agent not learn anything,
-	 * while a factor of 1 would make the agent consider only the most recent information.
+	 * The learning rate. The learning rate determines to what extent the newly
+	 * acquired information will override the old information. A factor of 0
+	 * will make the agent not learn anything, while a factor of 1 would make
+	 * the agent consider only the most recent information.
 	 */
 	private final double alpha = ALPHA;
 	private List<Integer> steps;
 	protected QTable<? extends QTableItem> q;
 	private QTable<? extends QTableItem> lastq;
-	private ValuedObjectChooser<Action> actionChooser = new RandomActionChooser();
+	private ValuedObjectChooser<Action> actionChooser = new RandomChooser<>();
 	private StoppingCriterium stoppingCriterium = DefaultTestProperties.DEFAULT_STOPON;
 	private int maxSteps;
+	private Map<String, Object> parameters;
 
 	@Override
 	public Policy run(Problem<M> pProblem, Map<String, Object> pParameters) {
@@ -56,6 +59,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 		episodes = 0;
 		steps = new ArrayList<Integer>();
 		model = pProblem.getModel();
+		parameters = pParameters;
 
 		initializeQTable(pParameters);
 	}
@@ -111,10 +115,16 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 			steps.add(currentSteps);
 			episodes++;
 			// Log.info("episodes: " + episodes + ". steps: " + steps);
+			
+			//Log.info("\nBest-Values: \n" + new GridPrinter().toGrid(model, getLastValues()));
+			//Log.info("\nCurr-Values: \n" + new GridPrinter().toGrid(model, getCurrentValues()));
+			
 		} while (!stoppingCriterium.isStop(this));
 
-		// && IterationError.comparePolicies((Map<State, Double>) parameters.get("policy"), q,
-		// model, (Collection<State>) parameters.get("blocked"))
+		// Log.info("\nQTable: \n" + q.toString(model));
+
+		// Log.info("\nV-Values: \n" + new GridPrinter().toGrid(model,
+		// getLastValues()));
 
 		return q.getPolicy(false);
 	}
@@ -127,7 +137,13 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	}
 
 	protected Map<Action, Double> getActionValues(State pState) {
-		return model.getTransitionFunction().getActionValues(model.getActions(), pState);
+		Map<Action, Double> map = new HashMap<Action, Double>();
+		double value = 1d / model.getActions().size();
+		for (final Action action : model.getActions()) {
+			map.put(action, value);
+		}
+
+		return map;
 	}
 
 	protected Action getNextAction(State state) {
@@ -145,10 +161,11 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	protected double getMax(State pState) {
 		Double max = null;
 
-		Collection<Action> actions = model.getTransitionFunction().getActionsFrom(
-				model.getActions(), pState);
+		// Collection<Action> actions =
+		// model.getTransitionFunction().getActionsFrom(
+		// model.getStates(), model.getActions(), pState);
 		// search for the Q v for each state
-		for (Action action : actions) {
+		for (Action action : model.getActions()) {
 			Double value = q.getValue(pState, action);
 			if (max == null || value > max) {
 				max = value;
@@ -165,7 +182,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	@Override
 	public String printResults() {
 		StringBuilder sb = new StringBuilder(super.printResults());
-		// sb.append("\nAlpha: ").append(alpha);//TODO:descomentar em produção
+		// sb.append("\nAlpha: ").append(alpha);//TODO:descomentar em producao
 		sb.append("\nSteps (max): ").append(maxSteps);
 		sb.append("\nSteps (mean): ").append(getMeanSteps());
 		return sb.toString();
@@ -192,12 +209,13 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 
 	@Override
 	public Map<State, Double> getLastValues() {
-		return lastq.getStateValue(); // (Map<State, Double>) parameters.get("values");
+		return (Map<State, Double>) parameters.get(PolicyUtils.BEST_VALUES_STR);// lastq.getStateValue();
 	}
 
 	@Override
 	public Map<State, Double> getCurrentValues() {
-		return q.getStateValue();
+		return PolicyUtils.extractV(model, q.getPolicy(false));
+		// return q.getStateValue();
 	}
 
 	public void setStoppingCriterium(StoppingCriterium stoppingCriterium) {

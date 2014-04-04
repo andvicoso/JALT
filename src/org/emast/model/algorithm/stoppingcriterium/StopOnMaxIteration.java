@@ -10,8 +10,18 @@ import org.emast.model.algorithm.iteration.IterationValues;
  */
 public class StopOnMaxIteration implements StoppingCriterium {
 
+	private int max;
+
+	public StopOnMaxIteration() {
+		this(MAX_ITERATIONS);
+	}
+
+	public StopOnMaxIteration(int max) {
+		this.max = max;
+	}
+
 	@Override
 	public boolean isStop(IterationValues values) {
-		return values.getIterations() == MAX_ITERATIONS;
+		return values.getIterations() == max;
 	}
 }

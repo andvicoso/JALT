@@ -3,14 +3,7 @@ package org.emast.model.algorithm.iteration;
 import java.util.Map;
 import java.util.Set;
 
-import org.emast.model.algorithm.table.QTable;
-import org.emast.model.algorithm.table.QTableItem;
-import org.emast.model.model.MDP;
-import org.emast.model.problem.Problem;
-import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
-import org.emast.util.CollectionsUtils;
-import org.emast.util.DefaultTestProperties;
 
 /**
  * 
@@ -61,24 +54,6 @@ public class IterationError {
 		return error;
 	}
 
-	public static <M extends MDP, QT extends QTable<? extends QTableItem>> boolean comparePolicies(
-			Map<State, Double> bv, QT qt, M oldModel) {
-		// best -> policy after running VI over the real/complete model
-		// the policy returned comprises only the visited states (extracted from Q-Table)
-		Policy pi = qt.getPolicy(false);
-		Map<State, Double> qv = extractV(oldModel, pi);
-		// calculate root-mean-square error (RMSE)
-		double error = rmse(bv, qv, pi.getStates());
-		// compare with predefined error
-		return error > DefaultTestProperties.ERROR;
-	}
-
-	private static Map<State, Double> extractV(MDP model, Policy current) {
-		PolicyEvaluation pe = new PolicyEvaluation();
-		return pe.run(new Problem<MDP>(model, null),
-				CollectionsUtils.asMap("policy", current.getBestPolicy()));
-	}
-
 	public static double rmse(Map<State, Double> best, Map<State, Double> current,
 			Set<State> visited) {
 		double sum = 0;
@@ -87,6 +62,7 @@ public class IterationError {
 		for (State state : visited) {
 			// get the best value for any action
 			Double v1 = best.get(state);
+			v1 = v1 == null ? 0.0 : v1;
 			Double v2 = current.get(state);
 			double diff = Math.abs(v1 - v2);
 			sum += (diff * diff);

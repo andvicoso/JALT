@@ -1,4 +1,4 @@
-package org.emast.model.algorithm.erg;
+package org.emast.util.erg;
 
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +16,6 @@ import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.ERG;
 import org.emast.model.model.impl.ERGModel;
-import org.emast.model.planning.PreservationGoalFactory;
 import org.emast.model.propositional.Expression;
 import org.emast.model.propositional.Proposition;
 import org.emast.model.state.State;

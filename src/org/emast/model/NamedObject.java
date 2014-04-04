@@ -4,13 +4,15 @@ import java.io.Serializable;
 
 public class NamedObject implements Comparable<NamedObject>, Serializable {
 
+    protected static final String STAR = "*";
+    protected static final String EMPTY_STR = "";
     private String name;
 
     public NamedObject() {
     }
 
     public NamedObject(final int pI) {
-        this(pI + "");
+        this(pI + EMPTY_STR);
     }
 
     public NamedObject(final String pName) {
@@ -32,8 +34,7 @@ public class NamedObject implements Comparable<NamedObject>, Serializable {
 
     @Override
     public boolean equals(final Object obj) {
-        return obj instanceof NamedObject
-                && (super.equals(obj) || getName().equals(obj.toString()));
+        return super.equals(obj) || (obj instanceof NamedObject && getName().equals(obj.toString()));
     }
 
     @Override

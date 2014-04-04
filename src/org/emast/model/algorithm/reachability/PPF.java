@@ -37,16 +37,18 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 	protected static final Double INITIAL_VALUE = 1d;
 
 	/**
-	 * if is true, then the algorithm will stop when it finds a valid path to some agent's initial
-	 * position. Else, it will find all the paths for all valid states.
+	 * if is true, then the algorithm will stop when it finds a valid path to
+	 * some agent's initial position. Else, it will find all the paths for all
+	 * valid states.
 	 */
 	protected final boolean stopWhenOneAgentFindPath;
 
 	/**
 	 * 
 	 * @param pStopWhenOneAgentFindPath
-	 *            if is true, then the algorithm will stop when it finds a valid path to some
-	 *            agent's initial position. Else, it will find all the paths for all valid states.
+	 *            if is true, then the algorithm will stop when it finds a valid
+	 *            path to some agent's initial position. Else, it will find all
+	 *            the paths for all valid states.
 	 */
 	public PPF(final boolean pStopWhenOneAgentFindPath) {
 		stopWhenOneAgentFindPath = pStopWhenOneAgentFindPath;
@@ -90,7 +92,8 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 			Collection<State> c) {
 		Collection<State> initialStates = pProblem.getInitialStates().values();
 		// If the flag "stopWhenOneAgentFindPath" is true, then the algorithm
-		// will stop when it finds a valid path to some agent's initial position.
+		// will stop when it finds a valid path to some agent's initial
+		// position.
 		// Else, it will find all paths for all states.
 		if (stopWhenOneAgentFindPath)
 			return !Collections.disjoint(c, initialStates);
@@ -126,8 +129,8 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 	}
 
 	/**
-	 * Para todas as transições da imagem forte, corta todas que não pertençam ao conjunto da
-	 * cobertura
+	 * Para todas as transições da imagem forte, corta todas que não
+	 * pertençam ao conjunto da cobertura
 	 * 
 	 * @param pStrongImage
 	 * @param pC
@@ -148,7 +151,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 		final Set<Transition> result = new HashSet<Transition>();
 
 		for (final State state : model.getStates()) {
-			for (final Action actions : getActionsFrom(state)) {
+			for (final Action actions : model.getActions()) {
 				final Collection<State> reachableStates = model.getTransitionFunction()
 						.getReachableStates(model.getStates(), state, actions);
 				if (!Collections.disjoint(pC, reachableStates)) {
@@ -175,7 +178,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 		final Set<Transition> result = new HashSet<Transition>();
 
 		for (final State state : model.getStates()) {
-			for (final Action action : getActionsFrom(state)) {
+			for (final Action action : model.getActions()) {// tf.getActionsFrom
 				final Collection<State> reachableStates = model.getTransitionFunction()
 						.getReachableStates(model.getStates(), state, action);
 				if (pC.containsAll(reachableStates)) {
@@ -190,10 +193,6 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 		}
 
 		return result;
-	}
-
-	private Iterable<Action> getActionsFrom(final State pState) {
-		return model.getTransitionFunction().getActionsFrom(model.getActions(), pState);
 	}
 
 	@Override
@@ -222,10 +221,9 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 		// search for the Qs values for state
 		for (final Action action : getActions(pPrune, state)) {
 			double sum = 0;
-			for (final State reachableState : tf.getReachableStates(model.getStates(), state,
-					action)) {
+			for (final State reachableState : model.getStates()) {
 				final double trans = tf.getValue(state, reachableState, action);
-				if (pValues.get(reachableState) != null) {
+				if (trans > 0 && pValues.get(reachableState) != null) {
 					sum += trans * pValues.get(reachableState);
 				}
 			}
