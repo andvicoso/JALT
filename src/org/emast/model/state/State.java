@@ -2,11 +2,13 @@ package org.emast.model.state;
 
 import java.io.Serializable;
 import org.emast.model.NamedObject;
-
+/**
+ * 
+ * @author andvicoso
+ */
 public class State extends NamedObject implements Serializable {
 
     public static final String NAME_PREFIX = "s";
-    public static final State ANY = new State(STAR);
 
     public State() {
     }

@@ -4,7 +4,7 @@ import org.emast.model.model.impl.GridModel;
 
 /**
  * 
- * @author anderson
+ * @author andvicoso
  */
 public class HunterPreyModel extends GridModel {
 

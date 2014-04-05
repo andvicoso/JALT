@@ -3,7 +3,10 @@ package org.emast.model.state;
 import org.emast.util.grid.GridUtils;
 import org.emast.util.grid.distancemeasure.CityBlock;
 import org.emast.util.grid.distancemeasure.DistanceMeasure;
-
+/**
+ * 
+ * @author andvicoso
+ */
 public class GridState extends State {
 	private static final DistanceMeasure dist = new CityBlock();
 

@@ -12,7 +12,7 @@ import org.emast.util.grid.GridUtils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class GridModel extends MDPModel implements Grid {
 

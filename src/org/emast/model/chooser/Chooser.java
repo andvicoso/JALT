@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public interface Chooser<T> {
 

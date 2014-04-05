@@ -22,7 +22,7 @@ import static org.emast.util.DefaultTestProperties.*;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class SuttonDynaMazeTests {
 

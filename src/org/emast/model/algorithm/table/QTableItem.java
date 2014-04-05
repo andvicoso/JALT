@@ -4,7 +4,7 @@ import org.emast.model.state.State;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class QTableItem {
 

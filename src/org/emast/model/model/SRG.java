@@ -7,7 +7,7 @@ import org.emast.model.propositional.Proposition;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public interface SRG extends MDP {
 

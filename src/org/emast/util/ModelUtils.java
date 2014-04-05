@@ -21,7 +21,7 @@ import org.emast.model.transition.Transition;
 
 /**
  * 
- * @author anderson
+ * @author andvicoso
  */
 public class ModelUtils {
 

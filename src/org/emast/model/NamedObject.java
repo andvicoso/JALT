@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 public class NamedObject implements Comparable<NamedObject>, Serializable {
 
-    protected static final String STAR = "*";
     protected static final String EMPTY_STR = "";
     private String name;
 

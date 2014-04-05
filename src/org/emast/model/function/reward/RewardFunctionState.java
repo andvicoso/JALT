@@ -8,7 +8,7 @@ import org.emast.model.state.State;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class RewardFunctionState<M extends MDP> extends DefaultRewardFunction<M, State> {
 

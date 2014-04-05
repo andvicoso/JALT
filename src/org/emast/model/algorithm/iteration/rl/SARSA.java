@@ -7,7 +7,7 @@ import org.emast.model.state.State;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class SARSA<M extends MDP> extends QLearning<M> {
 

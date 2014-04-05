@@ -4,7 +4,7 @@ import org.emast.model.action.Action;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public interface ActionChooser extends ValuedObjectChooser<Action> {
 

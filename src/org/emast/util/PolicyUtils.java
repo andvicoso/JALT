@@ -16,7 +16,7 @@ import org.emast.model.state.State;
 
 /**
  * 
- * @author anderson
+ * @author andvicoso
  */
 public class PolicyUtils {
 

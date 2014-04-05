@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class Log {
 

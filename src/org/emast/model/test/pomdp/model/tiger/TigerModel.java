@@ -12,7 +12,7 @@ import org.emast.model.state.State;
 
 /**
  *
- * @author Anderson Viçoso
+ * @author andvicoso Viçoso
  */
 public class TigerModel extends POMDPModel {
 

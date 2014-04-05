@@ -7,7 +7,7 @@ import org.emast.model.propositional.operator.BinaryOperator;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class PreservationGoalFactory {
 

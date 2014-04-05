@@ -15,7 +15,7 @@ import static org.emast.util.DefaultTestProperties.*;
  * Grid Caption: 0-9: Initial agent x position h: hole s: stone w: water a: antenna c: antenna coverage u:
  * exit up d: exit down
  *
- * @author anderson
+ * @author andvicoso
  */
 public class AntennaCoverageModel extends ERGGridModel {
 

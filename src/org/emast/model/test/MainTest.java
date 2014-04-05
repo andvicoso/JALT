@@ -16,9 +16,9 @@ import org.emast.view.ui.cli.ProblemsCLI;
 
 /**
  * 
- * @author anderson
+ * @author andvicoso
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class MainTest {
 
 	public static void main(final String[] pArgs) {

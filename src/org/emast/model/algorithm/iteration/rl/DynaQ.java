@@ -13,7 +13,7 @@ import org.emast.util.CollectionsUtils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class DynaQ<M extends MDP> extends QLearning<M> {
 

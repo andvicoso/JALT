@@ -8,7 +8,7 @@ import net.ericaro.surfaceplotter.surface.SurfaceModel;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class PlotFrame extends javax.swing.JFrame {
 

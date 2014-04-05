@@ -16,7 +16,7 @@ import org.emast.util.grid.GridUtils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class QTable<I extends QTableItem> extends StateActionTable<I> {
 	public static final String NAME = "qtable";

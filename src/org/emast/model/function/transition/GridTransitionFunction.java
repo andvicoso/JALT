@@ -10,7 +10,7 @@ import org.emast.util.grid.GridUtils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class GridTransitionFunction extends TransitionFunction {
 

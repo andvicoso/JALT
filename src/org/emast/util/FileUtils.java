@@ -22,7 +22,7 @@ import org.emast.util.grid.GridModelWriter;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class FileUtils {
 	private static final ERGGridModelReader reader = new ERGGridModelReader();

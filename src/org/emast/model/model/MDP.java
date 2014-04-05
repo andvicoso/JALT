@@ -6,6 +6,10 @@ import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.state.State;
 
+/**
+ * 
+ * @author andvicoso
+ */
 public interface MDP {
 
     MDP copy();

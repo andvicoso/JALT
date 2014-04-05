@@ -13,7 +13,7 @@ import org.emast.util.FileUtils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class ProblemsCLI {
 

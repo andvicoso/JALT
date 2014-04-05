@@ -19,7 +19,7 @@ import org.emast.model.NamedObject;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class CollectionsUtils {
 

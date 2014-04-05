@@ -8,7 +8,7 @@ import org.emast.util.CollectionsUtils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class MinValueChooser<T> implements Chooser<T> {
 

@@ -6,7 +6,7 @@ import org.emast.model.state.State;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class QLearning<M extends MDP> extends ReinforcementLearning<M> {
 

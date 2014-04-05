@@ -8,7 +8,7 @@ import org.emast.model.combinator.Combinator;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class MeanValueCombinator<T> implements Combinator<T> {
 

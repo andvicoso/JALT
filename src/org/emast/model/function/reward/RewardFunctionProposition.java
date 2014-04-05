@@ -12,7 +12,7 @@ import org.emast.model.state.State;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class RewardFunctionProposition<M extends ERG> extends DefaultRewardFunction<M, Proposition> {
 

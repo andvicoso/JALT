@@ -9,7 +9,7 @@ import org.emast.util.grid.GridPrinter;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class StateActionTable<T> {
 

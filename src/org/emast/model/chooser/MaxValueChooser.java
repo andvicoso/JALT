@@ -7,7 +7,7 @@ import java.util.Set;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class MaxValueChooser<T> implements Chooser<T> {
 

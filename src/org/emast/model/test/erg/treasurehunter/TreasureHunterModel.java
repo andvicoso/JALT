@@ -4,7 +4,7 @@ import org.emast.model.model.impl.ERGGridModel;
 
 /**
  *
- * @author anderson
+ * @author andvicoso
  */
 public class TreasureHunterModel extends ERGGridModel {
 

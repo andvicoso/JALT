@@ -7,7 +7,7 @@ import org.emast.model.problem.Problem;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public interface Algorithm<M extends MDP, R> {
 

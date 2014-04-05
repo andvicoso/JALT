@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author anderson
+ * @author andvicoso
  */
 public class Proposition extends NamedObject implements Serializable {
 

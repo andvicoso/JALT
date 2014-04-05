@@ -13,7 +13,7 @@ import org.emast.model.state.State;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public abstract class TransitionFunction implements Serializable {
 	private ValuedObjectChooser<State> chooser = new RandomChooser<>();

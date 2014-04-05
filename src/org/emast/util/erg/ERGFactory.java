@@ -23,7 +23,7 @@ import org.emast.util.ModelUtils;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class ERGFactory {
 

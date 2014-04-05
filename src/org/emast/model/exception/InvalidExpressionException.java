@@ -2,7 +2,7 @@ package org.emast.model.exception;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class InvalidExpressionException extends Exception {
 

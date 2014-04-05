@@ -9,7 +9,7 @@ import org.emast.util.CollectionsUtils;
 import static org.emast.util.DefaultTestProperties.*;
 /**
  *
- * @author anderson
+ * @author andvicoso
  */
 public class RoverModel extends ERGGridModel {
 

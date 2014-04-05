@@ -7,7 +7,7 @@ import org.emast.model.state.State;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class TableTransitionFunction extends TransitionFunction {
 	// private static final String GLUE = ".";

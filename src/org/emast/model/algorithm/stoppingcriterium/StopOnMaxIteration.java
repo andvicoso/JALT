@@ -6,7 +6,7 @@ import org.emast.model.algorithm.iteration.IterationValues;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class StopOnMaxIteration implements StoppingCriterium {
 

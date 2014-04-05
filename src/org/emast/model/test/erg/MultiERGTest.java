@@ -11,7 +11,7 @@ import org.emast.model.model.ERG;
 
 /**
  * 
- * @author anderson
+ * @author andvicoso
  */
 @SuppressWarnings("rawtypes")
 public class MultiERGTest extends AlgorithmTest {

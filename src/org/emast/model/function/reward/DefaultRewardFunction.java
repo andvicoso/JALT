@@ -8,7 +8,7 @@ import org.emast.model.model.MDP;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public abstract class DefaultRewardFunction<M extends MDP, C> implements RewardFunction,
 		Serializable {

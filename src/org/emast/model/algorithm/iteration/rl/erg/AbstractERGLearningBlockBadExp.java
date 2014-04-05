@@ -28,7 +28,7 @@ import org.emast.util.erg.ERGLearningUtils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, Policy> {
 	protected final Set<Expression> avoid = new HashSet<Expression>();

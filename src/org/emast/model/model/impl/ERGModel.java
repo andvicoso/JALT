@@ -13,7 +13,7 @@ import org.emast.model.state.State;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class ERGModel extends MDPModel implements ERG {
 

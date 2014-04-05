@@ -5,7 +5,7 @@ import org.emast.model.solution.Policy;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public interface PolicyGenerator<M extends MDP> extends Algorithm<M, Policy> {
 }

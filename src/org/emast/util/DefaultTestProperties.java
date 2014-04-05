@@ -5,7 +5,7 @@ import org.emast.model.algorithm.stoppingcriterium.StoppingCriterium;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public final class DefaultTestProperties {
 

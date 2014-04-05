@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class CalcUtils {
 

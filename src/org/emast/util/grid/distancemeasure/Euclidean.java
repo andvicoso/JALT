@@ -5,7 +5,7 @@ import org.emast.util.grid.GridUtils;
 
 /**
  *
- * @author anderson
+ * @author andvicoso
  */
 public class Euclidean implements DistanceMeasure {
 

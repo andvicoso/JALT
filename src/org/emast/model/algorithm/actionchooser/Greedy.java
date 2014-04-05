@@ -10,7 +10,7 @@ import org.emast.util.CollectionsUtils;
 /**
  * The implmentation returns a random action from those with the highest Q-value
  * 
- * @author Anderson
+ * @author andvicoso
  * 
  */
 public class Greedy<T> implements ValuedObjectChooser<T> {

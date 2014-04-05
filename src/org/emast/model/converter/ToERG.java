@@ -12,7 +12,7 @@ import org.emast.model.propositional.Proposition;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class ToERG {
 

@@ -10,7 +10,7 @@ import org.emast.model.problem.Problem;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class GridModelWriter {
 

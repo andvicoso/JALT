@@ -12,7 +12,7 @@ import org.emast.model.propositional.Expression;
 
 /**
  * 
- * @author anderson
+ * @author andvicoso
  */
 public class StopOnBadExpression implements StoppingCriterium {
 

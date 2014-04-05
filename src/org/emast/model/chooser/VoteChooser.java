@@ -9,7 +9,7 @@ import org.emast.util.CollectionsUtils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class VoteChooser<T> implements Chooser<T> {
 

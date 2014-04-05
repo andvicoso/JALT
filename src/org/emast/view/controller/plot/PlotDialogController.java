@@ -8,7 +8,7 @@ import org.emast.view.ui.plot.PlotFrame;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class PlotDialogController {
 

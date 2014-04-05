@@ -14,7 +14,7 @@ import org.emast.model.state.State;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class ERGGridModel extends GridModel implements ERG {
 

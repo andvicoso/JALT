@@ -28,7 +28,7 @@ import org.emast.util.PolicyUtils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgorithm<M, Policy>
 		implements PolicyGenerator<M>, IterationValues {
@@ -207,6 +207,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 		return CalcUtils.getStandardDeviation(getMeanSteps(), steps);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<State, Double> getLastValues() {
 		return (Map<State, Double>) parameters.get(PolicyUtils.BEST_VALUES_STR);// lastq.getStateValue();

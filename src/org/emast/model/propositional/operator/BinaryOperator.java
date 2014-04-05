@@ -2,7 +2,7 @@ package org.emast.model.propositional.operator;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class BinaryOperator extends Operator {
 

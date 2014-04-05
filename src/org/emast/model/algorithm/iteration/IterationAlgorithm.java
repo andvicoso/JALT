@@ -13,6 +13,10 @@ import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.MDP;
 import org.emast.model.state.State;
 
+/**
+ * 
+ * @author andvicoso
+ */
 public abstract class IterationAlgorithm<M extends MDP, R> implements Algorithm<M, R> {
 
 	/**
@@ -78,7 +82,7 @@ public abstract class IterationAlgorithm<M extends MDP, R> implements Algorithm<
 
 		return sum;
 	}
-	
+
 	protected double getValue(MDP model, State state, Action action, Map<State, Double> v) {
 		if (action != null) {
 			double reward = model.getRewardFunction().getValue(state, action);

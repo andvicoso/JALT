@@ -2,7 +2,7 @@ package org.emast.model.model;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public interface Grid {
 

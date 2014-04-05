@@ -13,7 +13,7 @@ import org.emast.util.CollectionsUtils;
 /**
  * The agent chooses the action with the highest Q-value epsilon factor times
  * 
- * @author Anderson
+ * @author andvicoso
  * 
  */
 public class EpsilonGreedy<T> implements ValuedObjectChooser<T> {

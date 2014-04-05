@@ -8,7 +8,7 @@ import org.emast.util.CollectionsUtils;
 
 /**
  *
- * @author anderson
+ * @author andvicoso
  */
 public class CityModel extends ERGGridModel {
 

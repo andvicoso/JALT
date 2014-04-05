@@ -17,7 +17,7 @@ import org.emast.util.Utils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 @SuppressWarnings("rawtypes")
 public class BatchTest extends Test {

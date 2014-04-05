@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public interface Combinator<T> {
 

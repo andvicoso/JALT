@@ -6,7 +6,7 @@ import java.util.Set;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class ThresholdChooser<T> implements Chooser<T> {
 

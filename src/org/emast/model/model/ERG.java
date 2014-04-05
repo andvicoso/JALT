@@ -4,7 +4,7 @@ import org.emast.model.propositional.Expression;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public interface ERG extends SRG {
 

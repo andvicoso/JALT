@@ -7,7 +7,7 @@ import org.emast.model.algorithm.iteration.rl.erg.ERGLearningBlockBadExp;
 
 /**
  * 
- * @author anderson
+ * @author andvicoso
  */
 @SuppressWarnings("rawtypes")
 public class ERGTest extends AlgorithmTest {

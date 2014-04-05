@@ -7,7 +7,7 @@ import org.emast.util.CollectionsUtils;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class RandomChooser<T> implements ValuedObjectChooser<T> {
 

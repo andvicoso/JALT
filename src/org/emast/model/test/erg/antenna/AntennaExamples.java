@@ -18,7 +18,7 @@ import org.emast.util.grid.distancemeasure.CityBlock;
 
 /**
  * 
- * @author Anderson
+ * @author andvicoso
  */
 public class AntennaExamples {
 	

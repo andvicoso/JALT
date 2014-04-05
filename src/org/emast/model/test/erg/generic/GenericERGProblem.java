@@ -11,7 +11,7 @@ import org.emast.util.CollectionsUtils;
 import static org.emast.util.DefaultTestProperties.*;
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class GenericERGProblem extends ERGGridModel {
 

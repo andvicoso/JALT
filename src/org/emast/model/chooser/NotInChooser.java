@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * 
- * @author anderson
+ * @author andvicoso
  */
 public class NotInChooser<T> implements Chooser<T> {
 

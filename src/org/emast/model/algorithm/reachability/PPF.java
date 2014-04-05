@@ -25,7 +25,7 @@ import org.emast.util.ModelUtils;
 /**
  * Strong probabilistic planning algorithm
  * 
- * @author Anderson
+ * @author andvicoso
  * @param <P>
  *            Simple reachability problem to be resolved
  */

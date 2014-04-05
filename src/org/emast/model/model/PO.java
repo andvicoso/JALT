@@ -6,7 +6,7 @@ import org.emast.model.observation.Observation;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public interface PO extends MDP {
 

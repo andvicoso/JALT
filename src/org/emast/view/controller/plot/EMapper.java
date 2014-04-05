@@ -4,7 +4,7 @@ import net.ericaro.surfaceplotter.Mapper;
 
 /**
  *
- * @author Anderson
+ * @author andvicoso
  */
 public class EMapper implements Mapper {
 
