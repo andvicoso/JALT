@@ -2,8 +2,11 @@ package org.emast.model.algorithm.stoppingcriterium;
 
 import static org.emast.util.DefaultTestProperties.ERROR;
 
-import org.emast.model.algorithm.iteration.IterationError;
+import java.util.Map;
+import java.util.Set;
+
 import org.emast.model.algorithm.iteration.IterationValues;
+import org.emast.model.state.State;
 
 /**
  * 
@@ -22,10 +25,29 @@ public class StopOnRMSError implements StoppingCriterium {
 
 	@Override
 	public boolean isStop(IterationValues values) {
+		Map<State, Double> current = values.getCurrentValues();
 		// calculate root-mean-square error (RMSE)
-		double currentError = IterationError.rmse(values.getLastValues(),
-				values.getCurrentValues(), values.getCurrentValues().keySet());
+		double currentError = rmse(values.getLastValues(), current, current.keySet());
 		// compare with predefined error
 		return currentError < error;
+	}
+
+	public static double rmse(Map<State, Double> best, Map<State, Double> current,
+			Set<State> visited) {
+		double sum = 0;
+		int count = 0;
+		// goes through the visited states
+		for (State state : visited) {
+			// get the best value for any action
+			Double v1 = best.get(state);
+			v1 = v1 == null ? 0.0 : v1;
+			Double v2 = current.get(state);
+			double diff = Math.abs(v1 - v2);
+			sum += (diff * diff);
+			count++;
+			// Log.info(String.format("%s->%f", state, diff));
+		}
+
+		return Math.sqrt(sum / count);
 	}
 }

@@ -1,9 +1,11 @@
 package org.emast.model.algorithm.stoppingcriterium;
 
-import org.emast.model.algorithm.iteration.IterationError;
-import org.emast.model.algorithm.iteration.IterationValues;
+import static org.emast.util.DefaultTestProperties.ERROR;
 
-import static org.emast.util.DefaultTestProperties.*;
+import java.util.Map;
+
+import org.emast.model.algorithm.iteration.IterationValues;
+import org.emast.model.state.State;
 
 /**
  * 
@@ -22,8 +24,29 @@ public class StopOnMaxDiffError implements StoppingCriterium {
 
 	@Override
 	public boolean isStop(IterationValues values) {
-		double currentError = IterationError.getMaxDiffError(values.getIterations(),
-				values.getLastValues(), values.getCurrentValues());
-		return currentError <  error;
+		double maxDiff = -Double.MAX_VALUE;
+		int n = values.getIterations();
+		Map<State, Double> lastv = values.getLastValues();
+		Map<State, Double> v = values.getCurrentValues();
+
+		if (n == 0) {
+			maxDiff = Double.MAX_VALUE;
+		} else {
+			for (State state : lastv.keySet()) {
+				Double val1 = lastv.get(state);
+				Double val2 = v.get(state);
+				val1 = val1 == null ? 0 : val1;
+				val2 = val2 == null ? 0 : val2;
+
+				double diff = Math.abs(val2 - val1);
+				if (diff > maxDiff) {
+					maxDiff = diff;
+				}
+			}
+		}
+
+		// Log.info("Error: " + String.format("%.4g", maxDif));
+
+		return maxDiff < error;
 	}
 }

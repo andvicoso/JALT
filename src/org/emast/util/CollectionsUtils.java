@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
@@ -69,6 +70,7 @@ public class CollectionsUtils {
 	public static Map<String, Object> asMap(String str, Object obj) {
 		final HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put(str, obj);
+
 		return map;
 	}
 
@@ -81,8 +83,8 @@ public class CollectionsUtils {
 	}
 
 	public static <T> Map<T, Double> createMap(Collection<T> pKeys, Double pValue) {
-		final Map map = new HashMap();
-		for (Object object : pKeys) {
+		final Map<T, Double> map = new HashMap<>();
+		for (T object : pKeys) {
 			map.put(object, pValue);
 		}
 		return map;
@@ -150,19 +152,18 @@ public class CollectionsUtils {
 		return list;
 	}
 
-	public static <K, V> Map<K, V> sortByValue(Map<K, V> map) {
-		final List<V> list = new LinkedList(map.entrySet());
-		Collections.sort(list, new Comparator() {
+	public static <K, V extends Comparable<V>> Map<K, V> sortByValue(Map<K, V> map) {
+		final List<Entry<K, V>> list = new LinkedList<>(map.entrySet());
+		Collections.sort(list, new Comparator<Entry<K, V>>() {
 			@Override
-			public int compare(Object o1, Object o2) {
-				return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2))
-						.getValue());
+			public int compare(Entry<K, V> o1, Entry<K, V> o2) {
+				return o1.getValue().compareTo(o2.getValue());
 			}
 		});
 
 		final Map<K, V> result = new LinkedHashMap<K, V>(list.size());
-		for (final Iterator it = list.iterator(); it.hasNext();) {
-			Map.Entry<K, V> entry = (Map.Entry<K, V>) it.next();
+		for (final Iterator<Entry<K, V>> it = list.iterator(); it.hasNext();) {
+			Map.Entry<K, V> entry = it.next();
 			result.put(entry.getKey(), entry.getValue());
 		}
 		return result;
@@ -179,7 +180,7 @@ public class CollectionsUtils {
 	 * @return the elements of the received type
 	 */
 	@SuppressWarnings("unchecked")
-	public static <C> List<C> getElementsOfType(final Collection pList, final Class<C> pType) {
+	public static <C> List<C> getElementsOfType(final Collection<?> pList, final Class<C> pType) {
 		final List<C> list = new ArrayList<C>();
 
 		if (pList != null && pList.size() > 0) {
@@ -195,10 +196,11 @@ public class CollectionsUtils {
 		return list;
 	}
 
-	public static <C> boolean containsElementOfType(final Collection pList, final Class<C> pType) {
+	public static <C> boolean containsElementOfType(final Collection<?> pList, final Class<C> pType) {
 		return getElementsOfType(pList, pType).size() > 0;
 	}
 
+	@SafeVarargs
 	public static <E> Set<E> asSet(final E... pEs) {
 		return new HashSet<E>(Arrays.asList(pEs));
 	}
@@ -279,8 +281,7 @@ public class CollectionsUtils {
 
 	public static <O> O getRandom(final Collection<O> pObjects) {
 		int r = Math.abs(random.nextInt() % pObjects.size());
-		List<O> objects = !(pObjects instanceof List) 
-				? new ArrayList<O>(pObjects)
+		List<O> objects = !(pObjects instanceof List) ? new ArrayList<O>(pObjects)
 				: (List<O>) pObjects;
 
 		return objects.get(r);

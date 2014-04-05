@@ -22,10 +22,9 @@ public class PolicyIteration extends IterationAlgorithm<MDP, Policy> implements
 		MDP model = pProblem.getModel();
 		boolean changed;
 		final Policy pi = PolicyUtils.createRandom(model);
-		PolicyEvaluation pe = new PolicyEvaluation();
 		// Start the main loop
 		do {
-			final Map<State, Double> v = pe.run(pProblem, pParameters);
+			final Map<State, Double> v = new PolicyEvaluation<MDP>().run(pProblem, pParameters);
 			changed = false;
 			// for each state
 			for (final State state : model.getStates()) {

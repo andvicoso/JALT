@@ -11,6 +11,7 @@ import org.emast.model.algorithm.Algorithm;
 import org.emast.model.function.reward.RewardFunction;
 import org.emast.model.function.transition.TransitionFunction;
 import org.emast.model.model.MDP;
+import org.emast.model.problem.Problem;
 import org.emast.model.state.State;
 
 /**
@@ -69,33 +70,37 @@ public abstract class IterationAlgorithm<M extends MDP, R> implements Algorithm<
 		return q;
 	}
 
-	protected double getSum(TransitionFunction tf, RewardFunction rf, Collection<State> states,
-			State pState, Action pAction, Map<State, Double> v) {
+	protected double getValue(MDP model, State state, Action action, Map<State, Double> v) {
+		if (action != null) {
+			double reward = model.getRewardFunction().getValue(state, action);
+			double value = reward
+					+ (getGama() * getSum(model.getTransitionFunction(), model.getStates(), state,
+							action, v));
+			return value;
+		}
+
+		return 0;
+	}
+
+	protected double getSum(TransitionFunction tf, Collection<State> states, State pState,
+			Action pAction, Map<State, Double> v) {
 		double sum = 0;
 
 		for (State finalState : states) {
-			if (!pState.equals(finalState)) {
-				Double trans = tf.getValue(pState, finalState, pAction);
-				sum += trans * getVValue(v, finalState);
-			}
+			Double trans = tf.getValue(pState, finalState, pAction);
+			sum += trans * getVValue(v, finalState);
 		}
 
 		return sum;
 	}
 
-	protected double getValue(MDP model, State state, Action action, Map<State, Double> v) {
-		if (action != null) {
-			double reward = model.getRewardFunction().getValue(state, action);
-			double value = (getGama() * getSum(model.getTransitionFunction(),
-					model.getRewardFunction(), model.getStates(), state, action, v))
-					+ reward;
-			return value;
-		}
-		return 0;
-
-	}
-
 	private double getVValue(Map<State, Double> v, State state) {
 		return v.isEmpty() || !v.containsKey(state) ? 0 : v.get(state);
+	}
+
+	protected void initializeV(Problem<M> pProblem, Map<State, Double> v) {
+		for (State state : pProblem.getModel().getStates()) {
+			v.put(state, 0.0);
+		}
 	}
 }

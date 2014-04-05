@@ -7,12 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.emast.infra.log.Log;
 import org.emast.model.action.Action;
 import org.emast.model.algorithm.PolicyGenerator;
 import org.emast.model.algorithm.actionchooser.RandomChooser;
 import org.emast.model.algorithm.actionchooser.ValuedObjectChooser;
 import org.emast.model.algorithm.iteration.IterationAlgorithm;
 import org.emast.model.algorithm.iteration.IterationValues;
+import org.emast.model.algorithm.iteration.PolicyEvaluation;
 import org.emast.model.algorithm.stoppingcriterium.StoppingCriterium;
 import org.emast.model.algorithm.table.QTable;
 import org.emast.model.algorithm.table.QTableItem;
@@ -23,8 +25,10 @@ import org.emast.model.problem.Problem;
 import org.emast.model.solution.Policy;
 import org.emast.model.state.State;
 import org.emast.util.CalcUtils;
+import org.emast.util.CollectionsUtils;
 import org.emast.util.DefaultTestProperties;
 import org.emast.util.PolicyUtils;
+import org.emast.util.grid.GridPrinter;
 
 /**
  * 
@@ -48,6 +52,8 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	private StoppingCriterium stoppingCriterium = DefaultTestProperties.DEFAULT_STOPON;
 	private int maxSteps;
 	private Map<String, Object> parameters;
+	Map<Action, Double> actionValues;
+	private Problem<M> problem;
 
 	@Override
 	public Policy run(Problem<M> pProblem, Map<String, Object> pParameters) {
@@ -58,10 +64,20 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	protected void init(Problem<M> pProblem, Map<String, Object> pParameters) {
 		episodes = 0;
 		steps = new ArrayList<Integer>();
+		problem = pProblem;
 		model = pProblem.getModel();
 		parameters = pParameters;
 
+		initializeActionValues();
 		initializeQTable(pParameters);
+	}
+
+	private void initializeActionValues() {
+		actionValues = new HashMap<Action, Double>();
+		double value = 1d / model.getActions().size();
+		for (final Action action : model.getActions()) {
+			actionValues.put(action, value);
+		}
 	}
 
 	protected void initializeQTable(Map<String, Object> pParameters) {
@@ -115,10 +131,10 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 			steps.add(currentSteps);
 			episodes++;
 			// Log.info("episodes: " + episodes + ". steps: " + steps);
-			
+
 			//Log.info("\nBest-Values: \n" + new GridPrinter().toGrid(model, getLastValues()));
 			//Log.info("\nCurr-Values: \n" + new GridPrinter().toGrid(model, getCurrentValues()));
-			
+
 		} while (!stoppingCriterium.isStop(this));
 
 		// Log.info("\nQTable: \n" + q.toString(model));
@@ -137,13 +153,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	}
 
 	protected Map<Action, Double> getActionValues(State pState) {
-		Map<Action, Double> map = new HashMap<Action, Double>();
-		double value = 1d / model.getActions().size();
-		for (final Action action : model.getActions()) {
-			map.put(action, value);
-		}
-
-		return map;
+		return actionValues;
 	}
 
 	protected Action getNextAction(State state) {
@@ -160,10 +170,6 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 
 	protected double getMax(State pState) {
 		Double max = null;
-
-		// Collection<Action> actions =
-		// model.getTransitionFunction().getActionsFrom(
-		// model.getStates(), model.getActions(), pState);
 		// search for the Q v for each state
 		for (Action action : model.getActions()) {
 			Double value = q.getValue(pState, action);
@@ -215,7 +221,9 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 
 	@Override
 	public Map<State, Double> getCurrentValues() {
-		return PolicyUtils.extractV(model, q.getPolicy(false));
+		Map<String, Object> map = CollectionsUtils.asMap(PolicyUtils.POLICY_STR, q.getPolicy(false)
+				.getBestPolicy());
+		return new PolicyEvaluation<>().run((Problem<MDP>) problem, map);
 		// return q.getStateValue();
 	}
 

@@ -3,6 +3,7 @@ package org.emast.model.test;
 import java.util.Collections;
 import java.util.Map;
 
+import org.emast.infra.log.Log;
 import org.emast.model.algorithm.iteration.ValueIteration;
 import org.emast.model.algorithm.iteration.rl.QLearning;
 import org.emast.model.algorithm.iteration.rl.ReinforcementLearning;
@@ -12,6 +13,7 @@ import org.emast.model.test.erg.AlgorithmTest;
 import org.emast.model.test.erg.ERGTest;
 import org.emast.util.CollectionsUtils;
 import org.emast.util.PolicyUtils;
+import org.emast.util.grid.GridPrinter;
 import org.emast.view.ui.cli.ProblemsCLI;
 
 /**
@@ -28,7 +30,7 @@ public class MainTest {
 		// ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\one");
 		// for (Problem<ERG> prob : ps) {
 
-		AlgorithmTest algTest = new ERGTest(QLearning.class);
+		AlgorithmTest algTest = new AlgorithmTest(QLearning.class);
 		Map<String, Object> params = createParamsMap();
 		runVI(prob, params);
 
@@ -44,8 +46,8 @@ public class MainTest {
 		Policy best = new ValueIteration().run(prob, Collections.emptyMap());
 		params.put(PolicyUtils.BEST_VALUES_STR, best.getBestPolicyValue());
 
-		// Log.info("\nV-Values VI: \n" + new
-		// GridPrinter().toGrid(prob.getModel(), best.getBestPolicyValue()));
+		 Log.info("\nV-Values VI: \n" + new
+		 GridPrinter().toGrid(prob.getModel(), best.getBestPolicyValue()));
 	}
 
 	private static Map<String, Object> createParamsMap() {

@@ -17,37 +17,38 @@ import org.emast.util.PolicyUtils;
  * @author andvicoso
  * 
  */
-public class PolicyEvaluation extends IterationAlgorithm<MDP, Map<State, Double>> {
+public class PolicyEvaluation<M extends MDP> extends IterationAlgorithm<M, Map<State, Double>> {
 
-	public Map<State, Double> run(Problem<MDP> pProblem, Map<String, Object> pParameters) {
+	private Map<State, Double> lastv;
+	private Map<State, Double> v;
+
+	public Map<State, Double> run(Problem<M> pProblem, Map<String, Object> pParameters) {
+		v = new HashMap<State, Double>();
+		model = pProblem.getModel();
+		initializeV(pProblem, v);
+
+		SinglePolicy pi = (SinglePolicy) pParameters.get(PolicyUtils.POLICY_STR);
 		MDP model = pProblem.getModel();
-		Map<State, Double> values;
-		Map<State, Double> lastv = new HashMap<State, Double>();
-		// initialize pi and values
-		for (final State state : model.getStates()) {
-			lastv.put(state, 0d);
-		}
-		final SinglePolicy pi = (SinglePolicy) pParameters.get(PolicyUtils.POLICY_STR);
 		double delta;
 		// Start the main loop
 		do {
 			delta = 0;
-			values = new HashMap<State, Double>();
+			lastv = v;
+			v = new HashMap<State, Double>();
 			// for each state
 			for (final State state : model.getStates()) {
 				Action action = pi.get(state);
-				double v = lastv.get(state);
-				double current = getValue(model, state, action, lastv);
-				double diff = Math.abs(v - current);
-				values.put(state, current);
+				double value = lastv.get(state);
+				double currentValue = getValue(model, state, action, lastv);
+				v.put(state, currentValue);
 
-				if (diff > delta)
-					delta = diff;
+				double diff = Math.abs(value - currentValue);
+				delta = Math.max(diff, delta);
 			}
-			lastv = values;
+
 			episodes++;
 		} while (delta > DefaultTestProperties.ERROR);
 
-		return values;
+		return v;
 	}
 }
