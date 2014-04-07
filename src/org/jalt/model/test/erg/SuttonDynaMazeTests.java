@@ -28,7 +28,7 @@ import static org.jalt.util.DefaultTestProperties.*;
  */
 public class SuttonDynaMazeTests {
 
-    public static Problem getERGFigure95Example() {
+    public static Problem<?> getERGFigure95Example() {
         int rows = 6;
         int cols = 9;
 

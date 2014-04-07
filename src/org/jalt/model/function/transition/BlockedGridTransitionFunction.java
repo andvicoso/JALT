@@ -52,6 +52,6 @@ public class BlockedGridTransitionFunction extends GridTransitionFunction {
 	}
 
 	private boolean isBlocked(State pState, State pFinalState, Action pAction) {
-		return blocked.contains(pFinalState);// || blocked.contains(pState);
+		return blocked.contains(pFinalState) || blocked.contains(pState);
 	}
 }

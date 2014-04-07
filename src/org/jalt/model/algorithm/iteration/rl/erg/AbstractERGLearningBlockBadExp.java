@@ -23,6 +23,7 @@ import org.jalt.model.problem.Problem;
 import org.jalt.model.propositional.Expression;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.state.State;
+import org.jalt.model.test.MainTest;
 import org.jalt.util.DefaultTestProperties;
 import org.jalt.util.erg.ERGLearningUtils;
 
@@ -45,6 +46,53 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 			int cols = gridModel.getCols();
 			model.setTransitionFunction(new BlockedGridTransitionFunction(rows, cols, blocked));
 		}// else//TODO:
+	}
+
+	@Override
+	public Policy run(Problem<ERG> prob, Map<String, Object> params) {
+		int iteration = 0;
+		ERG model = prob.getModel();
+		ERGQTable q;
+		Expression badExp;
+		Policy policy;
+		// initialize
+		initilize(model);
+		boolean valid = false;
+		// start main loop
+		do {
+			iteration++;
+			q = new ERGQTable(model.getStates(), model.getActions());
+			params.put(QTable.NAME, q);
+			// Log.info("\nITERATION " + iteration + ":");
+			// 1. RUN QLEARNING UNTIL A BAD REWARD EXPRESSION IS FOUND
+			policy = runLearning(prob, params);
+			// 2. GET BAD EXPRESSION FROM QLEARNING ITERATIONS
+			badExp = expFinder.chooseOne(q.getExpsValues());
+			// valid expression: not null and not empty
+			valid = isValid(badExp);
+			// 3. CHANGE THE Q VALUE FOR STATES THAT WERE VISITED IN
+			// QLEARNING EXPLORATION AND HAVE THE FOUND EXPRESSION
+			if (valid) {
+				Log.info("Found bad expression: " + badExp);
+				// avoid bad exp
+				avoid.add(badExp);
+				// Log.info("Avoid: " + avoid);
+				populateBlocked(model, badExp);
+				// run vi again->new environment to compare
+				MainTest.runVI(prob, params);
+			}
+		} while (valid);
+
+		if (!avoid.isEmpty()) {
+			policy = extractPolicyPPFERG(params, prob, model, q);
+		} else {
+			policy = q.getPolicy();
+		}
+
+		// Log.info("Preservation goal:" + model.getPreservationGoal());
+		// Log.info("\nQTable: \n" + q.toString(model));
+
+		return policy;
 	}
 
 	protected void populateBlocked(ERG model, Expression toBlock) {
@@ -77,56 +125,13 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 				DefaultTestProperties.DEFAULT_STOPON);
 	}
 
-	@Override
-	public Policy run(Problem<ERG> pProblem, Map<String, Object> pParameters) {
-		int iteration = 0;
-		Problem<ERG> prob = pProblem;
-		ERG model = prob.getModel();
-		ERGQTable q;
-		Expression badExp;
-		Policy policy;
-		// initialize
-		initilize(model);
-		// start main loop
-		do {
-			iteration++;
-			q = new ERGQTable(model.getStates(), model.getActions());
-			pParameters.put(QTable.NAME, q);
-			// Log.info("\nITERATION " + iteration + ":");
-			// 1. RUN QLEARNING UNTIL A BAD REWARD EXPRESSION IS FOUND
-			policy = runLearning(prob, pParameters);
-			// 2. GET BAD EXPRESSION FROM QLEARNING ITERATIONS
-			badExp = expFinder.chooseOne(q.getExpsValues());
-			// 3. CHANGE THE Q VALUE FOR STATES THAT WERE VISITED IN
-			// QLEARNING EXPLORATION AND HAVE THE FOUND EXPRESSION
-			if (isValid(badExp)) {
-				Log.info("Found bad expression: " + badExp);
-				// avoid bad exp
-				avoid.add(badExp);
-				// Log.info("Avoid: " + avoid);
-				populateBlocked(model, badExp);
-			}
-		} while (isValid(badExp));
-
-		if (!avoid.isEmpty()) {
-			policy = extractPolicyPPFERG(pParameters, prob, model, q);
-		} else {
-			policy = q.getPolicy();
-		}
-
-		// Log.info("Preservation goal:" + model.getPreservationGoal());
-		// Log.info("\nQTable: \n" + q.toString(model));
-
-		return policy;
-	}
-
-	protected Policy extractPolicyPPFERG(Map<String, Object> pParameters, Problem<ERG> prob,
+	protected Policy extractPolicyPPFERG(Map<String, Object> pParameters, Problem<ERG> pProb,
 			ERG model, ERGQTable q) {
 		Policy policy;
 		// 4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
 		model = ERGLearningUtils.createModel(model, q, avoid);
 		// create problem
-		prob = new Problem<ERG>(model, prob.getInitialStates(), prob.getFinalStates());
+		Problem<ERG> prob = new Problem<>(model, pProb.getInitialStates(), pProb.getFinalStates());
 		// q learning policy
 		// Log.info(prob.toString(policy));
 		// q learning policy - best (greater q values) actions

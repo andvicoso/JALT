@@ -51,7 +51,7 @@ public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp 
 			}
 		}
 
-		return policies.get(0);// TODO: ??
+		return policies.get(0);// TODO: not been used
 	}
 
 	protected void runThread(final Problem<ERG> pProblem, final Map<String, Object> pParameters,

@@ -3,16 +3,15 @@ package org.jalt.model.test;
 import java.util.Collections;
 import java.util.Map;
 
-import org.jalt.infra.log.Log;
 import org.jalt.model.algorithm.iteration.ValueIteration;
 import org.jalt.model.algorithm.iteration.rl.QLearning;
 import org.jalt.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.test.erg.AlgorithmTest;
+import org.jalt.model.test.erg.MultiERGTest;
 import org.jalt.util.CollectionsUtils;
 import org.jalt.util.PolicyUtils;
-import org.jalt.util.grid.GridPrinter;
 import org.jalt.view.ui.cli.ProblemsCLI;
 
 /**
@@ -24,12 +23,13 @@ public class MainTest {
 
 	public static void main(final String[] pArgs) {
 		// int count = 0;
-		Problem prob = ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\one").get(0);// ProblemIntroVI.getProblemIntroVI2();//AntennaExamples.getSMC13();
+		// new ProblemsCLI(GenericERGProblemFactory.createDefaultFactory(5)).run();
+		Problem prob = ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\two").get(0);// ProblemIntroVI.getProblemIntroVI2();//AntennaExamples.getSMC13();
 		// List<Problem<ERG>> ps =
 		// ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\one");
 		// for (Problem<ERG> prob : ps) {
 
-		AlgorithmTest algTest = new AlgorithmTest(QLearning.class);
+		AlgorithmTest algTest = new MultiERGTest(2,QLearning.class);
 		Map<String, Object> params = createParamsMap();
 		runVI(prob, params);
 
@@ -42,11 +42,14 @@ public class MainTest {
 	}
 
 	public static void runVI(Problem prob, Map<String, Object> params) {
+		//long ini = System.currentTimeMillis();
 		Policy best = new ValueIteration().run(prob, Collections.emptyMap());
+		//long end = System.currentTimeMillis();
+		//System.out.print(end - ini);
 		params.put(PolicyUtils.BEST_VALUES_STR, best.getBestPolicyValue());
 
-		 Log.info("\nV-Values VI: \n" + new
-		 GridPrinter().toGrid(prob.getModel(), best.getBestPolicyValue()));
+		// Log.info("\nV-Values VI: \n" + new
+		// GridPrinter().toGrid(prob.getModel(), best.getBestPolicyValue()));
 	}
 
 	private static Map<String, Object> createParamsMap() {

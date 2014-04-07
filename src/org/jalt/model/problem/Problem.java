@@ -27,6 +27,10 @@ public class Problem<M extends MDP> implements Serializable {
 		this(model, initialStates, Collections.<State> emptySet());
 	}
 
+	public Problem(Problem<M> pProb) {
+		this(pProb.getModel(), pProb.getInitialStates(), pProb.getFinalStates());
+	}
+
 	public Problem(M pModel, Map<Integer, State> pInitialStates, Set<State> pFinalStates) {
 		this.model = pModel;
 		this.initialStates = pInitialStates;
