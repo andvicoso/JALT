@@ -1,5 +1,6 @@
 package org.jalt.model.test;
 
+import java.awt.Toolkit;
 import java.util.Collections;
 import java.util.Map;
 
@@ -54,6 +55,8 @@ public class MainTest {
 		algTest = new MultiERGTest(5, DynaQ.class);
 		Test test = new Test(prob, algTest.createAlgorithmFactory());
 		test.run(params);
+
+		Toolkit.getDefaultToolkit().beep();
 		// }
 	}
 
@@ -69,7 +72,7 @@ public class MainTest {
 		// System.out.print(end - ini);
 		params.put(PolicyUtils.BEST_VALUES_STR, pi.getBestPolicyValue());
 
-		//ImageUtils.save(ImageUtils.create(prob, pi), "final_vi.png");
+		// ImageUtils.save(ImageUtils.create(prob, pi), "final_vi.png");
 
 		// Log.info("\nV-Values VI: \n" + new
 		// GridPrinter().toGrid(prob.getModel(), pi.getBestPolicyValue()));

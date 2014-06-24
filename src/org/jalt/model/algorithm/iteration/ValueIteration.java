@@ -66,8 +66,8 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy>
 		// Log.info("\n"+printResults());
 		// Log.info("\n" + pProblem.toString(pi.getBestPolicy()));
 
-		int size = (int) Math.sqrt(model.getStates().size());
-		Log.info("\n" + new GridPrinter().toTable(v, size, size));
+//		int size = (int) Math.sqrt(model.getStates().size());
+//		Log.info("\n" + new GridPrinter().toTable(v, size, size));
 
 		return pi;
 	}
