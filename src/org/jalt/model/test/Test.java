@@ -36,10 +36,12 @@ public class Test {
 	public void run(Map<String, Object> pParameters) {
 		printHeader();
 		createAndRun(pParameters);
+		print("End: " + Utils.now());
 	}
 
 	protected void printHeader() {
 		print("################################");
+		print("Start: " + Utils.now());
 		print("\nModel:");
 		print(problem.getModel().toString());
 		print("\nError: " + DefaultTestProperties.ERROR);
@@ -81,9 +83,9 @@ public class Test {
 		printNoInitialBreak(algorithm.printResults());
 		// if a solution was found...
 		if (result != null) {
-			//print("Result:" + problem.toString(result));
-			 SinglePolicy sp = ((Policy) result).getBestPolicy();
-			 print("Single Result:" + problem.toString(sp));
+			// print("Result:" + problem.toString(result));
+			SinglePolicy sp = ((Policy) result).getBestPolicy();
+			print("Single Result:" + problem.toString(sp));
 		}
 
 		return result;

@@ -1,19 +1,21 @@
 package org.jalt.model.test.erg.antenna;
 
-import java.util.Arrays;
+import static org.jalt.util.DefaultTestProperties.OTHERWISE;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.jalt.model.converter.ToRL;
 import org.jalt.model.function.PropositionFunction;
+import org.jalt.model.function.reward.RewardFunctionProposition;
 import org.jalt.model.model.ERG;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.propositional.Expression;
 import org.jalt.model.propositional.Proposition;
 import org.jalt.model.state.GridState;
 import org.jalt.model.state.State;
+import org.jalt.util.CollectionsUtils;
 import org.jalt.util.grid.distancemeasure.CityBlock;
 
 /**
@@ -21,8 +23,8 @@ import org.jalt.util.grid.distancemeasure.CityBlock;
  * @author andvicoso
  */
 public class AntennaExamples {
-	
-	private static final int BAD_REWARD = -30;
+
+	private static final double BAD_REWARD = -30;
 	private static final int ANTENNA_SIGNAL = 2;
 
 	public AntennaExamples() {
@@ -30,9 +32,9 @@ public class AntennaExamples {
 
 	public static Problem<ERG> getSMC13(Map<Integer, State> initialStates) {
 		final AntennaCoverageModel model = new AntennaCoverageModel(5, 5, initialStates.size());
-		//set a preservation goal different from the original
+		// set a preservation goal different from the original
 		model.setPreservationGoal(new Expression("coverage"));
-		
+
 		final Proposition hole = new Proposition("hole");
 		final Proposition stone = new Proposition("stone");
 		final Proposition water = new Proposition("water");
@@ -60,9 +62,9 @@ public class AntennaExamples {
 
 		final Set<State> finalStates = new HashSet<State>();
 		finalStates.add(new GridState(0, 4));
-
-		model.setRewardFunction(ToRL.convertRewardFunction(model, BAD_REWARD,
-				Arrays.asList(water, stone, hole)));
+		// set bad reward function
+		model.setRewardFunction(new RewardFunctionProposition(model, CollectionsUtils.createMap(
+				AntennaCoverageProblemFactory.getBadRewardObstacles(), BAD_REWARD), OTHERWISE));
 
 		return new Problem<ERG>(model, initialStates, finalStates);
 	}

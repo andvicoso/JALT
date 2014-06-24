@@ -61,6 +61,7 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 		// start main loop
 		do {
 			iteration++;
+			//CREATE AND SAVE Q-TABLE (SHARED BY ALL AGENTS)
 			q = new ERGQTable(model.getStates(), model.getActions());
 			params.put(QTable.NAME, q);
 			// Log.info("\nITERATION " + iteration + ":");

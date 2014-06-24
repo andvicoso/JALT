@@ -4,15 +4,15 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.jalt.model.algorithm.iteration.ValueIteration;
-import org.jalt.model.algorithm.iteration.rl.QLearning;
+import org.jalt.model.algorithm.iteration.rl.DynaQ;
 import org.jalt.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.test.erg.AlgorithmTest;
 import org.jalt.model.test.erg.MultiERGTest;
 import org.jalt.util.CollectionsUtils;
+import org.jalt.util.FileUtils;
 import org.jalt.util.PolicyUtils;
-import org.jalt.view.ui.cli.ProblemsCLI;
 
 /**
  * 
@@ -21,35 +21,58 @@ import org.jalt.view.ui.cli.ProblemsCLI;
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class MainTest {
 
-	public static void main(final String[] pArgs) {
-		// int count = 0;
-		// new ProblemsCLI(GenericERGProblemFactory.createDefaultFactory(5)).run();
-		Problem prob = ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\two").get(0);// ProblemIntroVI.getProblemIntroVI2();//AntennaExamples.getSMC13();
-		// List<Problem<ERG>> ps =
-		// ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\one");
-		// for (Problem<ERG> prob : ps) {
+	private static final String DEFAULT_PATH = "D:\\Dev\\Workspaces\\Projects\\Private\\JALT\\problems\\GenericERGProblem\\";
 
-		AlgorithmTest algTest = new MultiERGTest(2,QLearning.class);
+	public static void main(final String[] pArgs) {
 		Map<String, Object> params = createParamsMap();
+		String path;
+		Problem prob;
+		AlgorithmTest algTest;
+		// int count = 0;
+
+		// path = getPath("nov13\\five\\0_problem");
+		path = getPath("big\\50x25\\94_problem");
+
+		prob = FileUtils.fromFile(path);
+		// prob = new
+		// ProblemsCLI(GenericERGProblemFactory.createDefaultFactory(2,
+		// 10)).run();
+		// prob =
+		// ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\one").get(0);
+		// prob = ProblemIntroVI.getProblemIntroVI2();
+		// prob = AntennaExamples.getSMC13();
+
+		// for (Problem<ERG> prob :
+		// ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\one")) {
+
 		runVI(prob, params);
 
 		// Log.info("\n################################");
 		// Log.info("TEST RUN " + count++);
 
-		Test test = new BatchTest(prob, algTest.createAlgorithmFactory());
+		// algTest = new AlgorithmTest(QLearning.class);
+		algTest = new MultiERGTest(5, DynaQ.class);
+		Test test = new Test(prob, algTest.createAlgorithmFactory());
 		test.run(params);
 		// }
 	}
 
+	private static String getPath(String str) {
+		return DEFAULT_PATH + str + Problem.PROB_EXT;
+	}
+
 	public static void runVI(Problem prob, Map<String, Object> params) {
-		//long ini = System.currentTimeMillis();
-		Policy best = new ValueIteration().run(prob, Collections.emptyMap());
-		//long end = System.currentTimeMillis();
-		//System.out.print(end - ini);
-		params.put(PolicyUtils.BEST_VALUES_STR, best.getBestPolicyValue());
+		// long ini = System.currentTimeMillis();
+		ValueIteration vi = new ValueIteration();
+		Policy pi = vi.run(prob, Collections.emptyMap());
+		// long end = System.currentTimeMillis();
+		// System.out.print(end - ini);
+		params.put(PolicyUtils.BEST_VALUES_STR, pi.getBestPolicyValue());
+
+		//ImageUtils.save(ImageUtils.create(prob, pi), "final_vi.png");
 
 		// Log.info("\nV-Values VI: \n" + new
-		// GridPrinter().toGrid(prob.getModel(), best.getBestPolicyValue()));
+		// GridPrinter().toGrid(prob.getModel(), pi.getBestPolicyValue()));
 	}
 
 	private static Map<String, Object> createParamsMap() {

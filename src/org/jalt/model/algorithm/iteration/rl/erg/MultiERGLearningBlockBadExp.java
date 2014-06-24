@@ -13,11 +13,12 @@ import org.jalt.model.solution.Policy;
 import org.jalt.util.CalcUtils;
 
 /**
- * Learning + PPFERG + bloqueando a pior expressão de cada vez (com iteração)
+ * Learning + PPFERG + bloqueando a pior expressao de cada vez (com iteracao)
  */
-public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp implements MultiERGLearning {
+public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp implements
+		MultiERGLearning {
 
-	private static final int MAX_IT = 600;
+	private static final int MAX_IT = 5;
 	private List<ReinforcementLearning<ERG>> learnings;
 
 	public MultiERGLearningBlockBadExp(List<ReinforcementLearning<ERG>> learnings) {
@@ -42,8 +43,8 @@ public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp 
 
 		int it = 0;
 		while (policies.size() < learnings.size()) {
-			if (it++ > MAX_IT)
-				throw new RuntimeException("Tired of waiting thread/agent " + it + " to finish.");
+			if (it++ > pProblem.getModel().getStates().size() * MAX_IT)
+				throw new RuntimeException("Tired of waiting agent/thread " + it + " to finish.");
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -51,18 +52,19 @@ public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp 
 			}
 		}
 
-		return policies.get(0);// TODO: not been used
+		return policies.get(0);// not used (andvicoso)
 	}
 
 	protected void runThread(final Problem<ERG> pProblem, final Map<String, Object> pParameters,
-			final ReinforcementLearning<ERG> learning, final List<Policy> policies, final int i) {
+			final ReinforcementLearning<ERG> learning, final List<Policy> policies, final int agent) {
 
 		new Thread() {
 			@Override
 			public void run() {
 				// Log.info("Started thread " + i);
 				Map<String, Object> map = new HashMap<String, Object>(pParameters);
-				map.put(ReinforcementLearning.AGENT_NAME, i);
+				map.put(ReinforcementLearning.AGENT_NAME, agent);
+
 				Policy p = learning.run(pProblem, map);
 				synchronized (policies) {
 					policies.add(p);
@@ -80,9 +82,10 @@ public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp 
 	@Override
 	public String printResults() {
 		StringBuilder sb = new StringBuilder(super.printResults());
-
+		sb.append("\nLearning algorithm: ").append(learnings.get(0).getClass().getSimpleName());
+		int count = 0;
 		for (ReinforcementLearning<ERG> learning : learnings) {
-			sb.append("\nLearning algorithm: ").append(learning.getClass().getSimpleName());
+			sb.append("\nAgent: ").append(count++);
 			sb.append(learning.printResults());
 		}
 

@@ -11,9 +11,10 @@ import org.jalt.model.propositional.Proposition;
 import org.jalt.model.state.State;
 
 /**
- * 
+ * MUST BE ADDED TO THE MODEL AFTER PROPOSITION FUNCTION! 
  * @author andvicoso
  */
+
 public class RewardFunctionProposition<M extends ERG> extends DefaultRewardFunction<M, Proposition> {
 
 	public RewardFunctionProposition(M pModel, Map<Proposition, Double> pRewardValues,

@@ -74,28 +74,11 @@ public abstract class IterationAlgorithm<M extends MDP, R> implements Algorithm<
 		if (action != null) {
 			double reward = model.getRewardFunction().getValue(state, action);
 			double value = reward
-					+ (getGama() * getSum(model.getTransitionFunction(), model.getStates(), state,
-							action, v));
+					+ (getGama() * model.getTransitionFunction().getSum(model.getStates(), state, action, v));
 			return value;
 		}
 
 		return 0;
-	}
-
-	protected double getSum(TransitionFunction tf, Collection<State> states, State pState,
-			Action pAction, Map<State, Double> v) {
-		double sum = 0;
-
-		for (State finalState : states) {
-			Double trans = tf.getValue(pState, finalState, pAction);
-			sum += trans * getVValue(v, finalState);
-		}
-
-		return sum;
-	}
-
-	private double getVValue(Map<State, Double> v, State state) {
-		return v.isEmpty() || !v.containsKey(state) ? 0 : v.get(state);
 	}
 
 	protected void initializeV(Problem<M> pProblem, Map<State, Double> v) {

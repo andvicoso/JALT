@@ -1,9 +1,14 @@
 package org.jalt.model.function.transition;
 
+import static org.jalt.util.grid.GridUtils.STATES_CACHE;
+import static org.jalt.util.grid.GridUtils.east;
+import static org.jalt.util.grid.GridUtils.north;
+import static org.jalt.util.grid.GridUtils.south;
+import static org.jalt.util.grid.GridUtils.west;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.jalt.util.grid.GridUtils.*;
 
 import org.jalt.model.action.Action;
 import org.jalt.model.state.GridState;
@@ -55,6 +60,30 @@ public class GridTransitionFunction extends TransitionFunction {
 		}
 
 		return possibleMovs;
+	}
+
+	public Map<State, Double> getReachableStatesValues(final Collection<State> pModelStates,
+			final State pState, final Action pAction) {
+		Map<State, Action> possibleMovs = getTransitions(pState);
+		Map<State, Double> ret = new HashMap<State, Double>(possibleMovs.size());
+
+		for (State state : possibleMovs.keySet()) {
+			ret.put(state, getValue(pState, state, pAction));
+		}
+
+		return ret;
+	}
+	
+	public double getSum(Collection<State> states, State state, Action action, Map<State, Double> v) {
+		double sum = 0;
+		Map<State, Action> possibleMovs = getTransitions(state);
+
+		for (State finalState : possibleMovs.keySet()) {
+			Double trans = getValue(state, finalState, action);
+			sum += trans * getVValue(v, finalState);
+		}
+
+		return sum;
 	}
 
 	public State getNextState(GridState state, Action action) {

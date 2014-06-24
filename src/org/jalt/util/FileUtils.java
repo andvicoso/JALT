@@ -135,8 +135,7 @@ public class FileUtils {
 		return null;
 	}
 
-	public static boolean toFile(Problem<?> pProblem, String pFilename, boolean pUnique) {
-		boolean ret = true;
+	public static String toFile(Problem<?> pProblem, String pFilename, boolean pUnique) {
 		String path = pFilename;
 		String filename = getFilename(path);
 		String dirPath = getDir(path);
@@ -157,11 +156,11 @@ public class FileUtils {
 			writer.write();
 			Log.info("Problem saved to file: " + path);
 		} catch (IOException ex) {
-			ret = false;
+			path = null;
 			ex.printStackTrace();
 		}
 
-		return ret;
+		return path;
 	}
 
 	public static Problem<ERG> fromFile(String pFilename) {

@@ -1,5 +1,6 @@
 package org.jalt.util;
 
+import org.jalt.model.algorithm.stoppingcriterium.StopOnMaxDiffError;
 import org.jalt.model.algorithm.stoppingcriterium.StopOnRMSError;
 import org.jalt.model.algorithm.stoppingcriterium.StoppingCriterium;
 
@@ -30,7 +31,7 @@ public final class DefaultTestProperties {
 	public static final double EPSILON = 0.1;
 	public static final double GAMA = 0.9;
 
-	public static final double ERROR = 0.09;// 0.09(ERG) and 0.009(MDP)
+	public static final double ERROR = 0.009;// 0.09(ERG) and 0.009(MDP)
 
-	public static final StoppingCriterium DEFAULT_STOPON = new StopOnRMSError();//;
+	public static final StoppingCriterium DEFAULT_STOPON = new StopOnMaxDiffError();//new StopOnRMSError();
 }

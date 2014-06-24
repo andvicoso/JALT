@@ -24,6 +24,7 @@ public abstract class TransitionFunction implements Serializable {
 	public Map<State, Double> getReachableStatesValues(final Collection<State> pModelStates,
 			final State pState, final Action pAction) {
 		final Map<State, Double> map = new HashMap<State, Double>();
+
 		for (final State state : pModelStates) {
 			final double value = getValue(pState, state, pAction);
 			if (value > 0) {
@@ -54,6 +55,21 @@ public abstract class TransitionFunction implements Serializable {
 
 	public ValuedObjectChooser<State> getChooser() {
 		return chooser;
+	}
+
+	public double getSum(Collection<State> states, State state, Action action, Map<State, Double> v) {
+		double sum = 0;
+
+		for (State finalState : states) {
+			Double trans = getValue(state, finalState, action);
+			sum += trans * getVValue(v, finalState);
+		}
+
+		return sum;
+	}
+
+	protected double getVValue(Map<State, Double> v, State state) {
+		return v.isEmpty() || !v.containsKey(state) ? 0 : v.get(state);
 	}
 
 }

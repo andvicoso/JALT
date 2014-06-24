@@ -18,7 +18,7 @@ import org.jalt.util.grid.GridPrinter;
  */
 public class Problem<M extends MDP> implements Serializable {
 
-	private static final String PROB_EXT = ".jaltp";
+	public static final String PROB_EXT = ".jalt";
 	private Map<Integer, State> initialStates;
 	private Set<State> finalStates;
 	private M model;

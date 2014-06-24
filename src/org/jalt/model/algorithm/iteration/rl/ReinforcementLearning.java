@@ -214,7 +214,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<State, Double> getLastValues() {
-		return (Map<State, Double>) parameters.get(PolicyUtils.BEST_VALUES_STR);// lastq.getStateValue();
+		return  (Map<State, Double>) parameters.get(PolicyUtils.BEST_VALUES_STR);//lastq.getStateValue();//
 	}
 
 	@Override
@@ -222,7 +222,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 		Map<String, Object> map = CollectionsUtils.asMap(PolicyUtils.POLICY_STR, q.getPolicy(false)
 				.getBestPolicy());
 		return new PolicyEvaluation<>().run((Problem<MDP>) problem, map);
-		// return q.getStateValue();
+//		 return q.getStateValue();
 	}
 
 	public void setStoppingCriterium(StoppingCriterium stoppingCriterium) {

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jalt.infra.log.Log;
 import org.jalt.model.action.Action;
 import org.jalt.model.algorithm.PolicyGenerator;
 import org.jalt.model.algorithm.stoppingcriterium.StopOnMaxDiffError;
@@ -12,6 +13,7 @@ import org.jalt.model.model.MDP;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.state.State;
+import org.jalt.util.grid.GridPrinter;
 
 /**
  * Reinforcement Learning Survey 96 Kaelbling,Littman,Moore
@@ -29,8 +31,8 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy>
 	public Policy run(Problem<M> pProblem, Map<String, Object> pParameters) {
 		Policy pi;
 
-		v = new HashMap<State, Double>();
 		model = pProblem.getModel();
+		v = new HashMap<State, Double>(model.getStates().size());
 		initializeV(pProblem, v);
 		// Start the main loop
 		// When the maximmum error is greater than the defined error,
@@ -57,13 +59,15 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy>
 
 			episodes++;
 
-			// Log.info("\n" + new GridPrinter().toTable(v, 10, 10));
 			// Log.info("\n"+pProblem.toString(pi));
 		} while (!stoppingCriterium.isStop(this));
 
 		// Log.info("Iterations: " + episodes);
 		// Log.info("\n"+printResults());
 		// Log.info("\n" + pProblem.toString(pi.getBestPolicy()));
+
+		int size = (int) Math.sqrt(model.getStates().size());
+		Log.info("\n" + new GridPrinter().toTable(v, size, size));
 
 		return pi;
 	}

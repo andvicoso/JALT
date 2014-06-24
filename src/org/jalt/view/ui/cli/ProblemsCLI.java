@@ -1,5 +1,7 @@
 package org.jalt.view.ui.cli;
 
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +12,7 @@ import org.jalt.model.model.ERG;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.problem.ProblemFactory;
 import org.jalt.util.FileUtils;
+import org.jalt.util.ImageUtils;
 
 /**
  * 
@@ -17,11 +20,12 @@ import org.jalt.util.FileUtils;
  */
 public class ProblemsCLI {
 
+	private static final List<Command> COMMANDS = createCommands();
 	private static final String JALT = "jalt";
 	public static final String DEFAULT_SUFFIX = "problem." + JALT;
 	public static final String DEFAULT_DIR = "problems";
+
 	private final ProblemFactory factory;
-	private static final List<Command> COMMANDS = createCommands();
 
 	public ProblemsCLI(ProblemFactory pFactory) {
 		factory = pFactory;
@@ -33,7 +37,10 @@ public class ProblemsCLI {
 
 		out: do {
 			if (p != null) {
-				print("\nProblem: " + p.toString());
+				print("\nProblem: ");
+
+				if (p.getModel().getStates().size() <= 100)
+					print(p.toString());
 			}
 
 			print("console: ");
@@ -48,13 +55,18 @@ public class ProblemsCLI {
 					else
 						print("No problem selected!");
 				} else if (c.equals("s") && p != null) {
+					print("Saving current problem...");
 					save(p);
 				} else if (c.equals("h")) {
 					print("\n" + printMenu());
 				} else if (c.equals("l")) {
-					p = getLastExecuted();
+					print("Loading last saved problem...");
+					p = getLastModified();
 				} else if (c.equals("n")) {
+					print("Creating new problem...");
 					p = factory.create();
+					Toolkit.getDefaultToolkit().beep();
+					print("Done!");
 				} else if (c.equals("q")) {
 					p = null;
 					break out;
@@ -76,8 +88,7 @@ public class ProblemsCLI {
 		s.append("Menu:\n");
 
 		for (Command command : COMMANDS) {
-			s.append(String.format("%1$s: %2$s - %3$s\n", command.shortcut, command.name,
-					command.description));
+			s.append(command.toString());
 		}
 
 		return s.toString();
@@ -87,8 +98,15 @@ public class ProblemsCLI {
 		String modelName = p.getModel().getClass().getSimpleName();
 		String dir = DEFAULT_DIR + File.separator + modelName + File.separator;
 		String filename = dir + DEFAULT_SUFFIX;
+		String savedPath = FileUtils.toFile(p, filename, true);
 
-		return FileUtils.toFile(p, filename, true);
+		if (p.getModel().getStates().size() > 100) {
+			BufferedImage img = ImageUtils.create(p);
+
+			ImageUtils.save(img, filename + ".png");
+		}
+
+		return savedPath != null;
 	}
 
 	public static List<Problem<ERG>> getAllFromDir(String dir) {
@@ -102,21 +120,14 @@ public class ProblemsCLI {
 		return ps;
 	}
 
-	private Problem<?> getLastExecuted() {
+	private Problem<?> getLastModified() {
 		File last = FileUtils.getLastModified(DEFAULT_DIR + File.separator, JALT, 0l);
-		if (last != null)
+		if (last != null) {
 			print(last.toString());
+		}
 		return last != null ? FileUtils.fromFile(last.getAbsolutePath()) : null;
 	}
 
-	// private static Command getCommand(String shortcut) {
-	// for (Command command : COMMANDS) {
-	// if (command.shortcut.equals(shortcut)) {
-	// return command;
-	// }
-	// }
-	// return getCommand("m");
-	// }
 	private static List<Command> createCommands() {
 		List<Command> commands = new ArrayList<Command>();
 		commands.add(new Command("h", "help", "Show commands"));
@@ -152,6 +163,11 @@ public class ProblemsCLI {
 			this.shortcut = shortcut;
 			this.name = name;
 			this.description = description;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%1$s: %2$s - %3$s\n", shortcut, name, description);
 		}
 	}
 }

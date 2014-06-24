@@ -23,8 +23,8 @@ public class PolicyEvaluation<M extends MDP> extends IterationAlgorithm<M, Map<S
 	private Map<State, Double> v;
 
 	public Map<State, Double> run(Problem<M> pProblem, Map<String, Object> pParameters) {
-		v = new HashMap<State, Double>();
 		model = pProblem.getModel();
+		v = new HashMap<State, Double>(model.getStates().size());
 		initializeV(pProblem, v);
 
 		SinglePolicy pi = (SinglePolicy) pParameters.get(PolicyUtils.POLICY_STR);
