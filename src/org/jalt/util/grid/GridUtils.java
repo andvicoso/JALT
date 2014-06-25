@@ -16,7 +16,7 @@ import org.jalt.model.state.State;
 public class GridUtils {
 
 	private static final String GRID_STATE_SEP = "x";
-	public static final int GRID_MAX_SIZE = 200;//100;
+	public static final int GRID_MAX_SIZE = 1000;//100;
 	public static final String GRID_STATE_FORMAT_PREFFIX = "%0";
 	public static final String GRID_STATE_FORMAT_SUFFIX = "d";
 	public static final String ZERO = "0";

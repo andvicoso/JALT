@@ -72,9 +72,9 @@ public class ERGGridModelReader {
 									badProps.add(p);
 								}
 
-								if (!p.getName().equals(FINAL_GOAL)) {
+								//if (!p.getName().equals(FINAL_GOAL)) {
 									props.add(p);
-								}
+								//}
 							}
 						}
 					}

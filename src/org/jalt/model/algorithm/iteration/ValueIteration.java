@@ -13,6 +13,7 @@ import org.jalt.model.model.MDP;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.state.State;
+import org.jalt.util.ImageUtils;
 import org.jalt.util.grid.GridPrinter;
 
 /**
@@ -68,6 +69,8 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy>
 
 //		int size = (int) Math.sqrt(model.getStates().size());
 //		Log.info("\n" + new GridPrinter().toTable(v, size, size));
+//		
+//		ImageUtils.save(ImageUtils.createHeat(pProblem, v), "heat.png");
 
 		return pi;
 	}

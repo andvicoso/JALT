@@ -44,7 +44,8 @@ public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp 
 		int it = 0;
 		while (policies.size() < learnings.size()) {
 			if (it++ > pProblem.getModel().getStates().size() * MAX_IT)
-				throw new RuntimeException("Tired of waiting agent/thread " + it + " to finish.");
+				throw new RuntimeException("Tired of waiting agent/thread to finish. Secs: "
+						+ (it * 100 / 1000));
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {

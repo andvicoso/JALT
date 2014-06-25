@@ -93,7 +93,7 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 		// Log.info("Preservation goal:" + model.getPreservationGoal());
 		// Log.info("\nQTable: \n" + q.toString(model));
 
-		return policy;
+		return q.getPolicy();//policy;
 	}
 
 	protected void populateBlocked(ERG model, Expression toBlock) {
@@ -141,6 +141,7 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 		final PPFERG<ERG> ppferg = new PPFERG<ERG>();
 		// 6. GET THE VIABLE POLICIES FROM PPFERG EXECUTED OVER THE NEW
 		// MODEL
+		Log.info("Starting PPFERG...");
 		policy = ppferg.run(prob, pParameters);
 		// after ppferg
 		// Log.info(prob.toString(policy));

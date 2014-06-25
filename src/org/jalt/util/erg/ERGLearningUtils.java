@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.jalt.model.action.Action;
 import org.jalt.model.algorithm.table.erg.ERGQTable;
-import org.jalt.model.function.PropositionFunction;
 import org.jalt.model.model.ERG;
 import org.jalt.model.propositional.Expression;
 import org.jalt.model.propositional.Proposition;
@@ -26,13 +25,13 @@ public class ERGLearningUtils {
 		ERG model = ModelUtils.createModel(oldModel, q);
 		model.setGoal(oldModel.getGoal());
 		// GET THE SET OF PROPOSITIONS FROM EXPLORATED STATES
-		model.setPropositions(getPropositions(q.getExpsValues()));
+		model.setPropositions(oldModel.getPropositions());
 		// CREATE NEW PRESERVATION GOAL FROM EXPRESSIONS THAT SHOULD BE AVOIDED
 		Expression newPreservGoal = createNewPreservationGoal(oldModel.getPreservationGoal(), avoid);
 		model.setPreservationGoal(newPreservGoal);
-		// CREATE NEW PROPOSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
-		PropositionFunction pf = ERGFactory.createPropositionFunction(q);
-		model.setPropositionFunction(pf);
+		// CREATE NEW PROPOSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE) AND PREVIOUS(BLOCKED)
+		//PropositionFunction pf = //ERGFactory.createPropositionFunction(model, q, oldModel.getPropositionFunction());
+		model.setPropositionFunction(oldModel.getPropositionFunction());
 
 		return model;
 	}

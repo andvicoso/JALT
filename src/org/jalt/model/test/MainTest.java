@@ -1,11 +1,12 @@
 package org.jalt.model.test;
 
 import java.awt.Toolkit;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
 import org.jalt.model.algorithm.iteration.ValueIteration;
-import org.jalt.model.algorithm.iteration.rl.DynaQ;
+import org.jalt.model.algorithm.iteration.rl.QLearning;
 import org.jalt.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
@@ -13,6 +14,7 @@ import org.jalt.model.test.erg.AlgorithmTest;
 import org.jalt.model.test.erg.MultiERGTest;
 import org.jalt.util.CollectionsUtils;
 import org.jalt.util.FileUtils;
+import org.jalt.util.ImageUtils;
 import org.jalt.util.PolicyUtils;
 
 /**
@@ -22,46 +24,52 @@ import org.jalt.util.PolicyUtils;
 @SuppressWarnings(value = { "rawtypes", "unchecked" })
 public class MainTest {
 
-	private static final String DEFAULT_PATH = "D:\\Dev\\Workspaces\\Projects\\Private\\JALT\\problems\\GenericERGProblem\\";
+	private static final String DEFAULT_PATH = "D:\\Dev\\Workspaces\\Projects\\Private\\JALT\\problems\\GenericERGGridModel\\";
+	private static final String RESULT_EXT = ".txt";
 
-	public static void main(final String[] pArgs) {
-		Map<String, Object> params = createParamsMap();
-		String path;
+	public static void main(final String[] pArgs) throws IOException {
+		String file;
 		Problem prob;
 		AlgorithmTest algTest;
 		// int count = 0;
 
-		// path = getPath("nov13\\five\\0_problem");
-		path = getPath("big\\50x25\\94_problem");
+		file = "big\\100_problem";
+		// file = "nov13\\five\\0_problem";
 
-		prob = FileUtils.fromFile(path);
+		prob = FileUtils.fromFile(getProblemPath(file));
+
 		// prob = new
-		// ProblemsCLI(GenericERGProblemFactory.createDefaultFactory(2,
-		// 10)).run();
-		// prob =
-		// ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\one").get(0);
-		// prob = ProblemIntroVI.getProblemIntroVI2();
+		// ProblemsCLI(GenericERGProblemFactory.createDefaultFactory(100,
+		// 1000)).run();
 		// prob = AntennaExamples.getSMC13();
 
 		// for (Problem<ERG> prob :
-		// ProblemsCLI.getAllFromDir("GenericERGProblem\\nov13\\one")) {
+		// ProblemsCLI.getAllFromDir("GenericERGGridModel\\big")) {
 
+		//ImageUtils.save(ImageUtils.create(prob, null), "50.png");
+
+		Map<String, Object> params = createParamsMap();
 		runVI(prob, params);
 
 		// Log.info("\n################################");
 		// Log.info("TEST RUN " + count++);
 
 		// algTest = new AlgorithmTest(QLearning.class);
-		algTest = new MultiERGTest(5, DynaQ.class);
-		Test test = new Test(prob, algTest.createAlgorithmFactory());
+		algTest = new MultiERGTest(10, QLearning.class);
+		Test test = new BatchTest(prob, algTest.createAlgorithmFactory(), getResultPath(QLearning.class,
+				file));
 		test.run(params);
 
 		Toolkit.getDefaultToolkit().beep();
 		// }
 	}
 
-	private static String getPath(String str) {
+	private static String getProblemPath(String str) {
 		return DEFAULT_PATH + str + Problem.PROB_EXT;
+	}
+
+	private static String getResultPath(Class clazz, String str) {
+		return DEFAULT_PATH + str + clazz.getSimpleName() + RESULT_EXT;
 	}
 
 	public static void runVI(Problem prob, Map<String, Object> params) {

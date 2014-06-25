@@ -5,6 +5,7 @@ import java.util.Map;
 import org.jalt.model.action.Action;
 import org.jalt.model.model.MDP;
 import org.jalt.model.state.State;
+import org.jalt.util.DefaultTestProperties;
 
 /**
  * 
@@ -21,15 +22,13 @@ public class RewardFunctionState<M extends MDP> extends DefaultRewardFunction<M,
 						getModel().getStates(), state, action);
 				if (pRewardValues.containsKey(nextState)) {
 					table.put(state, action, pRewardValues.get(nextState));
+				} else if (state.equals(nextState)) {
+					table.put(state, action, DefaultTestProperties.BAD_REWARD);
+				} else {
+					table.put(state, action, getOtherwiseValue());
 				}
 			}
 		}
 
-	}
-
-	@Override
-	public double getValue(final State pState, final Action pAction) {
-		Double value = table.get(pState, pAction);
-		return value != null ? value : getOtherwiseValue();
 	}
 }

@@ -3,15 +3,16 @@ package org.jalt.model.function.reward;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.jalt.model.action.Action;
 import org.jalt.model.algorithm.table.DoubleTable;
 import org.jalt.model.model.MDP;
+import org.jalt.model.state.State;
 
 /**
  * 
  * @author andvicoso
  */
-public abstract class DefaultRewardFunction<M extends MDP, C> implements RewardFunction,
-		Serializable {
+public class DefaultRewardFunction<M extends MDP, C> implements RewardFunction, Serializable {
 	protected DoubleTable table;
 	private final M model;
 	private final Map<C, Double> rewards;
@@ -34,6 +35,11 @@ public abstract class DefaultRewardFunction<M extends MDP, C> implements RewardF
 
 	public M getModel() {
 		return model;
+	}
+
+	@Override
+	public double getValue(final State pState, final Action pAction) {
+		return table.get(pState, pAction);
 	}
 
 	@Override

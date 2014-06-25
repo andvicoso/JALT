@@ -103,7 +103,7 @@ public class ProblemsCLI {
 		if (p.getModel().getStates().size() > 100) {
 			BufferedImage img = ImageUtils.create(p);
 
-			ImageUtils.save(img, filename + ".png");
+			ImageUtils.save(img, savedPath + ".png");
 		}
 
 		return savedPath != null;

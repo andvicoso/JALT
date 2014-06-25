@@ -21,7 +21,7 @@ import org.jalt.util.CollectionsUtils;
 public class GenericERGGridModel extends ERGGridModel {
 	private static final char FIRST_PROP = 'a';
 	public static final double CHANCE_OF_HAVING_PROP = 0.25;
-	private State finalState;
+	private Set<State> finalStates;
 
 	public GenericERGGridModel(final int pRows, final int pCols, final int pAgents,
 			final int pPropositions, final int pObstacles, final double pBadReward,
@@ -42,8 +42,9 @@ public class GenericERGGridModel extends ERGGridModel {
 		setGoal(new Expression(finalProp));
 		// put final goal over the grid in a state that doesn`t have a bad
 		// rewarder
-		finalState = findFinalState(pf);
-		pf.add(finalState, finalProp);
+		finalStates = findFinalStates(pf, pAgents);// TODO: number of agents == number of final states
+
+		pf.add(finalStates, finalProp);
 		// add bad reward to bad prop
 		Map<Proposition, Double> rws = CollectionsUtils.createMap(badRewarders, pBadReward);
 		// add good reward to final prop
@@ -59,24 +60,20 @@ public class GenericERGGridModel extends ERGGridModel {
 		setRewardFunction(rf);
 	}
 
-	public State getFinalState() {
-		return finalState;
+	public Set<State> getFinalStates() {
+		return finalStates;
 	}
 
-	public void setFinalState(State finalState) {
-		this.finalState = finalState;
-	}
-
-	private State findFinalState(final PropositionFunction pf) {
-		State finalState;
+	private Set<State> findFinalStates(PropositionFunction pf, int size) {
+		Set<State> states = new HashSet<State>(size);
 		do {
-			finalState = CollectionsUtils.getRandom(getStates());
+			State finalState = CollectionsUtils.getRandom(getStates());
 			Set<Proposition> propsState = pf.getPropositionsForState(finalState);
 			if ((propsState != null && !hasBadProp(propsState)) || propsState == null) {
-				break;
+				states.add(finalState);
 			}
-		} while (true);
-		return finalState;
+		} while (states.size() < size);
+		return states;
 	}
 
 	private void fillPropsAndBadRewarders(final int pPropositions, final int pObstacles,
@@ -134,4 +131,5 @@ public class GenericERGGridModel extends ERGGridModel {
 		}
 		return false;
 	}
+
 }

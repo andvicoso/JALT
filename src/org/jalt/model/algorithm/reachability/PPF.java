@@ -129,8 +129,8 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 	}
 
 	/**
-	 * Para todas as transições da imagem forte, corta todas que não
-	 * pertençam ao conjunto da cobertura
+	 * Para todas as transicoes da imagem forte, corta todas que nao
+	 * pertencam ao conjunto da cobertura
 	 * 
 	 * @param pStrongImage
 	 * @param pC
@@ -169,7 +169,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 	}
 
 	/**
-	 * Retorna as transições que alcançam o conjunto da cobertura
+	 * Retorna as transicoes que alcancam o conjunto da cobertura
 	 * 
 	 * @param pC
 	 * @return
@@ -221,7 +221,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 		// search for the Qs values for state
 		for (final Action action : getActions(pPrune, state)) {
 			double sum = 0;
-			for (final State reachableState : model.getStates()) {
+			for (final State reachableState : model.getTransitionFunction().getReachableStates(model.getStates(),state, action)) {
 				final double trans = tf.getValue(state, reachableState, action);
 				if (trans > 0 && pValues.get(reachableState) != null) {
 					sum += trans * pValues.get(reachableState);

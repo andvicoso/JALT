@@ -8,7 +8,6 @@ import org.jalt.model.model.MDP;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.SinglePolicy;
 import org.jalt.model.state.State;
-import org.jalt.util.DefaultTestProperties;
 import org.jalt.util.PolicyUtils;
 
 /**
@@ -38,16 +37,19 @@ public class PolicyEvaluation<M extends MDP> extends IterationAlgorithm<M, Map<S
 			// for each state
 			for (final State state : model.getStates()) {
 				Action action = pi.get(state);
-				double value = lastv.get(state);
-				double currentValue = getValue(model, state, action, lastv);
-				v.put(state, currentValue);
-
-				double diff = Math.abs(value - currentValue);
-				delta = Math.max(diff, delta);
+				if (action != null) {
+					double value = lastv.get(state);
+					Double currentValue = getValue(model, state, action, lastv);
+					if (currentValue != null) {
+						v.put(state, currentValue);
+						double diff = Math.abs(value - currentValue);
+						delta = Math.max(diff, delta);
+					}
+				}
 			}
 
 			episodes++;
-		} while (delta > DefaultTestProperties.ERROR);
+		} while (delta > 0.009);
 
 		return v;
 	}

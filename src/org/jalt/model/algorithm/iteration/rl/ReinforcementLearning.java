@@ -130,8 +130,10 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 			episodes++;
 			// Log.info("episodes: " + episodes + ". steps: " + steps);
 
-			//Log.info("\nBest-Values: \n" + new GridPrinter().toGrid(model, getLastValues()));
-			//Log.info("\nCurr-Values: \n" + new GridPrinter().toGrid(model, getCurrentValues()));
+			// Log.info("\nBest-Values: \n" + new GridPrinter().toGrid(model,
+			// getLastValues()));
+			// Log.info("\nCurr-Values: \n" + new GridPrinter().toGrid(model,
+			// getCurrentValues()));
 
 		} while (!stoppingCriterium.isStop(this));
 
@@ -214,15 +216,15 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<State, Double> getLastValues() {
-		return  (Map<State, Double>) parameters.get(PolicyUtils.BEST_VALUES_STR);//lastq.getStateValue();//
+		return (Map<State, Double>) parameters.get(PolicyUtils.BEST_VALUES_STR);// lastq.getStateValue();//
 	}
 
 	@Override
 	public Map<State, Double> getCurrentValues() {
 		Map<String, Object> map = CollectionsUtils.asMap(PolicyUtils.POLICY_STR, q.getPolicy(false)
 				.getBestPolicy());
-		return new PolicyEvaluation<>().run((Problem<MDP>) problem, map);
-//		 return q.getStateValue();
+		return new PolicyEvaluation<M>().run(problem, map);
+		// return q.getStateValue();
 	}
 
 	public void setStoppingCriterium(StoppingCriterium stoppingCriterium) {

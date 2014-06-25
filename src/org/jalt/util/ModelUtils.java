@@ -8,6 +8,7 @@ import org.jalt.model.action.Action;
 import org.jalt.model.algorithm.table.QTable;
 import org.jalt.model.algorithm.table.QTableItem;
 import org.jalt.model.function.reward.RewardFunction;
+import org.jalt.model.function.transition.GridTransitionFunction;
 import org.jalt.model.function.transition.TransitionFunction;
 import org.jalt.model.model.ERG;
 import org.jalt.model.model.Grid;
@@ -47,23 +48,36 @@ public class ModelUtils {
 	}
 
 	public static <QT extends QTable<? extends QTableItem>> TransitionFunction createTransitionFunctionFrequency(
-			final QT q) {
-		TransitionFunction tf = new TransitionFunction() {
-			@Override
-			public double getValue(State pState, State pFinalState, Action pAction) {
-				QTableItem item = q.get(pState, pAction);
-				if (item != null) {
-					State fstate = item.getFinalState();
-					if (State.isValid(pFinalState, fstate)) {
-						double total = q.getTotal(pState);
-						return total != 0 ? item.getFrequency() / total : 0;
-					}
-				}
-				return 0d;
-			}
-		};
+			final QT q, MDP model) {
 
-		return tf;
+		if (model instanceof GridModel) {
+			GridModel g = (GridModel) model;
+			return new GridTransitionFunction(g.getRows(), g.getCols()) {
+				@Override
+				public double getValue(State pState, State pFinalState, Action pAction) {
+					return getValueFrequency(q, pState, pFinalState, pAction);
+				}
+			};
+		} else
+			return new TransitionFunction() {
+				@Override
+				public double getValue(State pState, State pFinalState, Action pAction) {
+					return getValueFrequency(q, pState, pFinalState, pAction);
+				}
+			};
+	}
+
+	private static <QT extends QTable<? extends QTableItem>> double getValueFrequency(final QT q,
+			State pState, State pFinalState, Action pAction) {
+		QTableItem item = q.get(pState, pAction);
+		if (item != null) {
+			State fstate = item.getFinalState();
+			if (State.isValid(pFinalState, fstate)) {
+				double total = q.getTotal(pState);
+				return total != 0 ? item.getFrequency() / total : 0;
+			}
+		}
+		return 0d;
 	}
 
 	public static <QT extends QTable<? extends QTableItem>> RewardFunction createRewardFunction(
@@ -82,13 +96,13 @@ public class ModelUtils {
 		if (oldModel instanceof ERG) {
 			if (oldModel instanceof Grid) {
 				ret = new ERGGridModel(((Grid) oldModel).getRows(), ((Grid) oldModel).getCols());
-			}
-			ret = new ERGModel();
+			} else
+				ret = new ERGModel();
 		} else {
 			if (oldModel instanceof Grid) {
 				ret = new GridModel(((Grid) oldModel).getRows(), ((Grid) oldModel).getCols());
-			}
-			ret = new MDPModel();
+			} else
+				ret = new MDPModel();
 		}
 		return (M) ret;
 	}
@@ -105,7 +119,7 @@ public class ModelUtils {
 		RewardFunction rf = createRewardFunction(q);
 		model.setRewardFunction(rf);
 		// CREATE NEW TRANSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
-		TransitionFunction tf = createTransitionFunctionFrequency(q);
+		TransitionFunction tf = createTransitionFunctionFrequency(q, model);
 		model.setTransitionFunction(tf);
 
 		// Log.info("\nTransition Function\n" + new GridPrinter().print(tf,

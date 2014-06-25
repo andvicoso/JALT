@@ -1,5 +1,6 @@
 package org.jalt.model.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +23,12 @@ import org.jalt.util.Utils;
 @SuppressWarnings("rawtypes")
 public class BatchTest extends Test {
 
-	private static final int MAX_ITERATIONS = 10;
+	private static final int MAX_ITERATIONS = 3;// 10
+
+	public BatchTest(Problem pProblem, AlgorithmFactory pFactory, String filename)
+			throws IOException {
+		super(pProblem, pFactory, filename);
+	}
 
 	public BatchTest(Problem pProblem, AlgorithmFactory pFactory) {
 		super(pProblem, pFactory);
@@ -61,12 +67,15 @@ public class BatchTest extends Test {
 					storeExecutionMeans(rl, episodes, steps);
 				}
 			}
+			print("");
+
+			flush();
 		}
 
 		double meanEps = CalcUtils.getMean(episodes);
 		double meanSteps = CalcUtils.getMean(steps);
 
-		print("Repetitions: " + MAX_ITERATIONS);
+		print("Total Repetitions: " + MAX_ITERATIONS);
 		print("Means: ");
 		print("-Time: " + Utils.toTimeString(timeSum / MAX_ITERATIONS));
 		print("-Episodes: " + meanEps);
@@ -79,6 +88,7 @@ public class BatchTest extends Test {
 		// if (result != null) {
 		// print("Result:" + problem.toString(result));
 		// }
+		flush();
 	}
 
 	protected void storeExecutionMeans(ReinforcementLearning rl, Collection<Integer> episodes,

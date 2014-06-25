@@ -9,9 +9,11 @@ import org.jalt.model.function.transition.TransitionFunction;
 import org.jalt.model.model.ERG;
 import org.jalt.model.propositional.Proposition;
 import org.jalt.model.state.State;
+import org.jalt.util.DefaultTestProperties;
 
 /**
- * MUST BE ADDED TO THE MODEL AFTER PROPOSITION FUNCTION! 
+ * MUST BE ADDED TO THE MODEL AFTER PROPOSITION FUNCTION!
+ * 
  * @author andvicoso
  */
 
@@ -28,20 +30,19 @@ public class RewardFunctionProposition<M extends ERG> extends DefaultRewardFunct
 			for (Action action : pModel.getActions()) {
 				State nextState = tf.getNextState(getModel().getStates(), state, action);
 				Set<Proposition> props = pf.getPropositionsForState(nextState);
-				if (props != null)
+
+				if (props != null) {
 					for (Proposition condition : props) {
 						if (pRewardValues.containsKey(condition)) {
 							table.put(state, action, pRewardValues.get(condition));
 							break;
 						}
 					}
+				} else if (state.equals(nextState)) {
+					table.put(state, action, DefaultTestProperties.BAD_REWARD);
+				} else
+					table.put(state, action, getOtherwiseValue());
 			}
 		}
-	}
-
-	@Override
-	public double getValue(final State pState, final Action pAction) {
-		Double value = table.get(pState, pAction);
-		return value != null ? value : getOtherwiseValue();
 	}
 }

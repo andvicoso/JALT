@@ -1,11 +1,10 @@
 package org.jalt.model.test.erg.generic;
 
-import static org.jalt.util.DefaultTestProperties.GOOD_REWARD;
 import static org.jalt.util.DefaultTestProperties.BAD_REWARD;
+import static org.jalt.util.DefaultTestProperties.GOOD_REWARD;
 import static org.jalt.util.DefaultTestProperties.OTHERWISE;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -65,23 +64,22 @@ public class GenericERGProblemFactory extends ProblemFactory {
 		final GenericERGGridModel model = new GenericERGGridModel(rows, cols, agents,
 				numberOfPropositions, numberOfBadProps, badReward, goodReward, otherwiseReward);
 		final PropositionFunction pf = model.getPropositionFunction();
-		State finalState = model.getFinalState();
+		Set<State> finalStates = model.getFinalStates();
 		// create initial states
-		final List<State> initStates = findInitialStates(model, agents, pf, finalState);
+		List<State> initStates = findInitialStates(model, agents, pf, finalStates);
 
-		return new Problem<ERG>(model, CollectionsUtils.asIndexMap(initStates),
-				Collections.singleton(finalState));
+		return new Problem<ERG>(model, CollectionsUtils.asIndexMap(initStates), finalStates);
 	}
 
 	private List<State> findInitialStates(GenericERGGridModel model, int agents,
-			PropositionFunction pf, State finalState) {
+			PropositionFunction pf, Set<State> finalStates) {
 		List<State> initialStates = new ArrayList<State>();
 		for (int i = 0; i < agents; i++) {
 			State state;
 			do {
 				state = CollectionsUtils.getRandom(model.getStates());
 				Set<Proposition> propsState = pf.getPropositionsForState(state);
-				if (!state.equals(finalState)
+				if (!finalStates.contains(state)
 						&& ((propsState != null && !GenericERGGridModel.hasBadProp(propsState)) || propsState == null)) {
 					break;
 				}
@@ -91,5 +89,4 @@ public class GenericERGProblemFactory extends ProblemFactory {
 		return initialStates;
 	}
 
-	
 }

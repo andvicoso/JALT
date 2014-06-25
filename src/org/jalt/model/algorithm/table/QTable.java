@@ -12,7 +12,6 @@ import org.jalt.model.solution.Policy;
 import org.jalt.model.solution.SinglePolicy;
 import org.jalt.model.state.State;
 import org.jalt.util.grid.GridPrinter;
-import org.jalt.util.grid.GridUtils;
 
 /**
  * 
@@ -125,22 +124,26 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		return table;
 	}
 
-	public String[][] getFrequencyTableModel() {
-		String[][] table = new String[getStates().size()][getStates().size()];
-		table[0][0] = getTitle();
-
+	public Map<State, Double> getFrequencyValues() {
+		Map<State, Double> freq = new HashMap<State, Double>(getStates().size());
 		for (State state : getStates()) {
-			int i = GridUtils.getRow(state);
-			int j = GridUtils.getCol(state);
-			String str = "";
 			for (Action action : getActions()) {
-				str += "" + action.getName().charAt(0) + get(state, action).getFrequency() + " ";
-			}
+				QTableItem item = get(state, action);
 
-			table[i][j] = str;
+				if (item.getFinalState() != null) {
+
+					Double f = freq.get(state);
+					Double totalf = f == null ? 0 : f;
+
+					f = item.getFrequency() * 1d;
+					totalf += f == null ? 0 : f;
+
+					freq.put(item.getFinalState(), totalf);
+				}
+			}
 		}
 
-		return table;
+		return freq;
 	}
 
 	public SinglePolicy getSimplePolicy() {

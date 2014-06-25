@@ -18,6 +18,7 @@ import org.jalt.util.grid.GridPrinter;
  */
 public class Problem<M extends MDP> implements Serializable {
 
+	public static final int MAX_SIZE_PRINT = 500;
 	public static final String PROB_EXT = ".jalt";
 	private Map<Integer, State> initialStates;
 	private Set<State> finalStates;
@@ -59,7 +60,7 @@ public class Problem<M extends MDP> implements Serializable {
 			sb.append("\nFinal states: ").append(finalStates);
 		}
 
-		if (model instanceof GridModel) {
+		if (model instanceof GridModel && model.getStates().size() < MAX_SIZE_PRINT) {
 			sb.append("\nEnvironment: ");
 			final GridPrinter gridPrinter = new GridPrinter();
 			final String grid = gridPrinter.print((GridModel) model, initialStates, finalStates,

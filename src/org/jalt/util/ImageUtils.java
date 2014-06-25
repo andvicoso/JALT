@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -29,6 +30,51 @@ import org.jalt.model.test.erg.generic.GenericERGGridModel;
 public class ImageUtils {
 	private static final String PNG = "PNG";
 	private static int MULT = 40;
+
+	public static BufferedImage createHeat(Problem<? extends MDP> problem, Map<State, Double> values) {
+		MDP model = problem.getModel();
+		int size = (int) Math.sqrt(model.getStates().size());
+		BufferedImage image = createImage(size);
+		Graphics2D g = (Graphics2D) image.getGraphics();
+		// fill white background
+		fillBackground(g, size);
+		// paint the states values -> yellow
+		if (values != null) {
+			paintStateValues(model, values, g);
+		}
+		// paint propositions(good and bad)
+		if (model instanceof ERG) {
+			paintPropositions(model, g);
+		}
+		// initial states -> green
+		paintStates(problem.getInitialStates().values(), g, Color.GREEN);
+		// draw grid lines
+		drawLines(g, size);
+
+		return image;
+	}
+
+	private static void paintStateValues(MDP model, Map<State, Double> values, Graphics2D g) {
+		Double max = -Double.MAX_VALUE;
+		for (State state : values.keySet()) {
+			Double v = values.get(state);
+			if (v != null && v > max)
+				max = v;
+		}
+
+		for (State state : values.keySet()) {
+			if (state instanceof GridState) {
+				GridState s = (GridState) state;
+				Double v = values.get(state);
+
+				if (v != null && v > 0) {
+					Color c = new Color(255, 255, 255 - (int) (v * 255 / max));
+
+					paintState(g, s.getCol(), s.getRow(), c);
+				}
+			}
+		}
+	}
 
 	public static BufferedImage create(Problem<? extends MDP> problem, Policy pi) {
 		MDP model = problem.getModel();
@@ -75,8 +121,8 @@ public class ImageUtils {
 		try {
 			Collection<State> goalStates = erg.getPropositionFunction().intension(erg.getStates(),
 					erg.getPropositions(), erg.getGoal());
-			// goal states -> yellow
-			paintStates(goalStates, g, Color.YELLOW);
+			// goal states -> orange
+			paintStates(goalStates, g, Color.MAGENTA);
 		} catch (InvalidExpressionException e) {
 		}
 	}
@@ -116,7 +162,7 @@ public class ImageUtils {
 		for (State state : states) {
 			if (state instanceof GridState) {
 				GridState s = (GridState) state;
-				drawState(g, s.getCol(), s.getRow(), color);
+				paintState(g, s.getCol(), s.getRow(), color);
 			}
 		}
 	}
@@ -137,7 +183,7 @@ public class ImageUtils {
 		}
 	}
 
-	private static void drawState(Graphics2D g, int x, int y, Color color) {
+	private static void paintState(Graphics2D g, int x, int y, Color color) {
 		g.setColor(color);
 		g.fillRect(x * MULT, y * MULT, MULT, MULT);
 		g.setColor(Color.BLACK);

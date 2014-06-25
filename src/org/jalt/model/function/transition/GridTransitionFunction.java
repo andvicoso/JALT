@@ -68,20 +68,23 @@ public class GridTransitionFunction extends TransitionFunction {
 		Map<State, Double> ret = new HashMap<State, Double>(possibleMovs.size());
 
 		for (State state : possibleMovs.keySet()) {
-			ret.put(state, getValue(pState, state, pAction));
+			double v = getValue(pState, state, pAction);
+			if (v > 0)
+				ret.put(state, v);
 		}
 
 		return ret;
 	}
-	
+
 	public double getSum(Collection<State> states, State state, Action action, Map<State, Double> v) {
 		double sum = 0;
 		Map<State, Action> possibleMovs = getTransitions(state);
 
-		for (State finalState : possibleMovs.keySet()) {
-			Double trans = getValue(state, finalState, action);
-			sum += trans * getVValue(v, finalState);
-		}
+		if (possibleMovs.values().contains(action))
+			for (State finalState : possibleMovs.keySet()) {
+				Double trans = getValue(state, finalState, action);
+				sum += trans * getVValue(v, finalState);
+			}
 
 		return sum;
 	}

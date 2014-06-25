@@ -64,13 +64,14 @@ public abstract class IterationAlgorithm<M extends MDP, R> implements Algorithm<
 		// search in all actions and discover if it is possible
 		// or not through the transition function
 		for (Action action : actions) {
-			double value = getValue(model, state, action, v);
-			q.put(action, value);
+			Double value = getValue(model, state, action, v);
+			if (value != null)
+				q.put(action, value);
 		}
 		return q;
 	}
 
-	protected double getValue(MDP model, State state, Action action, Map<State, Double> v) {
+	protected Double getValue(MDP model, State state, Action action, Map<State, Double> v) {
 		if (action != null) {
 			double reward = model.getRewardFunction().getValue(state, action);
 			double value = reward
@@ -78,7 +79,7 @@ public abstract class IterationAlgorithm<M extends MDP, R> implements Algorithm<
 			return value;
 		}
 
-		return 0;
+		return null;
 	}
 
 	protected void initializeV(Problem<M> pProblem, Map<State, Double> v) {
