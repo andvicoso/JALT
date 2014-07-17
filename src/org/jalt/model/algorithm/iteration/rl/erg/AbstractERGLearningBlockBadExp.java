@@ -61,7 +61,7 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 		// start main loop
 		do {
 			iteration++;
-			//CREATE AND SAVE Q-TABLE (SHARED BY ALL AGENTS)
+			// CREATE AND SAVE Q-TABLE (SHARED BY ALL AGENTS, IF MORE THAN ONE)
 			q = new ERGQTable(model.getStates(), model.getActions());
 			params.put(QTable.NAME, q);
 			// Log.info("\nITERATION " + iteration + ":");
@@ -74,7 +74,7 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 			// 3. CHANGE THE Q VALUE FOR STATES THAT WERE VISITED IN
 			// QLEARNING EXPLORATION AND HAVE THE FOUND EXPRESSION
 			if (valid) {
-				Log.info("Found bad expression: " + badExp);
+				//Log.info("Found bad expression: " + badExp);
 				// avoid bad exp
 				avoid.add(badExp);
 				// Log.info("Avoid: " + avoid);
@@ -93,12 +93,20 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 		// Log.info("Preservation goal:" + model.getPreservationGoal());
 		// Log.info("\nQTable: \n" + q.toString(model));
 
-		return q.getPolicy();//policy;
+		return policy;
 	}
 
 	protected void populateBlocked(ERG model, Expression toBlock) {
 		// mark as blocked all states that contains one of the "avoid"
 		// expressions
+
+		// TODO: check why not above
+		// try {
+		// blocked.addAll(model.getPropositionFunction().intension(model.getStates(),
+		// toBlock));
+		// } catch (InvalidExpressionException e) {
+		// e.printStackTrace();
+		// }
 		PropositionFunction pf = model.getPropositionFunction();
 		for (State state : model.getStates()) {
 			Expression exp = pf.getExpressionForState(state);
@@ -141,12 +149,12 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 		final PPFERG<ERG> ppferg = new PPFERG<ERG>();
 		// 6. GET THE VIABLE POLICIES FROM PPFERG EXECUTED OVER THE NEW
 		// MODEL
-		Log.info("Starting PPFERG...");
+		//Log.info("Starting PPFERG...");
 		policy = ppferg.run(prob, pParameters);
 		// after ppferg
 		// Log.info(prob.toString(policy));
 		// 7. GET THE FINAL POLICY FROM THE PPFERG VIABLE POLICIES
-		policy = new Policy(ERGLearningUtils.optmize(policy, q));
+		//policy = new Policy(ERGLearningUtils.optmize(policy, q));
 		// after optimize
 		// Log.info(prob.toString(policy));
 		return policy;

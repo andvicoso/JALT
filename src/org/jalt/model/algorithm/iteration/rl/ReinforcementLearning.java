@@ -111,7 +111,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 					State nextState = getNextState(state, action);
 					// if nextState eq null, stay in the same state and try a
 					// different action
-					if (nextState != null) {
+					if (nextState != null && !state.equals(nextState)) {
 						// get reward for current state and action
 						double reward = model.getRewardFunction().getValue(state, action);
 						// update q value for state and action
@@ -197,10 +197,10 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	// Verify if agent is blocked (no action or state) or reached a final goal
 	private boolean isStopSteps(Problem<M> pProblem, Action action, State state, int currentSteps) {
 		int states = pProblem.getModel().getStates().size();
-		if (currentSteps > (states * states)) {
-			String msg = "ERROR: Agent possibly blocked. State: %s. Action: %s. Steps: %d";
+		if (currentSteps > (states * states * 10)) {
+			String msg = "ERROR: Agent possibly blocked. State: %s. Action: %s. Steps: %d. Episodes: %d";
 
-			throw new RuntimeException(String.format(msg, state, action, currentSteps));
+			throw new RuntimeException(String.format(msg, state, action, currentSteps, episodes));
 		}
 		return action == null || state == null || pProblem.getFinalStates().contains(state);
 	}

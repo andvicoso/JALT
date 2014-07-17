@@ -2,9 +2,7 @@ package org.jalt.model.algorithm.table;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.jalt.model.action.Action;
 import org.jalt.model.model.MDP;
@@ -56,22 +54,6 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		return getPolicy(true);
 	}
 
-	public Set<State> getAllValidStates() {
-		Set<State> valid = new HashSet<State>();
-
-		for (Map.Entry<State, Map<Action, I>> entry : values.entrySet()) {
-			State state = entry.getKey();
-			Map<Action, I> actionsValues = entry.getValue();
-			for (I item : actionsValues.values()) {
-				if (item != null && item.getFrequency() != 0) {
-					valid.add(state);
-					break;
-				}
-			}
-		}
-		return valid;
-	}
-
 	public Map<Action, Double> getDoubleValues(State state) {
 		Map<Action, I> qvalues = getValues(state);
 		Map<Action, Double> dvalues = new HashMap<Action, Double>(qvalues.size());
@@ -82,20 +64,6 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		}
 
 		return dvalues;
-	}
-
-	public Set<Action> getAllValidActions(State state) {
-		Set<Action> valid = new HashSet<Action>();
-		Map<Action, I> actionsValues = getValues(state);
-
-		for (Map.Entry<Action, I> entry : actionsValues.entrySet()) {
-			Action action = entry.getKey();
-			Integer value = entry.getValue() == null ? 0 : entry.getValue().getFrequency();
-			if (value > 0) {
-				valid.add(action);
-			}
-		}
-		return valid;
 	}
 
 	public String[][] getFrequencyTableStr() {
@@ -197,7 +165,7 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 
 	@Override
 	protected String formatValue(State state, Action action, I item) {
-		return String.format("%.4g", item == null ? 0.0 : item.getValue());
+		return String.format("%.9g", item == null ? 0.0 : item.getValue());
 	}
 
 	public Double getValue(State state, Action action) {
@@ -223,5 +191,19 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 
 	public String toString(MDP model) {
 		return new GridPrinter().toGrid(model, getStateValue());
+	}
+
+	public Action getBestAction(State state) {
+		Action best = null;
+		Double max = -Double.MAX_VALUE;
+		for (Action action : getActions()) {
+			double value = getValue(state, action);
+			if (value > max) {
+				max = value;
+				best = action;
+			}
+		}
+
+		return best;
 	}
 }

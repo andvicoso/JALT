@@ -30,18 +30,21 @@ public class RewardFunctionProposition<M extends ERG> extends DefaultRewardFunct
 			for (Action action : pModel.getActions()) {
 				State nextState = tf.getNextState(getModel().getStates(), state, action);
 				Set<Proposition> props = pf.getPropositionsForState(nextState);
+				Double value = getOtherwiseValue();
 
-				if (props != null) {
+				if (state.equals(nextState)) {
+					// avoid to go to outside the grid (value iteration fix)
+					value = DefaultTestProperties.BAD_REWARD;
+				} else if (props != null) {
 					for (Proposition condition : props) {
 						if (pRewardValues.containsKey(condition)) {
-							table.put(state, action, pRewardValues.get(condition));
+							value = pRewardValues.get(condition);
 							break;
 						}
 					}
-				} else if (state.equals(nextState)) {
-					table.put(state, action, DefaultTestProperties.BAD_REWARD);
-				} else
-					table.put(state, action, getOtherwiseValue());
+				}
+
+				table.put(state, action, value);
 			}
 		}
 	}

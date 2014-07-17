@@ -120,7 +120,7 @@ public class ImageUtils {
 
 		try {
 			Collection<State> goalStates = erg.getPropositionFunction().intension(erg.getStates(),
-					erg.getPropositions(), erg.getGoal());
+					erg.getGoal());
 			// goal states -> orange
 			paintStates(goalStates, g, Color.MAGENTA);
 		} catch (InvalidExpressionException e) {

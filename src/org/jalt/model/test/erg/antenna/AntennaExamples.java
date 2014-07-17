@@ -25,6 +25,7 @@ import org.jalt.util.grid.distancemeasure.CityBlock;
 public class AntennaExamples {
 
 	private static final double BAD_REWARD = -30;
+	private static final double GOOD_REWARD = -BAD_REWARD;
 	private static final int ANTENNA_SIGNAL = 2;
 
 	public AntennaExamples() {
@@ -62,9 +63,12 @@ public class AntennaExamples {
 
 		final Set<State> finalStates = new HashSet<State>();
 		finalStates.add(new GridState(0, 4));
+
+		Map<Proposition, Double> rew = CollectionsUtils.createMap(
+				AntennaCoverageProblemFactory.getBadRewardObstacles(), BAD_REWARD);
+		rew.put(exit, GOOD_REWARD);
 		// set bad reward function
-		model.setRewardFunction(new RewardFunctionProposition(model, CollectionsUtils.createMap(
-				AntennaCoverageProblemFactory.getBadRewardObstacles(), BAD_REWARD), OTHERWISE));
+		model.setRewardFunction(new RewardFunctionProposition(model, rew, OTHERWISE));
 
 		return new Problem<ERG>(model, initialStates, finalStates);
 	}

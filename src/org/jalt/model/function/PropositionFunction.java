@@ -69,8 +69,7 @@ public class PropositionFunction implements Serializable {
 	 * @return
 	 * @throws EvaluationException
 	 */
-	public Set<State> intension(final Collection<State> pModelStates,
-			final Set<Proposition> pModelProps, final Expression pExpression)
+	public Set<State> intension(final Collection<State> pModelStates, final Expression pExpression)
 			throws InvalidExpressionException {
 		final Set<State> result = new HashSet<State>();
 

@@ -150,7 +150,7 @@ public class AntennaCoverageProblemFactory extends ProblemFactory {
 	}
 
 	public static Set<Proposition> getBadRewardObstacles() {
-		String[] props = { "water" };
+		String[] props = { "water", "stone", "hole" };
 		return CollectionsUtils.createSet(Proposition.class, props);
 	}
 }

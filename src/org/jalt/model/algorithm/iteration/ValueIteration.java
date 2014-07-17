@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jalt.infra.log.Log;
 import org.jalt.model.action.Action;
 import org.jalt.model.algorithm.PolicyGenerator;
 import org.jalt.model.algorithm.stoppingcriterium.StopOnMaxDiffError;
@@ -13,8 +12,6 @@ import org.jalt.model.model.MDP;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.state.State;
-import org.jalt.util.ImageUtils;
-import org.jalt.util.grid.GridPrinter;
 
 /**
  * Reinforcement Learning Survey 96 Kaelbling,Littman,Moore

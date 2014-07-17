@@ -5,16 +5,16 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
+import org.jalt.infra.log.Log;
 import org.jalt.model.algorithm.iteration.ValueIteration;
 import org.jalt.model.algorithm.iteration.rl.QLearning;
 import org.jalt.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.test.erg.AlgorithmTest;
-import org.jalt.model.test.erg.MultiERGTest;
+import org.jalt.model.test.erg.ERGTest;
+import org.jalt.model.test.erg.antenna.AntennaExamples;
 import org.jalt.util.CollectionsUtils;
-import org.jalt.util.FileUtils;
-import org.jalt.util.ImageUtils;
 import org.jalt.util.PolicyUtils;
 
 /**
@@ -26,6 +26,8 @@ public class MainTest {
 
 	private static final String DEFAULT_PATH = "D:\\Dev\\Workspaces\\Projects\\Private\\JALT\\problems\\GenericERGGridModel\\";
 	private static final String RESULT_EXT = ".txt";
+	private static long timevi = 0;
+	private static int count;
 
 	public static void main(final String[] pArgs) throws IOException {
 		String file;
@@ -33,20 +35,20 @@ public class MainTest {
 		AlgorithmTest algTest;
 		// int count = 0;
 
-		file = "big\\100_problem";
+		// file = "big\\50_problem";
 		// file = "nov13\\five\\0_problem";
 
-		prob = FileUtils.fromFile(getProblemPath(file));
+		// prob = FileUtils.fromFile(getProblemPath(file));
 
 		// prob = new
-		// ProblemsCLI(GenericERGProblemFactory.createDefaultFactory(100,
-		// 1000)).run();
-		// prob = AntennaExamples.getSMC13();
+		// ProblemsCLI(GenericERGProblemFactory.createDefaultFactory(10,
+		// 100)).run();
+		prob = AntennaExamples.getSMC13();
 
 		// for (Problem<ERG> prob :
 		// ProblemsCLI.getAllFromDir("GenericERGGridModel\\big")) {
 
-		//ImageUtils.save(ImageUtils.create(prob, null), "50.png");
+		// ImageUtils.save(ImageUtils.create(prob, null), "50.png");
 
 		Map<String, Object> params = createParamsMap();
 		runVI(prob, params);
@@ -55,11 +57,15 @@ public class MainTest {
 		// Log.info("TEST RUN " + count++);
 
 		// algTest = new AlgorithmTest(QLearning.class);
-		algTest = new MultiERGTest(10, QLearning.class);
-		Test test = new BatchTest(prob, algTest.createAlgorithmFactory(), getResultPath(QLearning.class,
-				file));
+		// algTest = new MultiERGTest(10, QLearning.class);
+		algTest = new ERGTest(QLearning.class);
+
+		Test test = new BatchTest(prob, algTest.createAlgorithmFactory(), getResultPath(
+				algTest.getLearningClass(), "antenna"));
 		test.run(params);
 
+		if (count > 0)
+			Log.info("Time VI " + (timevi / (count - 1)));
 		Toolkit.getDefaultToolkit().beep();
 		// }
 	}
@@ -73,11 +79,16 @@ public class MainTest {
 	}
 
 	public static void runVI(Problem prob, Map<String, Object> params) {
-		// long ini = System.currentTimeMillis();
+		long ini = System.currentTimeMillis();
 		ValueIteration vi = new ValueIteration();
 		Policy pi = vi.run(prob, Collections.emptyMap());
-		// long end = System.currentTimeMillis();
-		// System.out.print(end - ini);
+		long end = System.currentTimeMillis();
+
+		long t = (end - ini);
+		Log.info("vi:" + t + " - it:" + vi.getIterations());
+		timevi += t;
+		count++;
+
 		params.put(PolicyUtils.BEST_VALUES_STR, pi.getBestPolicyValue());
 
 		// ImageUtils.save(ImageUtils.create(prob, pi), "final_vi.png");

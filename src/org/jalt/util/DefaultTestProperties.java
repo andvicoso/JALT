@@ -14,7 +14,7 @@ public final class DefaultTestProperties {
 	public static final int MAX_ITERATIONS = 100;
 
 	public static final double BAD_Q_PERCENT = 0.3;
-	public static final double BAD_REWARD = -100;//-30
+	public static final double BAD_REWARD = -30;//-30(small) -100(large)
 	public static final double BAD_EXP_VALUE = BAD_REWARD/2;
 	public static final double BAD_MSG_VALUE = -20;
 	

@@ -59,7 +59,7 @@ public class PPFERG<M extends ERG> extends PPF<M> {
 					preserveIntension);
 			pi = choose(values, prunedStrongImage);
 			pi.putAll(pi2);
-			iterations++;
+			episodes++;
 		} while (!pi.equals(pi2) && !preserveIntension.equals(c));
 
 		return pi;

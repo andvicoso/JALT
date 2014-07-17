@@ -3,7 +3,6 @@ package org.jalt.util.erg;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,7 +10,6 @@ import org.jalt.model.action.Action;
 import org.jalt.model.algorithm.table.erg.ERGQTable;
 import org.jalt.model.model.ERG;
 import org.jalt.model.propositional.Expression;
-import org.jalt.model.propositional.Proposition;
 import org.jalt.model.propositional.operator.BinaryOperator;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.solution.SinglePolicy;
@@ -36,15 +34,15 @@ public class ERGLearningUtils {
 		return model;
 	}
 
-	private static Set<Proposition> getPropositions(Map<Expression, Double> expsValues) {
-		Set<Proposition> props = new HashSet<Proposition>();
-		for (Expression exp : expsValues.keySet()) {
-			Set<Proposition> expProps = exp.getPropositions();
-			props.addAll(expProps);
-		}
-
-		return props;
-	}
+//	private static Set<Proposition> getPropositions(Map<Expression, Double> expsValues) {
+//		Set<Proposition> props = new HashSet<Proposition>();
+//		for (Expression exp : expsValues.keySet()) {
+//			Set<Proposition> expProps = exp.getPropositions();
+//			props.addAll(expProps);
+//		}
+//
+//		return props;
+//	}
 
 	private static Expression createNewPreservationGoal(Expression pCurrent, Set<Expression> pAvoid) {
 		Expression badExp = new Expression(BinaryOperator.OR, pAvoid.toArray(new Expression[pAvoid
