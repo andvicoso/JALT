@@ -49,8 +49,8 @@ public class BatchTest extends Test {
 			algorithm = getAlgorithm();
 
 			if (i == 0) {
-				print("\n------------------------------");
 				print("Algorithm: " + algorithm.getName());
+				print("------------------------------");
 			}
 
 			print("Repetition: " + i);

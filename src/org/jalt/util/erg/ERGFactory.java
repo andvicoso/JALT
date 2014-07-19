@@ -136,21 +136,15 @@ public class ERGFactory {
 		return chooser.choose(expsValues);
 	}
 
-	public static PropositionFunction createPropositionFunction(ERG model, ERGQTable q,
-			PropositionFunction oldpf) {
+	public static PropositionFunction createPropositionFunction(ERGQTable q) {
 		PropositionFunction pf = new PropositionFunction();
 
-		for (State state : model.getStates()) {
-			for (Action action : model.getActions()) {
+		for (State state : q.getStates()) {
+			for (Action action : q.getActions()) {
 				ERGQTableItem item = q.get(state, action);
 				State fState = item.getFinalState();
-				if (item != null && item.getExpression() != null) {
+				if (fState != null && item != null && item.getExpression() != null) {
 					pf.add(fState, item.getExpression().getPropositions());
-				}
-				if (fState != null) {
-					Set<Proposition> props = oldpf.getPropositionsForState(fState);
-					if (props != null)
-						pf.add(fState, oldpf.getPropositionsForState(fState));
 				}
 			}
 		}

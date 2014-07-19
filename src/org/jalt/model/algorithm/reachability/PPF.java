@@ -3,10 +3,10 @@ package org.jalt.model.algorithm.reachability;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.jalt.model.action.Action;
 import org.jalt.model.algorithm.iteration.IterationAlgorithm;
@@ -18,6 +18,7 @@ import org.jalt.model.propositional.Expression;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.state.State;
 import org.jalt.model.transition.Transition;
+import org.jalt.util.CollectionsUtils;
 import org.jalt.util.ModelUtils;
 
 /**
@@ -56,7 +57,7 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 	@Override
 	public Policy run(Problem<M> pProblem, Map<String, Object> pParameters) {
 		model = pProblem.getModel();
-		final Map<State, Double> values = new HashMap<State, Double>();
+		final Map<State, Double> values = new TreeMap<State, Double>();
 		Policy pi = new Policy();
 		Policy pi2;
 		// get all the states that satisfies the goal
@@ -64,7 +65,7 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 		// initialize pi and values
 		for (final State state : intension) {
 			values.put(state, INITIAL_VALUE);
-			pi.put(state, Action.TRIVIAL_ACTION, INITIAL_VALUE);
+			pi.put(state, Action.TRIVIAL_ACTION);
 		}
 
 		do {
@@ -105,7 +106,7 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 				// get the max value for q
 				final Double max = Collections.max(q.values());
 				pValues.put(state, max);
-				pi.put(state, q);
+				pi.put(state, CollectionsUtils.getKeysForValue(q, max).iterator().next());
 			}
 		}
 
@@ -201,7 +202,7 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 
 	protected Map<Action, Double> getQValue(final Collection<Transition> pPrune, final State state,
 			final Map<State, Double> pValues) {
-		final Map<Action, Double> q = new HashMap<Action, Double>();
+		final Map<Action, Double> q = new TreeMap<Action, Double>();
 		// search for the Qs values for state
 		for (final Action action : getActions(pPrune, state)) {
 			double sum = 0;

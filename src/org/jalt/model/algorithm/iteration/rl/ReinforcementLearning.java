@@ -221,8 +221,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 
 	@Override
 	public Map<State, Double> getCurrentValues() {
-		Map<String, Object> map = CollectionsUtils.asMap(PolicyUtils.POLICY_STR, q.getPolicy(false)
-				.getBestPolicy());
+		Map<String, Object> map = CollectionsUtils.asMap(PolicyUtils.POLICY_STR, q.getPolicy(false));
 		return new PolicyEvaluation<M>().run(problem, map);
 		// return q.getStateValue();
 	}

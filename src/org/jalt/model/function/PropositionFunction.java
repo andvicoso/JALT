@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import net.sourceforge.jeval.EvaluationException;
 
@@ -29,7 +29,7 @@ public class PropositionFunction implements Serializable {
 	private Map<State, Set<Proposition>> table;
 
 	public PropositionFunction() {
-		table = new HashMap<State, Set<Proposition>>();
+		table = new TreeMap<State, Set<Proposition>>();
 	}
 
 	public void add(final State pState, final Collection<Proposition> pProps) {

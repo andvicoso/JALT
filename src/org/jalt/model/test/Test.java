@@ -13,7 +13,6 @@ import org.jalt.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.jalt.model.algorithm.iteration.rl.erg.MultiERGLearning;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
-import org.jalt.model.solution.SinglePolicy;
 import org.jalt.util.DefaultTestProperties;
 import org.jalt.util.ImageUtils;
 import org.jalt.util.Utils;
@@ -101,8 +100,7 @@ public class Test {
 		if (result != null) {
 			if (problem.getModel().getStates().size() < Problem.MAX_SIZE_PRINT) {
 				// print("Result:" + problem.toString(result));
-				SinglePolicy sp = ((Policy) result).getBestPolicy();
-				print("Single Result:" + problem.toString(sp));
+				print("Result:" + problem.toString((Policy) result));
 			}
 			// save heat map and final plans
 			//saveResultImages(problem, algorithm, result);

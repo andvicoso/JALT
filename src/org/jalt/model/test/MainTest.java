@@ -13,9 +13,11 @@ import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.test.erg.AlgorithmTest;
 import org.jalt.model.test.erg.ERGTest;
-import org.jalt.model.test.erg.antenna.AntennaExamples;
+import org.jalt.model.test.erg.MultiERGTest;
 import org.jalt.util.CollectionsUtils;
+import org.jalt.util.FileUtils;
 import org.jalt.util.PolicyUtils;
+import org.jalt.util.grid.GridPrinter;
 
 /**
  * 
@@ -36,14 +38,15 @@ public class MainTest {
 		// int count = 0;
 
 		// file = "big\\50_problem";
-		// file = "nov13\\five\\0_problem";
+		file = "nov13\\one\\0_problem";
 
-		// prob = FileUtils.fromFile(getProblemPath(file));
+		prob = FileUtils.fromFile(getProblemPath(file));
 
 		// prob = new
 		// ProblemsCLI(GenericERGProblemFactory.createDefaultFactory(10,
 		// 100)).run();
-		prob = AntennaExamples.getSMC13();
+		// prob = AntennaExamples.getSMC13();
+		// file= "antenna"
 
 		// for (Problem<ERG> prob :
 		// ProblemsCLI.getAllFromDir("GenericERGGridModel\\big")) {
@@ -55,16 +58,17 @@ public class MainTest {
 
 		// Log.info("\n################################");
 		// Log.info("TEST RUN " + count++);
+		int agents = prob.getInitialStates().size();
+		Class<? extends ReinforcementLearning> c = QLearning.class;
 
-		// algTest = new AlgorithmTest(QLearning.class);
-		// algTest = new MultiERGTest(10, QLearning.class);
-		algTest = new ERGTest(QLearning.class);
+		algTest = agents > 1 ? new MultiERGTest(agents, c) 
+		//: new AlgorithmTest(c);
+		: new ERGTest(c);
 
-		Test test = new BatchTest(prob, algTest.createAlgorithmFactory(), getResultPath(
-				algTest.getLearningClass(), "antenna"));
+		Test test = new BatchTest(prob, algTest.createAlgorithmFactory(), getResultPath(c, file));
 		test.run(params);
 
-		if (count > 0)
+		if (count > 1)
 			Log.info("Time VI " + (timevi / (count - 1)));
 		Toolkit.getDefaultToolkit().beep();
 		// }
@@ -89,12 +93,12 @@ public class MainTest {
 		timevi += t;
 		count++;
 
-		params.put(PolicyUtils.BEST_VALUES_STR, pi.getBestPolicyValue());
+		params.put(PolicyUtils.BEST_VALUES_STR, vi.getCurrentValues());
 
 		// ImageUtils.save(ImageUtils.create(prob, pi), "final_vi.png");
 
-		// Log.info("\nV-Values VI: \n" + new
-		// GridPrinter().toGrid(prob.getModel(), pi.getBestPolicyValue()));
+		Log.info("\nV-Values VI: \n"
+				+ new GridPrinter().toGrid(prob.getModel(), vi.getCurrentValues()));
 	}
 
 	private static Map<String, Object> createParamsMap() {

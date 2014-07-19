@@ -20,7 +20,6 @@ import org.jalt.model.model.MDP;
 import org.jalt.model.propositional.Proposition;
 import org.jalt.model.solution.Plan;
 import org.jalt.model.solution.Policy;
-import org.jalt.model.solution.SinglePolicy;
 import org.jalt.model.state.State;
 import org.jalt.util.DefaultTestProperties;
 
@@ -65,8 +64,6 @@ public class GridPrinter {
 		if (pResult != null) {
 			if (pResult instanceof Policy) {
 				fillWithActions(grid, (Policy) pResult);
-			} else if (pResult instanceof SinglePolicy) {
-				fillWithActions(grid, (SinglePolicy) pResult);
 			} else if (pResult instanceof Plan) {
 				fillWithActions(grid, pInitialStates, (Plan) pResult);
 			}
@@ -143,18 +140,6 @@ public class GridPrinter {
 		return sb.toString();
 	}
 
-	public void fillWithActions(String[][] pGrid, Policy pPolicy) {
-		for (State state : pPolicy.getStates()) {
-			Collection<Action> actions = pPolicy.get(state).keySet();
-			int row = GridUtils.getRow(state) + 1;
-			int col = GridUtils.getCol(state) + 1;
-
-			for (Action action : actions) {
-				getActionSymbol(action, pGrid, row, col);
-			}
-		}
-	}
-
 	public void fillWithActions(String[][] pGrid, Map<Integer, State> pInitialStates, Plan pPlan) {
 		for (State state : pInitialStates.values()) {
 			for (Action action : pPlan) {
@@ -163,7 +148,7 @@ public class GridPrinter {
 		}
 	}
 
-	public void fillWithActions(String[][] pGrid, SinglePolicy pPolicy) {
+	public void fillWithActions(String[][] pGrid, Policy pPolicy) {
 		for (State state : pPolicy.getStates()) {
 			Action action = pPolicy.get(state);
 			getActionSymbol(state, action, pGrid);
