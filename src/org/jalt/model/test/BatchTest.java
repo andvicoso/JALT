@@ -23,7 +23,7 @@ import org.jalt.util.Utils;
 @SuppressWarnings("rawtypes")
 public class BatchTest extends Test {
 
-	private static final int MAX_ITERATIONS = 3;// 10
+	private static final int MAX_ITERATIONS = 10;
 
 	public BatchTest(Problem pProblem, AlgorithmFactory pFactory, String filename)
 			throws IOException {
@@ -46,8 +46,14 @@ public class BatchTest extends Test {
 		Object result = null;
 
 		for (int i = 0; i < MAX_ITERATIONS; i++) {
-			print("Repetition: " + i);
 			algorithm = getAlgorithm();
+
+			if (i == 0) {
+				print("Algorithm: " + algorithm.getName());
+				print("------------------------------");
+			}
+
+			print("Repetition: " + i);
 			// execute
 			long initMsecs = System.currentTimeMillis();
 			result = runAlgorithm(problem, algorithm, pParameters);
@@ -76,12 +82,12 @@ public class BatchTest extends Test {
 		double meanSteps = CalcUtils.getMean(steps);
 
 		print("Total Repetitions: " + MAX_ITERATIONS);
-		print("Means: ");
-		print("-Time: " + Utils.toTimeString(timeSum / MAX_ITERATIONS));
-		print("-Episodes: " + meanEps);
-		print("-Episodes (std deviation): " + CalcUtils.getStandardDeviation(meanEps, episodes));
-		print("-Steps per episode: " + meanSteps);
-		print("-Steps per episode (std deviation): "
+		print("\nMeans: ");
+		print("\n-Time: " + Utils.toTimeString(timeSum / MAX_ITERATIONS));
+		print("\n-Episodes: " + meanEps);
+		print("\n-Episodes (std deviation): " + CalcUtils.getStandardDeviation(meanEps, episodes));
+		print("\n-Steps per episode: " + meanSteps);
+		print("\n-Steps per episode (std deviation): "
 				+ CalcUtils.getStandardDeviation(meanSteps, steps));
 		// //print results
 		// printNoInitialBreak(algorithm.printResults());

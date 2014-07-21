@@ -2,9 +2,9 @@ package org.jalt.model.function.transition;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.jalt.model.action.Action;
 import org.jalt.model.algorithm.actionchooser.RandomChooser;
@@ -23,7 +23,7 @@ public abstract class TransitionFunction implements Serializable {
 
 	public Map<State, Double> getReachableStatesValues(final Collection<State> pModelStates,
 			final State pState, final Action pAction) {
-		final Map<State, Double> map = new HashMap<State, Double>();
+		final Map<State, Double> map = new TreeMap<State, Double>();
 
 		for (final State state : pModelStates) {
 			final double value = getValue(pState, state, pAction);

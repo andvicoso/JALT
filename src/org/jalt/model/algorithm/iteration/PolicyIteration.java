@@ -33,7 +33,7 @@ public class PolicyIteration extends IterationAlgorithm<MDP, Policy> implements
 				if (!q.isEmpty()) {
 					// get the max value for q
 					Double max = Collections.max(q.values());
-					Double current = getValue(model, state, pi.getBestAction(state), v);
+					Double current = getValue(model, state, pi.get(state), v);
 					// save max value and position in the policy
 					if (current != null && max > current && !pi.get(state).equals(q.get(max))) {
 						v.put(state, max);

@@ -39,4 +39,8 @@ public class AlgorithmTest {
 		return null;
 	}
 
+	public Class<? extends ReinforcementLearning> getLearningClass() {
+		return learningClass;
+	}
+
 }

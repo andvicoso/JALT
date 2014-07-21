@@ -1,8 +1,8 @@
 package org.jalt.model.algorithm.iteration;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.jalt.infra.log.Log;
 import org.jalt.model.action.Action;
@@ -13,8 +13,7 @@ import org.jalt.model.model.MDP;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.state.State;
-import org.jalt.util.ImageUtils;
-import org.jalt.util.grid.GridPrinter;
+import org.jalt.util.CollectionsUtils;
 
 /**
  * Reinforcement Learning Survey 96 Kaelbling,Littman,Moore
@@ -33,14 +32,14 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy>
 		Policy pi;
 
 		model = pProblem.getModel();
-		v = new HashMap<State, Double>(model.getStates().size());
+		v = new TreeMap<State, Double>();
 		initializeV(pProblem, v);
 		// Start the main loop
 		// When the maximmum error is greater than the defined error,
 		// the best policy is found
 		do {
 			lastv = v;
-			v = new HashMap<State, Double>();
+			v = new TreeMap<State, Double>();
 			pi = new Policy();
 			// for each state
 			for (State state : model.getStates()) {
@@ -53,7 +52,7 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy>
 						// save the max value
 						v.put(state, max);
 						// add to the policy
-						pi.put(state, q);
+						pi.put(state, CollectionsUtils.getKeysForValue(q, max).iterator().next());
 					}
 				}
 			}
@@ -65,7 +64,7 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy>
 
 		// Log.info("Iterations: " + episodes);
 		// Log.info("\n"+printResults());
-		// Log.info("\n" + pProblem.toString(pi.getBestPolicy()));
+		 Log.info("\n" + pProblem.toString(pi));
 
 //		int size = (int) Math.sqrt(model.getStates().size());
 //		Log.info("\n" + new GridPrinter().toTable(v, size, size));

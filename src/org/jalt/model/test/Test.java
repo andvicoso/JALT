@@ -13,7 +13,6 @@ import org.jalt.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.jalt.model.algorithm.iteration.rl.erg.MultiERGLearning;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
-import org.jalt.model.solution.SinglePolicy;
 import org.jalt.util.DefaultTestProperties;
 import org.jalt.util.ImageUtils;
 import org.jalt.util.Utils;
@@ -50,12 +49,12 @@ public class Test {
 	public void run(Map<String, Object> pParameters) {
 		printHeader();
 		createAndRun(pParameters);
-		print("End: " + Utils.now());
+		print("\nEnd: " + Utils.now());
 	}
 
 	protected void printHeader() {
 		print("################################");
-		print("Start: " + Utils.now());
+		print("\nStart: " + Utils.now());
 		print("\nModel:");
 		print(problem.getModel().toString());
 		print("\nError: " + DefaultTestProperties.ERROR);
@@ -98,12 +97,13 @@ public class Test {
 		// print results
 		printNoInitialBreak(algorithm.printResults());
 		// if a solution was found...
-		if (result != null && problem.getModel().getStates().size() < Problem.MAX_SIZE_PRINT) {
-			// print("Result:" + problem.toString(result));
-			SinglePolicy sp = ((Policy) result).getBestPolicy();
-			print("Single Result:" + problem.toString(sp));
-			// save heat map and fina plans
-			// saveResultImages(problem, algorithm, result);
+		if (result != null) {
+			if (problem.getModel().getStates().size() < Problem.MAX_SIZE_PRINT) {
+				// print("Result:" + problem.toString(result));
+				print("Result:" + problem.toString((Policy) result));
+			}
+			// save heat map and final plans
+			//saveResultImages(problem, algorithm, result);
 		}
 
 		return result;
