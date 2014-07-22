@@ -1,8 +1,6 @@
 package org.jalt.model.problem;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -15,7 +13,7 @@ import org.jalt.model.state.State;
  */
 public abstract class ProblemFactory {
 
-	private Collection<State> usedStates;
+	private List<State> usedStates;
 	private static final Random random = new Random();
 
 	public ProblemFactory() {
@@ -56,7 +54,7 @@ public abstract class ProblemFactory {
 	protected abstract Problem<?> doCreate();
 
 	public Problem<?> create() {
-		usedStates = new HashSet<State>();
+		usedStates = new ArrayList<State>();
 		return doCreate();
 	}
 }

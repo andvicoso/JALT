@@ -19,6 +19,7 @@ public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp 
 		MultiERGLearning {
 
 	private static final int MAX_IT = 5;
+	private static final int TIME_TO_SLEEP = 100;
 	private List<ReinforcementLearning<ERG>> learnings;
 
 	public MultiERGLearningBlockBadExp(List<ReinforcementLearning<ERG>> learnings) {
@@ -45,9 +46,9 @@ public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp 
 		while (policies.size() < learnings.size()) {
 			if (it++ > pProblem.getModel().getStates().size() * MAX_IT)
 				throw new RuntimeException("Tired of waiting agent/thread to finish. Secs: "
-						+ (it * 100 / 1000));
+						+ (it * TIME_TO_SLEEP / 1000));
 			try {
-				Thread.sleep(100);
+				Thread.sleep(TIME_TO_SLEEP);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

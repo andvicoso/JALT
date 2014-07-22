@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import org.jalt.model.action.Action;
 import org.jalt.model.model.MDP;
 import org.jalt.model.problem.Problem;
-import org.jalt.model.solution.Policy;
+import org.jalt.model.solution.SinglePolicy;
 import org.jalt.model.state.State;
 import org.jalt.util.PolicyUtils;
 
@@ -27,7 +27,7 @@ public class PolicyEvaluation<M extends MDP> extends IterationAlgorithm<M, Map<S
 		v = new TreeMap<State, Double>();
 		initializeV(pProblem, v);
 
-		Policy pi = (Policy) pParameters.get(PolicyUtils.POLICY_STR);
+		SinglePolicy pi = (SinglePolicy) pParameters.get(PolicyUtils.POLICY_STR);
 		MDP model = pProblem.getModel();
 		double delta;
 		// Start the main loop

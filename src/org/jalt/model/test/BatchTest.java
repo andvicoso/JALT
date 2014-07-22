@@ -13,6 +13,7 @@ import org.jalt.model.algorithm.iteration.rl.erg.MultiERGLearning;
 import org.jalt.model.algorithm.iteration.rl.erg.SingleERGLearning;
 import org.jalt.model.model.ERG;
 import org.jalt.model.problem.Problem;
+import org.jalt.model.problem.ProblemFactory;
 import org.jalt.util.CalcUtils;
 import org.jalt.util.Utils;
 
@@ -25,30 +26,32 @@ public class BatchTest extends Test {
 
 	private static final int MAX_ITERATIONS = 10;
 
-	public BatchTest(Problem pProblem, AlgorithmFactory pFactory, String filename)
+	public BatchTest(ProblemFactory pProblemFactory, AlgorithmFactory pFactory, String filename)
 			throws IOException {
-		super(pProblem, pFactory, filename);
+		super(pProblemFactory, pFactory, filename);
 	}
 
-	public BatchTest(Problem pProblem, AlgorithmFactory pFactory) {
-		super(pProblem, pFactory);
+	public BatchTest(ProblemFactory pProblemFactory, AlgorithmFactory pFactory) {
+		super(pProblemFactory, pFactory);
 	}
 
-	public BatchTest(Problem pProblem, Algorithm pAlgorithm) {
-		super(pProblem, pAlgorithm);
+	public BatchTest(ProblemFactory pProblemFactory, Algorithm pAlgorithm) {
+		super(pProblemFactory, pAlgorithm);
 	}
 
 	@Override
 	protected void createAndRun(Map<String, Object> pParameters) {
-		long timeSum = 0;
+		List<Long> timeSum = new ArrayList<Long>(MAX_ITERATIONS);
 		Collection<Integer> episodes = new ArrayList<Integer>();
 		Collection<Double> steps = new ArrayList<Double>();
 		Object result = null;
 
 		for (int i = 0; i < MAX_ITERATIONS; i++) {
 			algorithm = getAlgorithm();
+			problem = getProblem();
 
 			if (i == 0) {
+				printHeader();
 				print("Algorithm: " + algorithm.getName());
 				print("------------------------------");
 			}
@@ -58,7 +61,7 @@ public class BatchTest extends Test {
 			long initMsecs = System.currentTimeMillis();
 			result = runAlgorithm(problem, algorithm, pParameters);
 			long diff = System.currentTimeMillis() - initMsecs;
-			timeSum += diff;
+			timeSum.add(diff);
 
 			if (algorithm instanceof SingleERGLearning) {
 				algorithm = ((SingleERGLearning) algorithm).getLearning();
@@ -83,7 +86,8 @@ public class BatchTest extends Test {
 
 		print("Total Repetitions: " + MAX_ITERATIONS);
 		print("\nMeans: ");
-		print("\n-Time: " + Utils.toTimeString(timeSum / MAX_ITERATIONS));
+		print("\n-Time: "
+				+ Utils.toTimeString(CalcUtils.middleAverage(timeSum) / (MAX_ITERATIONS - 2)));
 		print("\n-Episodes: " + meanEps);
 		print("\n-Episodes (std deviation): " + CalcUtils.getStandardDeviation(meanEps, episodes));
 		print("\n-Steps per episode: " + meanSteps);

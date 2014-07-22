@@ -31,11 +31,11 @@ public class GenericERGProblemFactory extends ProblemFactory {
 	private final int numberOfPropositions;
 	private double goodReward;
 
-	public static ProblemFactory createDefaultFactory() {
-		return createDefaultFactory(1, 10);
+	public static ProblemFactory createDefault() {
+		return createDefault(1, 10);
 	}
 
-	public static ProblemFactory createDefaultFactory(int agents, int rows) {
+	public static ProblemFactory createDefault(int agents, int rows) {
 		// double agentsRatio = 0.02;
 		// agents = (int) Math.ceil(rows * cols * agentsRatio);
 		int cols = rows;

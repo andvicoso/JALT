@@ -21,7 +21,7 @@ import org.jalt.model.state.State;
 public abstract class IterationAlgorithm<M extends MDP, R> implements Algorithm<M, R> {
 
 	/**
-	 * Discount factor The discount factor determines the importance of future
+	 * Discount factor - The discount factor determines the importance of future
 	 * rewards. A factor of 0 will make the agent "opportunistic" by only
 	 * considering current rewards, while a factor approaching 1 will make it
 	 * strive for a long-term high reward. If the discount factor meets or

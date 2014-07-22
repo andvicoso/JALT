@@ -16,7 +16,7 @@ import org.jalt.model.state.State;
 public class GridUtils {
 
 	private static final String GRID_STATE_SEP = "x";
-	public static final int GRID_MAX_SIZE = 1000;// 100;
+	public static final int GRID_MAX_SIZE = 100;//100;
 	public static final String GRID_STATE_FORMAT_PREFFIX = "%0";
 	public static final String GRID_STATE_FORMAT_SUFFIX = "d";
 	public static final String ZERO = "0";
@@ -38,7 +38,7 @@ public class GridUtils {
 				STATES_CACHE[i][j] = new GridState(i, j);
 			}
 		}
-		// set default grid actions
+		//set default grid actions
 		GRID_ACTIONS.add(north);
 		GRID_ACTIONS.add(south);
 		GRID_ACTIONS.add(west);
@@ -77,14 +77,10 @@ public class GridUtils {
 	}
 
 	public static int getRow(final State pState) {
-		if (pState instanceof GridState)
-			return ((GridState) pState).getRow();
 		return Integer.parseInt(pState.getName().split(GRID_STATE_SEP)[0]);
 	}
 
 	public static int getCol(final State pState) {
-		if (pState instanceof GridState)
-			return ((GridState) pState).getCol();
 		return Integer.parseInt(pState.getName().split(GRID_STATE_SEP)[1]);
 	}
 }

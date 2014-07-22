@@ -3,14 +3,15 @@ package org.jalt.model.algorithm.reachability;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.jalt.model.action.Action;
-import org.jalt.model.algorithm.iteration.IterationAlgorithm;
+import org.jalt.model.algorithm.PolicyGenerator;
 import org.jalt.model.exception.InvalidExpressionException;
+import org.jalt.model.function.transition.TransitionFunction;
 import org.jalt.model.model.MDP;
 import org.jalt.model.model.SRG;
 import org.jalt.model.problem.Problem;
@@ -18,7 +19,7 @@ import org.jalt.model.propositional.Expression;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.state.State;
 import org.jalt.model.transition.Transition;
-import org.jalt.util.CollectionsUtils;
+import org.jalt.util.DefaultTestProperties;
 import org.jalt.util.ModelUtils;
 
 /**
@@ -28,8 +29,11 @@ import org.jalt.util.ModelUtils;
  * @param <P>
  *            Simple reachability problem to be resolved
  */
-public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
+public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 
+	protected M model;
+	private double gama = DefaultTestProperties.GAMA;
+	protected int iterations = 0;
 	protected static final Double INITIAL_VALUE = 1d;
 
 	/**
@@ -57,7 +61,7 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 	@Override
 	public Policy run(Problem<M> pProblem, Map<String, Object> pParameters) {
 		model = pProblem.getModel();
-		final Map<State, Double> values = new TreeMap<State, Double>();
+		final Map<State, Double> values = new HashMap<State, Double>();
 		Policy pi = new Policy();
 		Policy pi2;
 		// get all the states that satisfies the goal
@@ -65,7 +69,7 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 		// initialize pi and values
 		for (final State state : intension) {
 			values.put(state, INITIAL_VALUE);
-			pi.put(state, Action.TRIVIAL_ACTION);
+			pi.put(state, Action.TRIVIAL_ACTION, INITIAL_VALUE);
 		}
 
 		do {
@@ -78,7 +82,7 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 			final Set<Transition> prunedStrongImage = prune(getStrongImage(c), c);
 			pi = choose(values, prunedStrongImage);
 			pi.putAll(pi2);
-			episodes++;
+			iterations++;
 		} while (!pi.equals(pi2));
 
 		return pi;
@@ -98,15 +102,16 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 
 	protected Policy choose(final Map<State, Double> pValues, final Collection<Transition> pPrune) {
 		final Policy pi = new Policy();
+		final TransitionFunction tf = model.getTransitionFunction();
 
 		for (final State state : ModelUtils.getStates(pPrune)) {
-			Map<Action, Double> q = getQValue(pPrune, state, pValues);
+			Map<Action, Double> q = getQValue(pPrune, state, tf, pValues);
 			// if found something
 			if (q.size() > 0) {
 				// get the max value for q
 				final Double max = Collections.max(q.values());
 				pValues.put(state, max);
-				pi.put(state, CollectionsUtils.getKeysForValue(q, max).iterator().next());
+				pi.put(state, q);
 			}
 		}
 
@@ -115,7 +120,8 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 
 	protected Collection<State> intension(final Expression pExpression) {
 		try {
-			return model.getPropositionFunction().intension(model.getStates(), pExpression);
+			return model.getPropositionFunction().intension(model.getStates(),
+					model.getPropositions(), pExpression);
 		} catch (InvalidExpressionException ex) {
 			ex.printStackTrace();
 		}
@@ -123,8 +129,8 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 	}
 
 	/**
-	 * Para todas as transicoes da imagem forte, corta todas que nao pertencam
-	 * ao conjunto da cobertura
+	 * Para todas as transicoes da imagem forte, corta todas que nao
+	 * pertencam ao conjunto da cobertura
 	 * 
 	 * @param pStrongImage
 	 * @param pC
@@ -175,7 +181,7 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 			for (final Action action : model.getActions()) {// tf.getActionsFrom
 				final Collection<State> reachableStates = model.getTransitionFunction()
 						.getReachableStates(model.getStates(), state, action);
-				if (!reachableStates.isEmpty() && pC.containsAll(reachableStates)) {
+				if (pC.containsAll(reachableStates)) {
 					final Transition t = new Transition(state, action);
 					if (!result.contains(t)) {
 						result.add(t);
@@ -187,6 +193,15 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 		}
 
 		return result;
+	}
+
+	@Override
+	public String printResults() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("\nIterations: ").append(iterations);
+		sb.append("\nGama: ").append(gama);
+
+		return sb.toString();
 	}
 
 	private Collection<Action> getActions(Collection<Transition> pPrune, State state) {
@@ -201,20 +216,18 @@ public class PPF<M extends MDP & SRG> extends IterationAlgorithm<M, Policy> {
 	}
 
 	protected Map<Action, Double> getQValue(final Collection<Transition> pPrune, final State state,
-			final Map<State, Double> pValues) {
-		final Map<Action, Double> q = new TreeMap<Action, Double>();
+			final TransitionFunction tf, final Map<State, Double> pValues) {
+		final Map<Action, Double> q = new HashMap<Action, Double>();
 		// search for the Qs values for state
 		for (final Action action : getActions(pPrune, state)) {
 			double sum = 0;
-			for (final State reachableState : model.getTransitionFunction().getReachableStates(
-					model.getStates(), state, action)) {
-				final double trans = model.getTransitionFunction().getValue(state, reachableState,
-						action);
+			for (final State reachableState : model.getTransitionFunction().getReachableStates(model.getStates(),state, action)) {
+				final double trans = tf.getValue(state, reachableState, action);
 				if (trans > 0 && pValues.get(reachableState) != null) {
 					sum += trans * pValues.get(reachableState);
 				}
 			}
-			double v = model.getRewardFunction().getValue(state, action) + gama * sum;
+			double v = gama * sum;
 			q.put(action, v);
 		}
 		return q;

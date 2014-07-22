@@ -30,7 +30,7 @@ public class ERGQTable extends QTable<ERGQTableItem> {
 		initExpMaps();
 	}
 
-	public  Map<Expression, Double> getExpsValues() {
+	public synchronized Map<Expression, Double> getExpsValues() {
 		Map<Expression, Double> expValues = new HashMap<Expression, Double>();
 
 		for (Expression p : expSum.keySet()) {

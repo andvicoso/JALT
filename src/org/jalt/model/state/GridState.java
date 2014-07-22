@@ -3,12 +3,13 @@ package org.jalt.model.state;
 import org.jalt.util.grid.GridUtils;
 import org.jalt.util.grid.distancemeasure.CityBlock;
 import org.jalt.util.grid.distancemeasure.DistanceMeasure;
-
 /**
  * 
  * @author andvicoso
  */
 public class GridState extends State {
+	private static final DistanceMeasure dist = new CityBlock();
+
 	private final int row;
 	private final int col;
 
@@ -44,8 +45,6 @@ public class GridState extends State {
 	}
 
 	public boolean isNeighbour(GridState g) {
-		int difr = row - g.row;
-		int difc = col - g.col;
-		return (Math.abs(difr) + Math.abs(difc)) == 1;
+		return dist.getDistance(this, g) == 1;
 	}
 }

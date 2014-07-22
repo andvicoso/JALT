@@ -12,6 +12,9 @@ import org.jalt.model.function.PropositionFunction;
 import org.jalt.model.model.ERG;
 import org.jalt.model.propositional.Expression;
 import org.jalt.model.propositional.operator.BinaryOperator;
+import org.jalt.model.solution.Policy;
+import org.jalt.model.solution.SinglePolicy;
+import org.jalt.model.state.State;
 import org.jalt.util.CollectionsUtils;
 import org.jalt.util.ModelUtils;
 
@@ -25,7 +28,8 @@ public class ERGLearningUtils {
 		// CREATE NEW PRESERVATION GOAL FROM EXPRESSIONS THAT SHOULD BE AVOIDED
 		Expression newPreservGoal = createNewPreservationGoal(oldModel.getPreservationGoal(), avoid);
 		newModel.setPreservationGoal(newPreservGoal);
-		// CREATE NEW PROPOSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE) AND PREVIOUS(BLOCKED)
+		// CREATE NEW PROPOSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
+		// AND PREVIOUS(BLOCKED)
 		PropositionFunction pf = ERGFactory.createPropositionFunction(q);
 		newModel.setPropositionFunction(pf);
 
@@ -63,6 +67,17 @@ public class ERGLearningUtils {
 	}
 
 	private ERGLearningUtils() {
+	}
+
+	public static SinglePolicy optmize(Policy policy, ERGQTable q) {
+		SinglePolicy single = new SinglePolicy();
+		for (Map.Entry<State, Map<Action, Double>> entry : policy.entrySet()) {
+			State state = entry.getKey();
+			Action bestAction = getBestAction(entry.getValue(), q.getDoubleValues(state));
+			single.put(state, bestAction);
+		}
+
+		return single;
 	}
 
 }

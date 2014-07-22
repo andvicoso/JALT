@@ -3,7 +3,6 @@ package org.jalt.model.algorithm.table;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.jalt.model.action.Action;
 import org.jalt.model.state.State;
@@ -18,7 +17,7 @@ public class StateActionTable<T> {
     protected Map<State, Map<Action, T>> values;
 
     public StateActionTable(Collection<State> states, Collection<Action> actions, T initialValue) {
-        values = new TreeMap<State, Map<Action, T>>();
+        values = new HashMap<State, Map<Action, T>>(states.size());
 
         for (State state : states) {
             Map<Action, T> actionMap = new HashMap<Action, T>(actions.size());
@@ -35,10 +34,10 @@ public class StateActionTable<T> {
     }
 
     public StateActionTable(StateActionTable<T> q) {
-        values = new TreeMap<State, Map<Action, T>>();
+        values = new HashMap<State, Map<Action, T>>(q.getStates().size());
 
         for (State state : q.getStates()) {
-            Map<Action, T> actionMap = new TreeMap<Action, T>();
+            Map<Action, T> actionMap = new HashMap<Action, T>(q.getActions().size());
             values.put(state, actionMap);
 
             for (Action action : q.getActions()) {

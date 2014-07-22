@@ -109,12 +109,24 @@ public class ProblemsCLI {
 		return savedPath != null;
 	}
 
-	public static List<Problem<ERG>> getAllFromDir(String dir) {
+	public static List<Problem<ERG>> getAllProblemsFromDir(String dir) {
 		List<Problem<ERG>> ps = new ArrayList<Problem<ERG>>();
 		List<File> files = FileUtils.getAllFromDir(DEFAULT_DIR + File.separator + dir);
 		Collections.sort(files);
 		for (File file : files) {
 			ps.add(FileUtils.fromFile(file.getAbsolutePath()));
+		}
+
+		return ps;
+	}
+
+	public static List<String> getAllFilesFromDir(String dir) {
+		List<String> ps = new ArrayList<String>();
+		List<File> files = FileUtils.getAllFromDir(DEFAULT_DIR + File.separator + dir);
+		Collections.sort(files);
+		for (File file : files) {
+			if (file.getName().endsWith("jalt"))
+				ps.add(file.getAbsolutePath());
 		}
 
 		return ps;

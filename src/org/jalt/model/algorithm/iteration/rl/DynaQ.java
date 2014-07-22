@@ -1,5 +1,6 @@
 package org.jalt.model.algorithm.iteration.rl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class DynaQ<M extends MDP> extends QLearning<M> {
 	protected void init(Problem<M> pProblem, Map<String, Object> pParameters) {
 		super.init(pProblem, pParameters);
 		setActionChooser(new EpsilonGreedy<Action>(EPSILON));
-		visited = new HashMap<State, Set<Action>>();
+		visited = Collections.synchronizedMap(new HashMap<State, Set<Action>>());
 	}
 
 	@Override

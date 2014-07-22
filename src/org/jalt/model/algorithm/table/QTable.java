@@ -2,12 +2,14 @@ package org.jalt.model.algorithm.table;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
 
 import org.jalt.model.action.Action;
 import org.jalt.model.model.MDP;
 import org.jalt.model.solution.Policy;
+import org.jalt.model.solution.SinglePolicy;
 import org.jalt.model.state.State;
 import org.jalt.util.grid.GridPrinter;
 
@@ -39,17 +41,11 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		final Policy policy = new Policy();
 
 		for (State state : getStates()) {
-			double max = 0;
-			Action max_action = null;
 			for (Action action : getActions()) {
-				Double value = getValue(state, action);
-				if (value != 0 && (max_action == null || value > max)) {
-					max = value;
-					max_action = action;
+				double value = getValue(state, action);
+				if (pAddZeros || value != 0) {
+					policy.put(state, action, value);
 				}
-			}
-			if (max_action != null) {
-				policy.put(state, max_action);
 			}
 		}
 
@@ -58,6 +54,22 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 
 	public Policy getPolicy() {
 		return getPolicy(true);
+	}
+
+	public Set<State> getAllValidStates() {
+		Set<State> valid = new HashSet<State>();
+
+		for (Map.Entry<State, Map<Action, I>> entry : values.entrySet()) {
+			State state = entry.getKey();
+			Map<Action, I> actionsValues = entry.getValue();
+			for (I item : actionsValues.values()) {
+				if (item != null && item.getFrequency() != 0) {
+					valid.add(state);
+					break;
+				}
+			}
+		}
+		return valid;
 	}
 
 	public Map<Action, Double> getDoubleValues(State state) {
@@ -70,6 +82,20 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		}
 
 		return dvalues;
+	}
+
+	public Set<Action> getAllValidActions(State state) {
+		Set<Action> valid = new HashSet<Action>();
+		Map<Action, I> actionsValues = getValues(state);
+
+		for (Map.Entry<Action, I> entry : actionsValues.entrySet()) {
+			Action action = entry.getKey();
+			Integer value = entry.getValue() == null ? 0 : entry.getValue().getFrequency();
+			if (value > 0) {
+				valid.add(action);
+			}
+		}
+		return valid;
 	}
 
 	public String[][] getFrequencyTableStr() {
@@ -120,6 +146,27 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		return freq;
 	}
 
+	public SinglePolicy getSimplePolicy() {
+		final SinglePolicy policy = new SinglePolicy();
+
+		for (State state : getStates()) {
+			double max = 0;
+			Action max_action = null;
+			for (Action action : getActions()) {
+				Double value = getValue(state, action);
+				if (value != 0 && (max_action == null || value > max)) {
+					max = value;
+					max_action = action;
+				}
+			}
+			if (max_action != null) {
+				policy.put(state, max_action);
+			}
+		}
+
+		return policy;
+	}
+
 	public double getTotal(State pState) {
 		int count = 0;
 
@@ -132,7 +179,7 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 	}
 
 	public Map<State, Double> getStateValue() {
-		final Map<State, Double> map = new TreeMap<State, Double>();
+		final Map<State, Double> map = new HashMap<State, Double>();
 
 		for (State state : getStates()) {
 			double max = -Double.MAX_VALUE;
@@ -150,7 +197,7 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 
 	@Override
 	protected String formatValue(State state, Action action, I item) {
-		return String.format("%.9g", item == null ? 0.0 : item.getValue());
+		return String.format("%.4g", item == null ? 0.0 : item.getValue());
 	}
 
 	public Double getValue(State state, Action action) {

@@ -1,10 +1,10 @@
 package org.jalt.model.algorithm.reachability;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.jalt.model.action.Action;
 import org.jalt.model.model.ERG;
@@ -33,7 +33,7 @@ public class PPFERG<M extends ERG> extends PPF<M> {
 		// get the initial state for only one agent
 		final Collection<State> preserveIntension = intension(model.getPreservationGoal());
 		final Collection<State> goalsIntension = intension(model.getGoal());
-		final Map<State, Double> values = new TreeMap<State, Double>();
+		final Map<State, Double> values = new HashMap<State, Double>();
 		Collection<State> c;
 		Policy pi = new Policy();
 		Policy pi2;
@@ -44,7 +44,7 @@ public class PPFERG<M extends ERG> extends PPF<M> {
 
 		for (final State state : goalsIntension) {
 			values.put(state, INITIAL_VALUE);
-			pi.put(state, Action.TRIVIAL_ACTION);
+			pi.put(state, Action.TRIVIAL_ACTION, INITIAL_VALUE);
 		}
 
 		do {
@@ -59,7 +59,7 @@ public class PPFERG<M extends ERG> extends PPF<M> {
 					preserveIntension);
 			pi = choose(values, prunedStrongImage);
 			pi.putAll(pi2);
-			episodes++;
+			iterations++;
 		} while (!pi.equals(pi2) && !preserveIntension.equals(c));
 
 		return pi;

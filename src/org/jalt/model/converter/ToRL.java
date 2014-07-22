@@ -147,6 +147,6 @@ public class ToRL {
 	private static Set<State> getStatesThatSatisfies(ERG pErg, Expression pExp)
 			throws InvalidExpressionException {
 		return pExp.isEmpty() ? Collections.<State> emptySet() : pErg.getPropositionFunction()
-				.intension(pErg.getStates(), pExp);
+				.intension(pErg.getStates(), pErg.getPropositions(), pExp);
 	}
 }

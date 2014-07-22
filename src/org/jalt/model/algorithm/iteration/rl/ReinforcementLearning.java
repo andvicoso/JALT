@@ -111,7 +111,7 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 					State nextState = getNextState(state, action);
 					// if nextState eq null, stay in the same state and try a
 					// different action
-					if (nextState != null && !state.equals(nextState)) {
+					if (nextState != null) {
 						// get reward for current state and action
 						double reward = model.getRewardFunction().getValue(state, action);
 						// update q value for state and action
@@ -198,9 +198,9 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	private boolean isStopSteps(Problem<M> pProblem, Action action, State state, int currentSteps) {
 		int states = pProblem.getModel().getStates().size();
 		if (currentSteps > (states * states * 10)) {
-			String msg = "ERROR: Agent possibly blocked. State: %s. Action: %s. Steps: %d. Episodes: %d";
+			String msg = "ERROR: Agent possibly blocked. State: %s. Action: %s. Steps: %d";
 
-			throw new RuntimeException(String.format(msg, state, action, currentSteps, episodes));
+			throw new RuntimeException(String.format(msg, state, action, currentSteps));
 		}
 		return action == null || state == null || pProblem.getFinalStates().contains(state);
 	}
@@ -216,12 +216,14 @@ public abstract class ReinforcementLearning<M extends MDP> extends IterationAlgo
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<State, Double> getLastValues() {
-		return (Map<State, Double>) parameters.get(PolicyUtils.BEST_VALUES_STR);// lastq.getStateValue();//
+		return (Map<State, Double>) parameters.get(PolicyUtils.BEST_VALUES_STR);
+		//return  lastq.getStateValue();
 	}
 
 	@Override
 	public Map<State, Double> getCurrentValues() {
-		Map<String, Object> map = CollectionsUtils.asMap(PolicyUtils.POLICY_STR, q.getPolicy(false));
+		Map<String, Object> map = CollectionsUtils.asMap(PolicyUtils.POLICY_STR, q.getPolicy(false)
+				.getBestPolicy());
 		return new PolicyEvaluation<M>().run(problem, map);
 		// return q.getStateValue();
 	}

@@ -2,9 +2,9 @@ package org.jalt.model.algorithm.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.jalt.model.propositional.Proposition;
 import org.jalt.model.state.State;
@@ -70,7 +70,7 @@ public class PropTable {
     }
 
     public Map<State, Double> getStateValue() {
-        final Map<State, Double> map = new TreeMap<State, Double>();
+        final Map<State, Double> map = new HashMap<State, Double>();
 
         for (State state : states) {
             double max = 0;
@@ -91,7 +91,7 @@ public class PropTable {
     }
 
     public Map<Proposition, Double> getPropValue() {
-        final Map<Proposition, Double> map = new TreeMap<Proposition, Double>();
+        final Map<Proposition, Double> map = new HashMap<Proposition, Double>();
 
         for (Proposition prop : props) {
             double sum = 0;

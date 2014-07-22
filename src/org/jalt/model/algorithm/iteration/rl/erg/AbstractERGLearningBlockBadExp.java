@@ -42,12 +42,16 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 		avoid.clear();
 		blocked.clear();
 		// POG
+		setBlockedTransitionFunction(model);
+	}
+
+	private void setBlockedTransitionFunction(ERG model) {
 		if (model instanceof GridModel) {
 			GridModel gridModel = (GridModel) model;
 			int rows = gridModel.getRows();
 			int cols = gridModel.getCols();
 			model.setTransitionFunction(new BlockedGridTransitionFunction(rows, cols, blocked));
-		}// else//TODO:
+		}
 	}
 
 	@Override
@@ -55,7 +59,7 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 		int iteration = 0;
 		ERG model = prob.getModel();
 		ERGQTable q;
-		Expression badExp;
+		Expression toBlock;
 		Policy policy;
 		// initialize
 		initilize(model);
@@ -63,31 +67,31 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 		// start main loop
 		do {
 			iteration++;
-			// CREATE AND SAVE Q-TABLE (SHARED BY ALL AGENTS, IF MORE THAN ONE)
+			// CREATE AND SAVE Q-TABLE (SHARED BY ALL AGENTS)
 			q = new ERGQTable(model.getStates(), model.getActions());
 			params.put(QTable.NAME, q);
 			// Log.info("\nITERATION " + iteration + ":");
 			// 1. RUN QLEARNING UNTIL A BAD REWARD EXPRESSION IS FOUND
 			policy = runLearning(prob, params);
 			// 2. GET BAD EXPRESSION FROM QLEARNING ITERATIONS
-			badExp = expFinder.chooseOne(q.getExpsValues());
+			toBlock = expFinder.chooseOne(q.getExpsValues());
 			// valid expression: not null and not empty
-			valid = isValid(badExp);
+			valid = isValid(toBlock);
 			// 3. CHANGE THE Q VALUE FOR STATES THAT WERE VISITED IN
 			// QLEARNING EXPLORATION AND HAVE THE FOUND EXPRESSION
 			if (valid) {
-				Log.info("Found bad expression: " + badExp);
+				Log.info("Found bad expression: " + toBlock);
 				// avoid bad exp
-				avoid.add(badExp);
+				avoid.add(toBlock);
 				// Log.info("Avoid: " + avoid);
-				populateBlocked(q);
+				populateBlocked(model, toBlock);// q
 				// run vi again->new environment to compare
 				MainTest.runVI(prob, params);
 			}
 		} while (valid);
 
 		if (!avoid.isEmpty()) {
-			policy = extractPolicyPPFERG(params, prob, model, q);
+			policy = extractPolicyPPFERG(params, prob, q);
 		} else {
 			policy = q.getPolicy();
 		}
@@ -95,23 +99,40 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 		// Log.info("Preservation goal:" + model.getPreservationGoal());
 		// Log.info("\nQTable: \n" + q.toString(model));
 
-		return policy;
+		return q.getPolicy();// policy;
 	}
 
-	protected void populateBlocked(ERGQTable q) {
-		// mark as blocked all states that 
-		//contains one of the "avoid" expressions
-		PropositionFunction pf = ERGFactory.createPropositionFunction(q);
-		for (State state : q.getStates()) {
+	// protected void populateBlocked(ERGQTable q) {
+	// mark as blocked all states that
+	// contains one of the "avoid" expressions
+	// PropositionFunction pf = ERGFactory.createPropositionFunction(q);
+	// for (State state : q.getStates()) {
+	// Expression exp = pf.getExpressionForState(state);
+	// for (Expression toBlock : avoid) {
+	// if (toBlock.equals(exp)) {
+	// blocked.add(state);
+	// }
+	// }
+	// }
+	//
+	// Log.info("blocked: " + blocked);
+
+	protected void populateBlocked(ERG model, Expression toBlock) {
+		PropositionFunction pf = model.getPropositionFunction();
+		for (State state : model.getStates()) {
 			Expression exp = pf.getExpressionForState(state);
-			for (Expression toBlock : avoid) {
-				if (toBlock.equals(exp)) {
-					blocked.add(state);
-				}
+			if (toBlock.equals(exp)) {
+				blocked.add(state);
 			}
 		}
-		
-		 Log.info("blocked: " + blocked);
+	}
+
+	private Problem<ERG> createNewProblem(Problem<ERG> oldProb, ERGQTable q) {
+		ERG newModel = ERGLearningUtils.createModel(oldProb.getModel(), q, avoid);
+		setBlockedTransitionFunction(newModel);
+		Problem<ERG> newProblem = new Problem<>(newModel, oldProb.getInitialStates(),
+				oldProb.getFinalStates());
+		return newProblem;
 	}
 
 	protected boolean isValid(Expression exp) {
@@ -131,18 +152,21 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 				DefaultTestProperties.DEFAULT_STOPON);
 	}
 
-	protected Policy extractPolicyPPFERG(Map<String, Object> pParameters, Problem<ERG> pProb,
-			ERG oldModel, ERGQTable q) {
+	protected Policy extractPolicyPPFERG(Map<String, Object> pParameters, Problem<ERG> oldProb,
+			ERGQTable q) {
 		// 4. CREATE NEW MODEL AND PROBLEM FROM AGENT EXPLORATION
-		ERG newModel = ERGLearningUtils.createModel(oldModel, q, avoid);
-		Problem<ERG> newProblem = new Problem<>(newModel, pProb.getInitialStates(),
-				pProb.getFinalStates());
+		Problem<ERG> newProblem = createNewProblem(oldProb, q);
 		// 5. CREATE PPFERG ALGORITHM
 		final PPFERG<ERG> ppferg = new PPFERG<ERG>();
-		// 6. GET THE POLICY FROM PPFERG EXECUTED OVER THE NEW MODEL
-		// Log.info("Starting PPFERG...");
+		// 6. GET THE VIABLE POLICIES FROM PPFERG EXECUTED OVER THE NEW
+		// MODEL
+		Log.info("Starting PPFERG...");
 		Policy policy = ppferg.run(newProblem, pParameters);
 		// after ppferg
+		// Log.info(prob.toString(policy));
+		// 7. GET THE FINAL POLICY FROM THE PPFERG VIABLE POLICIES
+		policy = new Policy(ERGLearningUtils.optmize(policy, q));
+		// after optimize
 		// Log.info(prob.toString(policy));
 		return policy;
 	}

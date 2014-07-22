@@ -1,5 +1,7 @@
 package org.jalt.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -35,27 +37,38 @@ public class PolicyUtils {
 		for (final State state : pModel.getStates()) {
 			final int randPosition = rand.nextInt(pModel.getActions().size());
 			Action action = actions[randPosition];
-			policy.put(state, action);
+			policy.put(state, action, 0d);
 		}
 
 		return policy;
 	}
 
-//	public static Policy join(List<Policy> policies) {
-//		Policy ret = new Policy();
-//		for (Policy policy : policies) {
-//			ret.join(policy);
-//		}
-//		return ret;
-//	}
+	public static Policy join(List<Policy> policies) {
+		Policy ret = new Policy();
+		for (Policy policy : policies) {
+			ret.join(policy);
+		}
+		return ret;
+	}
 
 	public static List<State> getPlanStates(MDP model, Policy pi, State init) {
 		Stack<State> states = new Stack<State>();
 		State state = init;
 		Action action = null;
 		do {
-			action = pi.get(state);
-			state = model.getTransitionFunction().getNextState(model.getStates(), state, action);
+			Collection<Action> acts = pi.getBestActions(state);
+			if (acts == null || acts.isEmpty())
+				break;
+
+			List<Action> actions = new ArrayList<Action>(acts);
+			int count = 0;
+			do {
+				if (actions.size() <= count)
+					return states;
+				action = actions.get(count++);
+				state = model.getTransitionFunction()
+						.getNextState(model.getStates(), state, action);
+			} while (action != null && state != null && states.contains(state));
 
 			if (action != null && state != null) {
 				states.push(state);

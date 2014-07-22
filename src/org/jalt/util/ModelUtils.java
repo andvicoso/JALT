@@ -116,7 +116,8 @@ public class ModelUtils {
 		model.setActions(q.getActions());
 		model.setAgents(oldModel.getAgents());
 		// CREATE NEW REWARD FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
-		model.setRewardFunction(createRewardFunction(q));
+		RewardFunction rf = createRewardFunction(q);
+		model.setRewardFunction(rf);
 		// CREATE NEW TRANSITION FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
 		TransitionFunction tf = createTransitionFunctionFrequency(q, model);
 		model.setTransitionFunction(tf);

@@ -10,9 +10,9 @@ import org.jalt.util.grid.GridUtils;
 public class CityBlock implements DistanceMeasure {
 
     @Override
-    public double getDistance(final State s1, final State s2) {
-        int difr = GridUtils.getRow(s1) - GridUtils.getRow(s2);
-        int difc = GridUtils.getCol(s1) - GridUtils.getCol(s2);
+    public double getDistance(final State pS1, final State pS2) {
+        int difr = GridUtils.getRow(pS1) - GridUtils.getRow(pS2);
+        int difc = GridUtils.getCol(pS1) - GridUtils.getCol(pS2);
         return Math.abs(difr) + Math.abs(difc);
     }
 }

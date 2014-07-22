@@ -12,7 +12,9 @@ import org.jalt.model.algorithm.AlgorithmFactory;
 import org.jalt.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.jalt.model.algorithm.iteration.rl.erg.MultiERGLearning;
 import org.jalt.model.problem.Problem;
+import org.jalt.model.problem.ProblemFactory;
 import org.jalt.model.solution.Policy;
+import org.jalt.model.solution.SinglePolicy;
 import org.jalt.util.DefaultTestProperties;
 import org.jalt.util.ImageUtils;
 import org.jalt.util.Utils;
@@ -26,8 +28,9 @@ public class Test {
 
 	protected static final boolean DEBUG = true;
 	protected Algorithm algorithm;
-	protected AlgorithmFactory factory;
+	protected AlgorithmFactory algFactory;
 	protected Problem problem;
+	protected ProblemFactory probFactory;
 	protected Writer out;
 
 	public Test(Problem pProblem, Algorithm pAlgorithm) {
@@ -37,17 +40,33 @@ public class Test {
 
 	public Test(Problem pProblem, AlgorithmFactory pFactory) {
 		problem = pProblem;
-		factory = pFactory;
+		algFactory = pFactory;
 	}
 
 	public Test(Problem pProblem, AlgorithmFactory pFactory, String filename) throws IOException {
 		problem = pProblem;
-		factory = pFactory;
+		algFactory = pFactory;
 		out = new BufferedWriter(new FileWriter(filename));
 	}
 
+	public Test(ProblemFactory pProblemFactory, AlgorithmFactory pFactory, String filename)
+			throws IOException {
+		probFactory = pProblemFactory;
+		algFactory = pFactory;
+		out = new BufferedWriter(new FileWriter(filename));
+	}
+
+	public Test(ProblemFactory pProblemFactory, AlgorithmFactory pFactory) {
+		probFactory = pProblemFactory;
+		algFactory = pFactory;
+	}
+
+	public Test(ProblemFactory pProblemFactory, Algorithm pAlgorithm) {
+		probFactory = pProblemFactory;
+		algorithm = pAlgorithm;
+	}
+
 	public void run(Map<String, Object> pParameters) {
-		printHeader();
 		createAndRun(pParameters);
 		print("\nEnd: " + Utils.now());
 	}
@@ -66,6 +85,9 @@ public class Test {
 
 	protected void createAndRun(Map<String, Object> pParameters) {
 		algorithm = getAlgorithm();
+		problem = getProblem();
+		
+		printHeader();
 
 		print("\n------------------------------");
 		print("Algorithm: " + algorithm.getName());
@@ -74,9 +96,18 @@ public class Test {
 		flush();
 	}
 
+	protected Problem getProblem() {
+		if (probFactory != null) {
+			return probFactory.create();
+		} else if (problem != null) {
+			return problem;
+		}
+		throw new RuntimeException("Algorithm and factory are not defined for test!");
+	}
+
 	protected Algorithm getAlgorithm() {
-		if (factory != null) {
-			return factory.create();
+		if (algFactory != null) {
+			return algFactory.create();
 		} else if (algorithm != null) {
 			return algorithm;
 		}
@@ -91,19 +122,17 @@ public class Test {
 		long diff = System.currentTimeMillis() - initMsecs;
 		// print time
 		print("Time: " + Utils.toTimeString(diff));
-		if (problem.getInitialStates().size() > 1)
-			print("Mean Time per Agent: "
-					+ Utils.toTimeString(diff / problem.getInitialStates().size()));
 		// print results
 		printNoInitialBreak(algorithm.printResults());
 		// if a solution was found...
 		if (result != null) {
 			if (problem.getModel().getStates().size() < Problem.MAX_SIZE_PRINT) {
 				// print("Result:" + problem.toString(result));
-				print("Result:" + problem.toString((Policy) result));
+				print("Result:" + problem.toString(((Policy) result).getBestPolicy()));//TODO: uncomment to see final policy
+				// print("Result:" + problem.toString((Policy) result));
 			}
 			// save heat map and final plans
-			//saveResultImages(problem, algorithm, result);
+			// saveResultImages(problem, algorithm, result);
 		}
 
 		return result;

@@ -18,7 +18,7 @@ public class AlgorithmTest {
 	}
 
 	public Problem createFromCLI(int agents) {
-		ProblemFactory factory = GenericERGProblemFactory.createDefaultFactory();
+		ProblemFactory factory = GenericERGProblemFactory.createDefault();
 		return new ProblemsCLI(factory).run();
 	}
 
@@ -37,10 +37,6 @@ public class AlgorithmTest {
 		} catch (InstantiationException | IllegalAccessException e) {
 		}
 		return null;
-	}
-
-	public Class<? extends ReinforcementLearning> getLearningClass() {
-		return learningClass;
 	}
 
 }
