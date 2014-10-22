@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jalt.infra.log.Log;
@@ -11,10 +13,12 @@ import org.jalt.model.algorithm.Algorithm;
 import org.jalt.model.algorithm.AlgorithmFactory;
 import org.jalt.model.algorithm.iteration.rl.ReinforcementLearning;
 import org.jalt.model.algorithm.iteration.rl.erg.MultiERGLearning;
+import org.jalt.model.model.ERG;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.problem.ProblemFactory;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.solution.SinglePolicy;
+import org.jalt.model.state.State;
 import org.jalt.util.DefaultTestProperties;
 import org.jalt.util.ImageUtils;
 import org.jalt.util.Utils;
@@ -86,7 +90,7 @@ public class Test {
 	protected void createAndRun(Map<String, Object> pParameters) {
 		algorithm = getAlgorithm();
 		problem = getProblem();
-		
+
 		printHeader();
 
 		print("\n------------------------------");
@@ -128,11 +132,16 @@ public class Test {
 		if (result != null) {
 			if (problem.getModel().getStates().size() < Problem.MAX_SIZE_PRINT) {
 				// print("Result:" + problem.toString(result));
-				print("Result:" + problem.toString(((Policy) result).getBestPolicy()));//TODO: uncomment to see final policy
+				print("Result:" + problem.toString(((Policy) result).getBestPolicy()));// TODO:
+																						// uncomment
+																						// to
+																						// see
+																						// final
+																						// policy
 				// print("Result:" + problem.toString((Policy) result));
 			}
 			// save heat map and final plans
-			// saveResultImages(problem, algorithm, result);
+			//saveResultImages(problem, algorithm, result);
 		}
 
 		return result;
@@ -140,15 +149,33 @@ public class Test {
 
 	private void saveResultImages(Problem problem, Algorithm algorithm, Object result) {
 		if (algorithm instanceof ReinforcementLearning) {
-			saveResultImages(problem, (ReinforcementLearning) algorithm, result);
+			saveResultImages(problem, ((ReinforcementLearning) algorithm).getQTable()
+					.getFrequencyValues(), result);
 		} else if (algorithm instanceof MultiERGLearning) {
-			saveResultImages(problem, ((MultiERGLearning) algorithm).getLearnings().get(0), result);
+			saveResultImages(problem, joinFrequency(((MultiERGLearning) algorithm).getLearnings()),
+					result);
 		}
 	}
 
-	private void saveResultImages(Problem problem, ReinforcementLearning algorithm, Object result) {
-		ImageUtils.save(ImageUtils.createHeat(problem, algorithm.getQTable().getFrequencyValues()),
-				"final_heat.png");
+	private Map<State, Double> joinFrequency(List<ReinforcementLearning<ERG>> learnings) {
+		Map<State, Double> values = new HashMap<State, Double>();
+
+		for (ReinforcementLearning<ERG> rl : learnings) {
+			Map<State, Double> fs = rl.getQTable().getFrequencyValues();
+			for (State st : fs.keySet()) {
+				Double v = values.get(st);
+				v = v == null ? 0 : v;
+				Double f = fs.get(st);
+				f = f == null ? 0 : f;
+				values.put(st, f + v);
+			}
+		}
+
+		return values;
+	}
+
+	private void saveResultImages(Problem problem, Map<State, Double> values, Object result) {
+		ImageUtils.save(ImageUtils.createHeat(problem, values), "final_heat.png");
 
 		ImageUtils.save(ImageUtils.create(problem, (Policy) result), "result.png");
 	}

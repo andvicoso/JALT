@@ -14,23 +14,20 @@ import org.jalt.model.propositional.Expression;
  * 
  * @author andvicoso
  */
-public class StopOnBadExpression implements StoppingCriterium {
+public class StopOnAvoidableExpression implements StoppingCriterium<ReinforcementLearning> {
 
 	private Chooser<Expression> chooser;
 
-	public StopOnBadExpression(double threshold, Set<Expression> pAvoid) {
+	public StopOnAvoidableExpression(double threshold, Set<Expression> pAvoid) {
 		this.chooser = new BadExpressionChooser(threshold, pAvoid);
 	}
 
 	@Override
-	public boolean isStop(IterationValues pValues) {
+	public boolean isStop(ReinforcementLearning pValues) {
 		Set<Expression> chosen = Collections.emptySet();
-		if (pValues instanceof ReinforcementLearning) {
-			ReinforcementLearning<?> alg = (ReinforcementLearning<?>) pValues;
-			if (alg.getQTable() instanceof ERGQTable) {
-				ERGQTable q = (ERGQTable) alg.getQTable();
-				chosen = chooser.choose(q.getExpsValues());
-			}
+		if (pValues.getQTable() instanceof ERGQTable) {
+			ERGQTable q = (ERGQTable) pValues.getQTable();
+			chosen = chooser.choose(q.getExpsValues());
 		}
 
 		return !chosen.isEmpty();

@@ -5,12 +5,11 @@ import static org.jalt.util.DefaultTestProperties.BAD_EXP_VALUE;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.jalt.infra.log.Log;
 import org.jalt.model.algorithm.Algorithm;
 import org.jalt.model.algorithm.reachability.PPFERG;
-import org.jalt.model.algorithm.stoppingcriterium.StopOnBadExpression;
+import org.jalt.model.algorithm.stoppingcriterium.StopOnAvoidableExpression;
 import org.jalt.model.algorithm.stoppingcriterium.StoppingCriteria;
 import org.jalt.model.algorithm.table.QTable;
 import org.jalt.model.algorithm.table.erg.ERGQTable;
@@ -26,7 +25,6 @@ import org.jalt.model.solution.Policy;
 import org.jalt.model.state.State;
 import org.jalt.model.test.MainTest;
 import org.jalt.util.DefaultTestProperties;
-import org.jalt.util.erg.ERGFactory;
 import org.jalt.util.erg.ERGLearningUtils;
 
 /**
@@ -34,13 +32,13 @@ import org.jalt.util.erg.ERGLearningUtils;
  * @author andvicoso
  */
 public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, Policy> {
-	protected final Set<Expression> avoid = new HashSet<Expression>();
-	protected final Set<State> blocked = new TreeSet<>();
+	protected final Set<Expression> avoid = new HashSet<Expression>(5);
+	protected Set<State> blocked;
 	protected final Chooser<Expression> expFinder = new BadExpressionChooser(BAD_EXP_VALUE, avoid);
 
 	protected void initilize(ERG model) {
 		avoid.clear();
-		blocked.clear();
+		blocked = new HashSet<>(model.getStates().size() / 3);
 		// POG
 		setBlockedTransitionFunction(model);
 	}
@@ -148,7 +146,7 @@ public abstract class AbstractERGLearningBlockBadExp implements Algorithm<ERG, P
 	}
 
 	protected StoppingCriteria getStopCriteria() {
-		return new StoppingCriteria(new StopOnBadExpression(BAD_EXP_VALUE, avoid),
+		return new StoppingCriteria(new StopOnAvoidableExpression(BAD_EXP_VALUE, avoid),
 				DefaultTestProperties.DEFAULT_STOPON);
 	}
 

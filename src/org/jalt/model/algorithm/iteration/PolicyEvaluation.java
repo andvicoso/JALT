@@ -1,5 +1,6 @@
 package org.jalt.model.algorithm.iteration;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,7 +25,7 @@ public class PolicyEvaluation<M extends MDP> extends IterationAlgorithm<M, Map<S
 
 	public Map<State, Double> run(Problem<M> pProblem, Map<String, Object> pParameters) {
 		model = pProblem.getModel();
-		v = new TreeMap<State, Double>();
+		v =  new HashMap<State, Double>(model.getStates().size());//new TreeMap<State, Double>();
 		initializeV(pProblem, v);
 
 		SinglePolicy pi = (SinglePolicy) pParameters.get(PolicyUtils.POLICY_STR);
@@ -34,7 +35,7 @@ public class PolicyEvaluation<M extends MDP> extends IterationAlgorithm<M, Map<S
 		do {
 			delta = 0;
 			lastv = v;
-			v = new TreeMap<State, Double>();
+			v =  new HashMap<State, Double>(model.getStates().size());//new TreeMap<State, Double>();
 			// for each state
 			for (final State state : model.getStates()) {
 				Action action = pi.get(state);

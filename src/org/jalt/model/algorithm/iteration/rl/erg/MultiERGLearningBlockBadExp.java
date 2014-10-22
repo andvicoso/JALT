@@ -19,7 +19,7 @@ public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp 
 		MultiERGLearning {
 
 	private static final int MAX_IT = 5;
-	private static final int TIME_TO_SLEEP = 100;
+	private static final int TIME_TO_SLEEP = 50;
 	private List<ReinforcementLearning<ERG>> learnings;
 
 	public MultiERGLearningBlockBadExp(List<ReinforcementLearning<ERG>> learnings) {
@@ -37,18 +37,33 @@ public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp 
 
 	protected Policy runLearning(Problem<ERG> pProblem, Map<String, Object> pParameters) {
 		int count = 0;
-		List<Policy> policies = new ArrayList<Policy>(learnings.size());
+		int it = 0;
+
+		final List<Policy> policies = new ArrayList<Policy>(learnings.size());
 		for (ReinforcementLearning<ERG> learning : learnings) {
 			runThread(pProblem, pParameters, learning, policies, count++);
 		}
 
-		int it = 0;
-		while (policies.size() < learnings.size()) {
+		// while (policies.size() < learnings.size()) {
+		// if (it++ > pProblem.getModel().getStates().size() * MAX_IT)
+		// throw new
+		// RuntimeException("Tired of waiting agent/thread to finish. Secs: "
+		// + (it * TIME_TO_SLEEP / 1000));
+		// try {
+		// Thread.sleep(TIME_TO_SLEEP);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// }
+
+		while (policies.size() < 1) {
 			if (it++ > pProblem.getModel().getStates().size() * MAX_IT)
 				throw new RuntimeException("Tired of waiting agent/thread to finish. Secs: "
 						+ (it * TIME_TO_SLEEP / 1000));
 			try {
-				Thread.sleep(TIME_TO_SLEEP);
+				synchronized (policies) {
+					policies.wait(TIME_TO_SLEEP);
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -70,7 +85,9 @@ public class MultiERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp 
 				Policy p = learning.run(pProblem, map);
 				synchronized (policies) {
 					policies.add(p);
+					policies.notifyAll();
 				}
+
 				// Log.info("Finished thread " + i);
 			}
 		}.start();

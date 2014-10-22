@@ -3,6 +3,7 @@ package org.jalt.model.algorithm.table.erg;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.jalt.model.action.Action;
 import org.jalt.model.algorithm.table.QTable;
@@ -30,10 +31,15 @@ public class ERGQTable extends QTable<ERGQTableItem> {
 		initExpMaps();
 	}
 
-	public synchronized Map<Expression, Double> getExpsValues() {
+	public Map<Expression, Double> getExpsValues() {
 		Map<Expression, Double> expValues = new HashMap<Expression, Double>();
+		Set<Expression> exps;
 
-		for (Expression p : expSum.keySet()) {
+		synchronized (expSum) {
+			exps = expSum.keySet();
+		}
+
+		for (Expression p : exps) {
 			double value = 0;
 			Double sum = expSum.get(p);
 			Integer count = expCount.get(p);
@@ -47,12 +53,14 @@ public class ERGQTable extends QTable<ERGQTableItem> {
 	}
 
 	@Override
-	public synchronized void put(State state, Action action, ERGQTableItem value) {
-		super.put(state, action, value);
+	public void put(State state, Action action, ERGQTableItem value) {
+		synchronized (value) {
+			super.put(state, action, value);
+		}
 		updateExpressionValues(value.getValue(), value.getExpression());
 	}
 
-	protected synchronized void updateExpressionValues(double value, Expression exp) {
+	protected void updateExpressionValues(double value, Expression exp) {
 		if (exp != null && !exp.isEmpty()) {
 			double sum = 0;
 			int count = 0;
@@ -64,12 +72,14 @@ public class ERGQTable extends QTable<ERGQTableItem> {
 				count = expCount.get(exp);
 			}
 
-			expSum.put(exp, sum + value);
-			expCount.put(exp, count + 1);
+			synchronized (expSum) {
+				expSum.put(exp, sum + value);
+				expCount.put(exp, count + 1);
+			}
 		}
 	}
 
-	private  void initExpMaps() {
+	private void initExpMaps() {
 		expCount = new HashMap<Expression, Integer>();
 		expSum = new HashMap<Expression, Double>();
 	}

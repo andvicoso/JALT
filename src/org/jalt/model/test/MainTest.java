@@ -73,7 +73,7 @@ public class MainTest {
 
 	private static void runOne() throws IOException {
 		// 0,2,5,7
-		final String file = "thesis\\3three\\7_problem";
+		final String file = "thesis\\5five\\0_problem";
 
 		ProblemFactory probFactory = new ProblemFactory() {
 			protected Problem<?> doCreate() {
@@ -86,7 +86,8 @@ public class MainTest {
 
 		Problem prob = probFactory.create();
 
-		ImageUtils.save(ImageUtils.create(prob, null), getProblemPath(file) + ".png");
+		// ImageUtils.save(ImageUtils.create(prob, null), getProblemPath(file) +
+		// ".png");
 
 		Map<String, Object> params = createParamsMap();
 		runVI(prob, params);
@@ -115,15 +116,17 @@ public class MainTest {
 		};
 
 		Problem prob = probFactory.create();
+		
+		 //ImageUtils.save(ImageUtils.create(prob, null), getProblemPath(file) + ".png");
 
 		Map<String, Object> params = createParamsMap();
 		runVI(prob, params);
 
-		int agents = prob.getInitialStates().size();
-		Class<? extends ReinforcementLearning> c = QLearning.class;
+		Class<? extends ReinforcementLearning> c = DynaQ.class;
 
-		AlgorithmTest algTest = new MultiERGTest(agents, c);
-		//AlgorithmTest algTest = new AlgorithmTest(c);
+		AlgorithmTest algTest = 
+		new MultiERGTest(prob.getInitialStates().size(), c);
+		//new AlgorithmTest(c);
 
 		Test test = new BatchTest(probFactory, algTest.createAlgorithmFactory(), getDirResultPath(
 				c, file));

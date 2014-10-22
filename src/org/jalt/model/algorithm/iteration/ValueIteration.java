@@ -31,14 +31,14 @@ public class ValueIteration<M extends MDP> extends IterationAlgorithm<M, Policy>
 		Policy pi;
 
 		model = pProblem.getModel();
-		v = new TreeMap<State, Double>();
+		v = new HashMap<State, Double>(model.getStates().size());//new TreeMap<State, Double>();
 		initializeV(pProblem, v);
 		// Start the main loop
 		// When the maximmum error is greater than the defined error,
 		// the best policy is found
 		do {
 			lastv = v;
-			v = new TreeMap<State, Double>();
+			v = new HashMap<State, Double>(model.getStates().size());//new TreeMap<State, Double>();
 			pi = new Policy();
 			// for each state
 			for (State state : model.getStates()) {
