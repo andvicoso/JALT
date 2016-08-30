@@ -329,7 +329,7 @@ class Rn {
 
 		} while (episodes < MAX_EP);
 		System.out.println("Finished. Steps mean: " + (totalSteps / episodes));
-		// System.out.println(String.format("Iterations=%d", episodes));
+		System.out.println(String.format("Iterations=%d", episodes));
 	}
 
 	// private void runPoleThread() {

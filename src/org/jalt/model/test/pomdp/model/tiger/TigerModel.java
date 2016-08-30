@@ -13,12 +13,12 @@ import org.jalt.model.state.State;
 
 /**
  *
- * @author andvicoso Viçoso
+ * @author andvicoso Vicoso
  */
 public class TigerModel extends POMDPModel {
 
     public TigerModel() {
-        //createh the system states
+        //create the system states
         final State tigerLeft = new State("TigerLeft");
         final State tigerRight = new State("TigerRight");
         setStates(Arrays.asList(tigerLeft, tigerRight));

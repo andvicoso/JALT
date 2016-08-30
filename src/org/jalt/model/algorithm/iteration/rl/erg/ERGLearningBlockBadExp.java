@@ -8,7 +8,7 @@ import org.jalt.model.problem.Problem;
 import org.jalt.model.solution.Policy;
 
 /**
- * Learning + PPFERG + bloqueando a pior expressão de cada vez (com iteração)
+ * Learning + PPFERG + bloqueando a pior expressão de cada vez (com iteracao)
  */
 public class ERGLearningBlockBadExp extends AbstractERGLearningBlockBadExp implements SingleERGLearning {
 
