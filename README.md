@@ -1,26 +1,28 @@
-JALT
+#1 JALT
 ===
 
-Java Agent Reinforcement Learning Toolbox
+#2 Java Agent Reinforcement Learning Toolbox
 
-- Framework free e open source;
-- Desenvolvido em Java;
-- Lê e interpreta um formato de arquivo de testes vastamente conhecido encontrado em:http://www.cassandra.org/pomdp/code/pomdp-file-spec.shtml ;
-- Contém definições para os modelos:
-  - MDP;
+- Free and open source;
+- Developed in Java;
+- Reads the file format: <http://www.cassandra.org/pomdp/code/pomdp-file-spec.shtml>;
+- Models definitions:
+  - MDP: Markov Decision Process;
   - SRG: Simple Reachability Goal MDP;
   - ERG: Extended Reachability Goals MDP
-- Algoritmos implementados:
-  - MDP:
-    - ValueIteration;
-    - PolicyIteration;
+- Implemented Techniques and Algorithms:
+  - Reinforcement Learning:
+    - Value Iteration;
+    - Policy Iteration;
+    - Q-Learning;
+    - SARSA;
+    - Dyna Architecture (Dyna-Q, Dyna-SARSA, ...).
   - SRG:
-    - ValueIterationSRG;
-    - PPF;
+    - PPF
   - ERG:
-    - PPFERG.
+    - PPFERG
     
-- Possui diversos exemplos para execução dos algoritmos;
+- Various examples implemented to show algorithms and techniques usage;
 
 
 
