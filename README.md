@@ -1,5 +1,5 @@
 # JALT
-===
+======
 
 ## Java Agent Reinforcement Learning Toolbox
 
