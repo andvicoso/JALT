@@ -1,4 +1,4 @@
-Alt-JALT
+JALT
 ======
 
 ## Java Agent Reinforcement Learning Toolbox
