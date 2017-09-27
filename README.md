@@ -1,7 +1,7 @@
-#1 JALT
+# JALT
 ===
 
-#2 Java Agent Reinforcement Learning Toolbox
+## Java Agent Reinforcement Learning Toolbox
 
 - Free and open source;
 - Developed in Java;
