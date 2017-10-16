@@ -20,7 +20,6 @@ import org.jalt.model.model.MDP;
 import org.jalt.model.propositional.Proposition;
 import org.jalt.model.solution.Plan;
 import org.jalt.model.solution.Policy;
-import org.jalt.model.solution.SinglePolicy;
 import org.jalt.model.state.State;
 import org.jalt.util.DefaultTestProperties;
 
@@ -53,20 +52,16 @@ public class GridPrinter {
 	}
 
 	public <M extends MDP & Grid> String print(M pModel) {
-		String[][] grid = getGrid(pModel, Collections.<Integer, State> emptyMap(),
-				Collections.<State> emptySet());
+		String[][] grid = getGrid(pModel, Collections.<Integer, State> emptyMap(), Collections.<State> emptySet());
 		return toTable(grid);
 	}
 
-	public <M extends MDP & Grid> String print(M pModel, Map<Integer, State> pInitialStates,
-			Set<State> pFinalStates, Object pResult) {
+	public <M extends MDP & Grid> String print(M pModel, Map<Integer, State> pInitialStates, Set<State> pFinalStates, Object pResult) {
 		String[][] grid = getGrid(pModel, pInitialStates, pFinalStates);
 
 		if (pResult != null) {
 			if (pResult instanceof Policy) {
 				fillWithActions(grid, (Policy) pResult);
-			} else if (pResult instanceof SinglePolicy) {
-				fillWithActions(grid, (SinglePolicy) pResult);
 			} else if (pResult instanceof Plan) {
 				fillWithActions(grid, pInitialStates, (Plan) pResult);
 			}
@@ -75,8 +70,7 @@ public class GridPrinter {
 		return toTable(grid);
 	}
 
-	public <M extends MDP & Grid> String[][] getGrid(M pModel, Map<Integer, State> pInitialStates,
-			Set<State> pFinalStates) {
+	public <M extends MDP & Grid> String[][] getGrid(M pModel, Map<Integer, State> pInitialStates, Set<State> pFinalStates) {
 		String[][] grid = createGrid(pModel);
 
 		if (pModel instanceof ERG) {
@@ -145,7 +139,7 @@ public class GridPrinter {
 
 	public void fillWithActions(String[][] pGrid, Policy pPolicy) {
 		for (State state : pPolicy.getStates()) {
-			Collection<Action> actions = pPolicy.get(state).keySet();
+			Collection<Action> actions = pPolicy.getBestActions(state);
 			int row = GridUtils.getRow(state) + 1;
 			int col = GridUtils.getCol(state) + 1;
 
@@ -160,13 +154,6 @@ public class GridPrinter {
 			for (Action action : pPlan) {
 				getActionSymbol(state, action, pGrid);
 			}
-		}
-	}
-
-	public void fillWithActions(String[][] pGrid, SinglePolicy pPolicy) {
-		for (State state : pPolicy.getStates()) {
-			Action action = pPolicy.get(state);
-			getActionSymbol(state, action, pGrid);
 		}
 	}
 
@@ -272,24 +259,24 @@ public class GridPrinter {
 			for (Action action : mdp.getActions()) {
 				j++;
 				grid[0][j] = action.getName();
-				grid[i][j] = rf.getValue(state, action) + "";//maxReward(state, action, rf, mdp.getStates()) + "";
+				grid[i][j] = rf.getValue(state, action) + "";// maxReward(state, action, rf, mdp.getStates()) + "";
 			}
 		}
 
 		return toTable(grid);
 	}
 
-//	private Double maxReward(State state, Action action, RewardFunction rf, Collection<State> states) {
-//		double max = 0;
-//		for (State state2 : states) {
-//			Double rew = rf.getValue(state, state2, action);
-//			if (rew != null && rew > max) {
-//				max = rew;
-//			}
-//		}
-//
-//		return max;
-//	}
+	// private Double maxReward(State state, Action action, RewardFunction rf, Collection<State> states) {
+	// double max = 0;
+	// for (State state2 : states) {
+	// Double rew = rf.getValue(state, state2, action);
+	// if (rew != null && rew > max) {
+	// max = rew;
+	// }
+	// }
+	//
+	// return max;
+	// }
 
 	public String print(TransitionFunction tf, MDP mdp) {
 		int i = 0;

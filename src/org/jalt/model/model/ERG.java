@@ -8,7 +8,7 @@ import org.jalt.model.propositional.Expression;
  */
 public interface ERG extends SRG {
 
-    Expression getPreservationGoal();
+	Expression getPreservationGoal();
 
-    void setPreservationGoal(Expression pPreservationGoal);
+	void setPreservationGoal(Expression pPreservationGoal);
 }

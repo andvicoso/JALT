@@ -12,7 +12,6 @@ import org.jalt.model.action.Action;
 import org.jalt.model.algorithm.PolicyGenerator;
 import org.jalt.model.exception.InvalidExpressionException;
 import org.jalt.model.function.transition.TransitionFunction;
-import org.jalt.model.model.MDP;
 import org.jalt.model.model.SRG;
 import org.jalt.model.problem.Problem;
 import org.jalt.model.propositional.Expression;
@@ -23,13 +22,13 @@ import org.jalt.util.DefaultTestProperties;
 import org.jalt.util.ModelUtils;
 
 /**
- * Strong probabilistic planning algorithm
+ * Strong probabilistic planning algorithm. Based on https://link.springer.com/chapter/10.1007/978-3-540-88636-5_61
  * 
  * @author andvicoso
  * @param <P>
  *            Simple reachability problem to be resolved
  */
-public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
+public class PPF<M extends SRG> implements PolicyGenerator<M> {
 
 	protected M model;
 	private double gama = DefaultTestProperties.GAMA;
@@ -37,18 +36,16 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 	protected static final Double INITIAL_VALUE = 1d;
 
 	/**
-	 * if is true, then the algorithm will stop when it finds a valid path to
-	 * some agent's initial position. Else, it will find all the paths for all
-	 * valid states.
+	 * if is true, then the algorithm will stop when it finds a valid path to some agent's initial position. Else, it
+	 * will find all the paths for all valid states.
 	 */
 	protected final boolean stopWhenOneAgentFindPath;
 
 	/**
 	 * 
 	 * @param pStopWhenOneAgentFindPath
-	 *            if is true, then the algorithm will stop when it finds a valid
-	 *            path to some agent's initial position. Else, it will find all
-	 *            the paths for all valid states.
+	 *            if is true, then the algorithm will stop when it finds a valid path to some agent's initial position.
+	 *            Else, it will find all the paths for all valid states.
 	 */
 	public PPF(final boolean pStopWhenOneAgentFindPath) {
 		stopWhenOneAgentFindPath = pStopWhenOneAgentFindPath;
@@ -88,8 +85,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 		return pi;
 	}
 
-	protected boolean isStop(Problem<M> pProblem, Map<String, Object> pParameters,
-			Collection<State> c) {
+	protected boolean isStop(Problem<M> pProblem, Map<String, Object> pParameters, Collection<State> c) {
 		Collection<State> initialStates = pProblem.getInitialStates().values();
 		// If the flag "stopWhenOneAgentFindPath" is true, then the algorithm
 		// will stop when it finds a valid path to some agent's initial
@@ -120,8 +116,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 
 	protected Collection<State> intension(final Expression pExpression) {
 		try {
-			return model.getPropositionFunction().intension(model.getStates(),
-					model.getPropositions(), pExpression);
+			return model.getPropositionFunction().intension(model.getStates(), model.getPropositions(), pExpression);
 		} catch (InvalidExpressionException ex) {
 			ex.printStackTrace();
 		}
@@ -129,8 +124,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 	}
 
 	/**
-	 * Para todas as transicoes da imagem forte, corta todas que nao
-	 * pertencam ao conjunto da cobertura
+	 * Para todas as transicoes da imagem forte, corta todas que nao pertencam ao conjunto da cobertura
 	 * 
 	 * @param pStrongImage
 	 * @param pC
@@ -152,8 +146,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 
 		for (final State state : model.getStates()) {
 			for (final Action actions : model.getActions()) {
-				final Collection<State> reachableStates = model.getTransitionFunction()
-						.getReachableStates(model.getStates(), state, actions);
+				final Collection<State> reachableStates = model.getTransitionFunction().getReachableStates(model.getStates(), state, actions);
 				if (!Collections.disjoint(pC, reachableStates)) {
 					final Transition t = new Transition(state, actions);
 					if (!result.contains(t)) {
@@ -179,8 +172,7 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 
 		for (final State state : model.getStates()) {
 			for (final Action action : model.getActions()) {// tf.getActionsFrom
-				final Collection<State> reachableStates = model.getTransitionFunction()
-						.getReachableStates(model.getStates(), state, action);
+				final Collection<State> reachableStates = model.getTransitionFunction().getReachableStates(model.getStates(), state, action);
 				if (pC.containsAll(reachableStates)) {
 					final Transition t = new Transition(state, action);
 					if (!result.contains(t)) {
@@ -215,13 +207,13 @@ public class PPF<M extends MDP & SRG> implements PolicyGenerator<M> {
 		return actions;
 	}
 
-	protected Map<Action, Double> getQValue(final Collection<Transition> pPrune, final State state,
-			final TransitionFunction tf, final Map<State, Double> pValues) {
+	protected Map<Action, Double> getQValue(final Collection<Transition> pPrune, final State state, final TransitionFunction tf,
+			final Map<State, Double> pValues) {
 		final Map<Action, Double> q = new HashMap<Action, Double>();
 		// search for the Qs values for state
 		for (final Action action : getActions(pPrune, state)) {
 			double sum = 0;
-			for (final State reachableState : model.getTransitionFunction().getReachableStates(model.getStates(),state, action)) {
+			for (final State reachableState : model.getTransitionFunction().getReachableStates(model.getStates(), state, action)) {
 				final double trans = tf.getValue(state, reachableState, action);
 				if (trans > 0 && pValues.get(reachableState) != null) {
 					sum += trans * pValues.get(reachableState);

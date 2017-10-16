@@ -17,24 +17,22 @@ import org.jalt.model.propositional.Proposition;
  */
 public class ToERG {
 
-    public ERG convert(MDP pModel, Set<Proposition> pPropositions,
-            PropositionFunction pPropositionFunction, Expression pGoal, Expression pPreservGoal) {
-        ERG model;
-        if (pModel instanceof Grid) {
-            final Grid grid = (Grid) pModel;
-            model = new ERGGridModel(grid.getRows(), grid.getCols());
-        } else {
-            model = new ERGModel();
-        }
+	public ERG convert(MDP pModel, Set<Proposition> pPropositions, PropositionFunction pPropositionFunction, Expression pGoal, Expression pPreservGoal) {
+		ERG model;
+		if (pModel instanceof Grid) {
+			final Grid grid = (Grid) pModel;
+			model = new ERGGridModel(grid.getRows(), grid.getCols());
+		} else {
+			model = new ERGModel();
+		}
 
-        model.setAgents(pModel.getAgents());
-        model.setActions(pModel.getActions());
-        model.setStates(pModel.getStates());
-        model.setPropositions(pPropositions);
-        model.setPropositionFunction(pPropositionFunction);
-        model.setGoal(pGoal);
-        model.setPreservationGoal(pPreservGoal);
+		model.setActions(pModel.getActions());
+		model.setStates(pModel.getStates());
+		model.setPropositions(pPropositions);
+		model.setPropositionFunction(pPropositionFunction);
+		model.setGoal(pGoal);
+		model.setPreservationGoal(pPreservGoal);
 
-        return model;
-    }
+		return model;
+	}
 }

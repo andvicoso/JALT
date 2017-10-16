@@ -13,6 +13,14 @@ import org.jalt.model.solution.Policy;
 import org.jalt.model.state.State;
 import org.jalt.model.transition.Transition;
 
+/**
+ * Strong probabilistic planning algorithm for extended reachability goals. Based on
+ * https://link.springer.com/chapter/10.1007/978-3-540-88636-5_61
+ * 
+ * @author Anderson
+ *
+ * @param <M>
+ */
 public class PPFERG<M extends ERG> extends PPF<M> {
 
 	public PPFERG(boolean pStopWhenOneAgentFindPath) {
@@ -55,8 +63,7 @@ public class PPFERG<M extends ERG> extends PPF<M> {
 
 			pi2 = pi;
 			final Collection<Transition> strongImage = getStrongImage(c);
-			final Collection<Transition> prunedStrongImage = prune(strongImage, c,
-					preserveIntension);
+			final Collection<Transition> prunedStrongImage = prune(strongImage, c, preserveIntension);
 			pi = choose(values, prunedStrongImage);
 			pi.putAll(pi2);
 			iterations++;
@@ -65,8 +72,7 @@ public class PPFERG<M extends ERG> extends PPF<M> {
 		return pi;
 	}
 
-	protected Set<Transition> prune(final Collection<Transition> pStrongImage,
-			final Collection<State> pS, final Collection<State> pI) {
+	protected Set<Transition> prune(final Collection<Transition> pStrongImage, final Collection<State> pS, final Collection<State> pI) {
 		final Set<Transition> result = new HashSet<Transition>();
 
 		for (final Transition t : pStrongImage) {

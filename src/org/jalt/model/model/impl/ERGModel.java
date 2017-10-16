@@ -29,19 +29,12 @@ public class ERGModel extends MDPModel implements ERG {
 
 	public ERGModel(Expression goal, Expression preservationGoal, PropositionFunction pf,
 			Set<Proposition> propositions, TransitionFunction transitionFunction,
-			RewardFunction rewardFunction, Collection<State> states, Collection<Action> actions,
-			int agents) {
-		super(transitionFunction, rewardFunction, states, actions, agents);
+			RewardFunction rewardFunction, Collection<State> states, Collection<Action> actions) {
+		super(transitionFunction, rewardFunction, states, actions);
 		this.goal = goal;
 		this.preservationGoal = preservationGoal;
 		this.pf = pf;
 		this.propositions = propositions;
-	}
-
-	@Override
-	public ERGModel copy() {
-		return new ERGModel(goal, preservationGoal, pf, propositions, getTransitionFunction(),
-				getRewardFunction(), getStates(), getActions(), getAgents());
 	}
 
 	@Override

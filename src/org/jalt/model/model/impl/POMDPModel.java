@@ -17,37 +17,36 @@ import org.jalt.model.state.State;
  */
 public class POMDPModel extends MDPModel implements PO {
 
-    private ObservationFunction observationFunction;
-    private Set<Observation> observations;
+	private ObservationFunction observationFunction;
+	private Set<Observation> observations;
 
-    public POMDPModel() {
-    }
+	public POMDPModel() {
+	}
 
-    public POMDPModel(ObservationFunction observationFunction, Set<Observation> observations,
-            TransitionFunction transitionFunction, RewardFunction rewardFunction,
-            Collection<State> states, Collection<Action> actions, int agents) {
-        super(transitionFunction, rewardFunction, states, actions, agents);
-        this.observationFunction = observationFunction;
-        this.observations = observations;
-    }
+	public POMDPModel(ObservationFunction observationFunction, Set<Observation> observations, TransitionFunction transitionFunction,
+			RewardFunction rewardFunction, Collection<State> states, Collection<Action> actions) {
+		super(transitionFunction, rewardFunction, states, actions);
+		this.observationFunction = observationFunction;
+		this.observations = observations;
+	}
 
-    @Override
-    public Set<Observation> getObservations() {
-        return observations;
-    }
+	@Override
+	public Set<Observation> getObservations() {
+		return observations;
+	}
 
-    @Override
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+	@Override
+	public void setObservations(Set<Observation> observations) {
+		this.observations = observations;
+	}
 
-    @Override
-    public ObservationFunction getObservationFunction() {
-        return observationFunction;
-    }
+	@Override
+	public ObservationFunction getObservationFunction() {
+		return observationFunction;
+	}
 
-    @Override
-    public void setObservationFunction(ObservationFunction observationFunction) {
-        this.observationFunction = observationFunction;
-    }
+	@Override
+	public void setObservationFunction(ObservationFunction observationFunction) {
+		this.observationFunction = observationFunction;
+	}
 }

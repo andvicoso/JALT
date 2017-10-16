@@ -16,23 +16,15 @@ public class MDPModel implements MDP, Serializable {
 	private RewardFunction rewardFunction;
 	private Collection<State> states;
 	private Collection<Action> actions;
-	private int agents = 1;
 
 	public MDPModel() {
 	}
 
-	public MDPModel(TransitionFunction transitionFunction, RewardFunction rewardFunction,
-			Collection<State> states, Collection<Action> actions, int agents) {
+	public MDPModel(TransitionFunction transitionFunction, RewardFunction rewardFunction, Collection<State> states, Collection<Action> actions) {
 		this.transitionFunction = transitionFunction;
 		this.rewardFunction = rewardFunction;
 		this.states = states;
 		this.actions = actions;
-		this.agents = agents;
-	}
-
-	@Override
-	public MDPModel copy() {
-		return new MDPModel(transitionFunction, rewardFunction, states, actions, agents);
 	}
 
 	@Override
@@ -43,11 +35,6 @@ public class MDPModel implements MDP, Serializable {
 	@Override
 	public Collection<Action> getActions() {
 		return actions;
-	}
-
-	@Override
-	public int getAgents() {
-		return agents;
 	}
 
 	@Override
@@ -71,17 +58,11 @@ public class MDPModel implements MDP, Serializable {
 	}
 
 	@Override
-	public void setAgents(int agents) {
-		this.agents = agents;
-	}
-
-	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		if (getStates().size() < Problem.MAX_SIZE_PRINT)
 			sb.append("\nStates: ").append(states);
 		sb.append("\nActions: ").append(actions);
-		sb.append("\nAgents: ").append(agents);
 		// GridPrinter gp = new GridPrinter();
 		// TODO:
 		// sb.append("\nReward function: ").append("\n").append(gp.print(getRewardFunction(),

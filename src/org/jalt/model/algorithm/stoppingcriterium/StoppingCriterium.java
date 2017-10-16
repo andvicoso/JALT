@@ -1,12 +1,12 @@
 package org.jalt.model.algorithm.stoppingcriterium;
 
-import org.jalt.model.algorithm.iteration.IterationValues;
+import org.jalt.model.algorithm.rl.dp.IterationValues;
 
 /**
  *
  * @author andvicoso
  */
-public interface StoppingCriterium<T extends IterationValues> {
+public interface StoppingCriterium {
 
-    boolean isStop(T iterationValues);
+    boolean isStop(IterationValues iterationValues);
 }

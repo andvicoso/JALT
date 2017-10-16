@@ -23,6 +23,9 @@ JALT
     - PPFERG
     
 - Various examples implemented to show algorithms and techniques usage;
+	- Simple MDP & QLearning examples/usage:
+		- HunterPreyTest
+		
 
 
 

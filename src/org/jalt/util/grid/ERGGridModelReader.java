@@ -98,7 +98,7 @@ public class ERGGridModelReader {
 		}
 		//create model
 		ERGGridModel model = new ERGGridModel(rows, cols);
-		model.setAgents(initialStates.size());
+//		model.setAgents(initialStates.size());
 		model.setPropositionFunction(pf);
 		model.setPropositions(props);
 		model.setRewardFunction(new RewardFunctionProposition<ERGGridModel>(model, rewardMap,

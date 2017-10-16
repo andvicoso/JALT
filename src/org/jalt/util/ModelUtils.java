@@ -114,7 +114,6 @@ public class ModelUtils {
 		// COPY MAIN PROPERTIES
 		model.setStates(q.getStates());
 		model.setActions(q.getActions());
-		model.setAgents(oldModel.getAgents());
 		// CREATE NEW REWARD FUNCTION FROM AGENT'S EXPLORATION (Q TABLE)
 		RewardFunction rf = createRewardFunction(q);
 		model.setRewardFunction(rf);

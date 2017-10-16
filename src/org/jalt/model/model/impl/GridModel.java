@@ -22,10 +22,9 @@ public class GridModel extends MDPModel implements Grid {
 	public GridModel() {
 	}
 
-	public GridModel(int rows, int cols, TransitionFunction transitionFunction,
-			RewardFunction rewardFunction, Collection<State> states, Collection<Action> actions,
-			int agents) {
-		super(transitionFunction, rewardFunction, states, actions, agents);
+	public GridModel(int rows, int cols, TransitionFunction transitionFunction, RewardFunction rewardFunction, Collection<State> states,
+			Collection<Action> actions) {
+		super(transitionFunction, rewardFunction, states, actions);
 		this.rows = rows;
 		this.cols = cols;
 	}
@@ -36,13 +35,7 @@ public class GridModel extends MDPModel implements Grid {
 		setStates(GridUtils.createStates(pRows, pCols));
 		setActions(GridUtils.GRID_ACTIONS);
 		setTransitionFunction(new GridTransitionFunction(rows, cols));
-				//new TableTransitionFunction(getStates(), getActions(),new GridTransitionFunction(rows, cols)));
-	}
-
-	@Override
-	public GridModel copy() {
-		return new GridModel(rows, cols, getTransitionFunction(), getRewardFunction(), getStates(),
-				getActions(), getAgents());
+		// new TableTransitionFunction(getStates(), getActions(),new GridTransitionFunction(rows, cols)));
 	}
 
 	@Override

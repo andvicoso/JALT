@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.jalt.infra.log.Log;
 import org.jalt.model.action.Action;
-import org.jalt.model.algorithm.iteration.rl.QLearning;
+import org.jalt.model.algorithm.rl.td.QLearning;
 import org.jalt.model.algorithm.table.erg.ERGQTable;
 import org.jalt.model.algorithm.table.erg.ERGQTableItem;
 import org.jalt.model.chooser.Chooser;

@@ -38,7 +38,6 @@ public class ToRL {
 			mdp = new GridModel(grid.getRows(), grid.getCols());
 		} else {
 			mdp = new MDPModel();
-			mdp.setAgents(erg.getAgents());
 			mdp.setStates(erg.getStates());
 			mdp.setTransitionFunction(erg.getTransitionFunction());
 		}

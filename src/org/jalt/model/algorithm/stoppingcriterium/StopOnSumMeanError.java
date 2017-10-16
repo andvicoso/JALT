@@ -4,7 +4,7 @@ import static org.jalt.util.DefaultTestProperties.ERROR;
 
 import java.util.Map;
 
-import org.jalt.model.algorithm.iteration.IterationValues;
+import org.jalt.model.algorithm.rl.dp.IterationValues;
 import org.jalt.model.state.State;
 
 /**

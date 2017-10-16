@@ -36,19 +36,12 @@ public class ERGGridModel extends GridModel implements ERG {
 	public ERGGridModel(Expression goal, Expression preservationGoal, PropositionFunction pf,
 			Set<Proposition> propositions, int rows, int cols,
 			TransitionFunction transitionFunction, RewardFunction rewardFunction,
-			Collection<State> states, Collection<Action> actions, int agents) {
-		super(rows, cols, transitionFunction, rewardFunction, states, actions, agents);
+			Collection<State> states, Collection<Action> actions) {
+		super(rows, cols, transitionFunction, rewardFunction, states, actions);
 		this.goal = goal;
 		this.preservationGoal = preservationGoal;
 		this.pf = pf;
 		this.propositions = propositions;
-	}
-
-	@Override
-	public ERGGridModel copy() {
-		return new ERGGridModel(goal, preservationGoal, pf, propositions, getRows(), getCols(),
-				getTransitionFunction(), getRewardFunction(), getStates(), getActions(),
-				getAgents());
 	}
 
 	@Override

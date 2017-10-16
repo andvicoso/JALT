@@ -7,25 +7,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.jalt.model.action.Action;
+import org.jalt.model.algorithm.table.erg.ERGQTable;
 import org.jalt.model.state.State;
 import org.jalt.util.CollectionsUtils;
+import org.jalt.util.erg.ERGLearningUtils;
 
 public class Policy extends HashMap<State, Map<Action, Double>> {
 
 	private static final int DECIMAL_ACTION = 3;
 	private static final String FORMAT = "%1$." + DECIMAL_ACTION + "f";
-
-	public Policy(SinglePolicy single) {
-		for (Entry<State, Action> entry : single.entrySet()) {
-			State state = entry.getKey();
-			Action action = entry.getValue();
-			put(state, Collections.singletonMap(action, 1d));
-		}
-	}
 
 	public Policy() {
 	}
@@ -34,38 +27,9 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
 		return keySet();
 	}
 
-//	public String[][] getBestValueTableStr() {
-//		String[][] table = new String[getStates().size()/2 + 1][getStates().size()/2 + 1];
-//		table[0][0] = "";
-//		int i = 1;
-//		for (State state : getStates()) {
-//			table[i++][0] = state.getName();
-//		}
-//		int j = 1;
-//		for (State state : getStates()) {
-//			table[0][j++] = state.getName();
-//		}
-//
-//		i = 1;
-//		for (State state : getStates()) {
-//			j = 1;
-//			for (State state2 : getStates()) {
-//				table[i][j] = (getBestValue(state)) + "";
-//				j++;
-//			}
-//			i++;
-//		}
-//
-//		return table;
-//	}
-//
-//	public String toBestValueString() {
-//		return new GridPrinter().toTable(getBestValueTableStr());
-//	}
-
 	@Override
 	public String toString() {
-		final List<State> list = new ArrayList<State>(keySet());
+		final List<State> list = new ArrayList<>(keySet());
 		Collections.sort(list);
 
 		final StringBuilder sb = new StringBuilder();
@@ -73,6 +37,8 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
 			final Map<Action, Double> actions = get(state);
 			sb.append("(");
 			sb.append(state.getName());
+			sb.append(", ");
+			sb.append(getBestActions(state));
 			sb.append(", ");
 			sb.append(toString(actions));
 			sb.append(")\n");
@@ -84,7 +50,7 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
 	public Map<Action, Double> getBestMapActions(State state) {
 		Map<Action, Double> map = get(state);
 		if (map != null && !map.isEmpty()) {
-			Map<Action, Double> temp = new HashMap<Action, Double>(map);
+			Map<Action, Double> temp = new HashMap<>(map);
 			Double max = Collections.max(temp.values());
 			Set<Action> actions = CollectionsUtils.getKeysForValue(temp, max);
 			if (max == 0) {
@@ -202,16 +168,6 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
 		return values;
 	}
 
-	public SinglePolicy getBestPolicy() {
-		final SinglePolicy policy = new SinglePolicy();
-
-		for (final State state : keySet()) {
-			policy.put(state, getBestAction(state));
-		}
-
-		return policy;
-	}
-
 	public Policy optimize() {
 		final Policy policy = new Policy();
 
@@ -220,6 +176,17 @@ public class Policy extends HashMap<State, Map<Action, Double>> {
 		}
 
 		return policy;
+	}
+
+	public Policy optimize(ERGQTable q) {
+		Policy single = new Policy();
+		for (Map.Entry<State, Map<Action, Double>> entry : entrySet()) {
+			State state = entry.getKey();
+			Action bestAction = ERGLearningUtils.getBestAction(entry.getValue(), q.getDoubleValues(state));
+			single.put(state, Collections.singletonMap(bestAction, 1d));
+		}
+
+		return single;
 	}
 
 	public void join(Policy policy) {

@@ -12,9 +12,6 @@ import org.jalt.model.function.PropositionFunction;
 import org.jalt.model.model.ERG;
 import org.jalt.model.propositional.Expression;
 import org.jalt.model.propositional.operator.BinaryOperator;
-import org.jalt.model.solution.Policy;
-import org.jalt.model.solution.SinglePolicy;
-import org.jalt.model.state.State;
 import org.jalt.util.CollectionsUtils;
 import org.jalt.util.ModelUtils;
 
@@ -37,8 +34,7 @@ public class ERGLearningUtils {
 	}
 
 	private static Expression createNewPreservationGoal(Expression pCurrent, Set<Expression> pAvoid) {
-		Expression badExp = new Expression(BinaryOperator.OR, pAvoid.toArray(new Expression[pAvoid
-				.size()]));
+		Expression badExp = new Expression(BinaryOperator.OR, pAvoid.toArray(new Expression[pAvoid.size()]));
 		return pCurrent.and(badExp.parenthesize().negate());
 	}
 
@@ -68,16 +64,4 @@ public class ERGLearningUtils {
 
 	private ERGLearningUtils() {
 	}
-
-	public static SinglePolicy optmize(Policy policy, ERGQTable q) {
-		SinglePolicy single = new SinglePolicy();
-		for (Map.Entry<State, Map<Action, Double>> entry : policy.entrySet()) {
-			State state = entry.getKey();
-			Action bestAction = getBestAction(entry.getValue(), q.getDoubleValues(state));
-			single.put(state, bestAction);
-		}
-
-		return single;
-	}
-
 }

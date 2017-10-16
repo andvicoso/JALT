@@ -25,7 +25,7 @@ import org.jalt.model.propositional.Proposition;
 import org.jalt.model.solution.Policy;
 import org.jalt.model.state.GridState;
 import org.jalt.model.state.State;
-import org.jalt.model.test.erg.generic.GenericERGGridModel;
+import org.jalt.test.erg.generic.GenericERGGridModel;
 
 public class ImageUtils {
 	private static final String PNG = "PNG";

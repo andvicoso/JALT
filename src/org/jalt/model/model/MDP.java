@@ -12,9 +12,7 @@ import org.jalt.model.state.State;
  * @author andvicoso
  */
 public interface MDP {
-
-    MDP copy();
-
+	
     Collection<State> getStates();
 
     void setStates(Collection<State> states);
@@ -23,10 +21,6 @@ public interface MDP {
 
     void setActions(Collection<Action> actions);
 
-    int getAgents();
-
-    void setAgents(int pAgents);
-    
     TransitionFunction getTransitionFunction();
 
     RewardFunction getRewardFunction();

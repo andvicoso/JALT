@@ -14,7 +14,8 @@ public class CalcUtils {
 		double sum = 0;
 		for (Number n : values) {
 			double v = n.doubleValue();
-			sum += ((v - mean) * (v - mean)) / values.size() - 1;
+			double vm = (v - mean);
+			sum += (vm * vm) / values.size() - 1;
 		}
 
 		return values.isEmpty() ? 0 : Math.sqrt(sum);

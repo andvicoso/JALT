@@ -8,6 +8,7 @@ import java.util.Set;
 import org.jalt.model.model.MDP;
 import org.jalt.model.model.impl.GridModel;
 import org.jalt.model.state.State;
+import org.jalt.util.DefaultTestProperties;
 import org.jalt.util.FileUtils;
 import org.jalt.util.Utils;
 import org.jalt.util.grid.GridPrinter;
@@ -38,6 +39,10 @@ public class Problem<M extends MDP> implements Serializable {
 		this.finalStates = pFinalStates;
 	}
 
+	public Problem(M pModel) {
+		this.model = pModel;
+	}
+
 	public Map<Integer, State> getInitialStates() {
 		return initialStates;
 	}
@@ -47,44 +52,37 @@ public class Problem<M extends MDP> implements Serializable {
 	}
 
 	public void save() {
-		final String filename = getClass().getSimpleName()
-				+ Utils.toFileTimeString(System.currentTimeMillis()) + PROB_EXT;
+		final String filename = getClass().getSimpleName() + Utils.toFileTimeString(System.currentTimeMillis()) + PROB_EXT;
 		FileUtils.toObjectFile(this, filename, true);
 	}
 
 	@Override
 	public String toString() {
+		return print(null).toString();
+	}
+
+	private StringBuilder print(Object pResult) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append("\nInitial states: ").append(initialStates);
 		if (finalStates != null && !finalStates.isEmpty()) {
-			sb.append("\nFinal states: ").append(finalStates);
+			sb.append("\nFinal states (").append(DefaultTestProperties.FINAL_GOAL + "): ").append(finalStates);
 		}
 
 		if (model instanceof GridModel && model.getStates().size() < MAX_SIZE_PRINT) {
 			sb.append("\nEnvironment: ");
 			final GridPrinter gridPrinter = new GridPrinter();
-			final String grid = gridPrinter.print((GridModel) model, initialStates, finalStates,
-					null);
+			final String grid = gridPrinter.print((GridModel) model, initialStates, finalStates, pResult);
 			sb.append("\n\n").append(grid);
-		}
-
-		return sb.toString();
-	}
-
-	public String toString(Object pResult) {
-		final StringBuilder sb = new StringBuilder();
-
-		if (model instanceof GridModel) {
-			final GridPrinter gridPrinter = new GridPrinter();
-			final String grid = gridPrinter.print((GridModel) model, initialStates, finalStates,
-					pResult);
-			sb.append("\n").append(grid);
-		} else {
+		} else if (pResult != null) {
 			final String resultName = pResult.getClass().getSimpleName();
 			sb.append("\n").append(resultName).append(": \n").append(pResult);
 		}
 
-		return sb.toString();
+		return sb;
+	}
+
+	public String toString(Object pResult) {
+		return print(pResult).toString();
 	}
 
 	public Set<State> getFinalStates() {

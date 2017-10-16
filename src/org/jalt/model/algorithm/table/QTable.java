@@ -9,7 +9,6 @@ import java.util.Set;
 import org.jalt.model.action.Action;
 import org.jalt.model.model.MDP;
 import org.jalt.model.solution.Policy;
-import org.jalt.model.solution.SinglePolicy;
 import org.jalt.model.state.State;
 import org.jalt.util.grid.GridPrinter;
 
@@ -114,8 +113,7 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		for (State state : getStates()) {
 			j = 1;
 			for (Action action : getActions()) {
-				table[i][j] = (get(state, action) != null ? get(state, action).getFrequency() : 0)
-						+ "";
+				table[i][j] = (get(state, action) != null ? get(state, action).getFrequency() : 0) + "";
 				j++;
 			}
 			i++;
@@ -144,27 +142,6 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 		}
 
 		return freq;
-	}
-
-	public SinglePolicy getSimplePolicy() {
-		final SinglePolicy policy = new SinglePolicy();
-
-		for (State state : getStates()) {
-			double max = 0;
-			Action max_action = null;
-			for (Action action : getActions()) {
-				Double value = getValue(state, action);
-				if (value != 0 && (max_action == null || value > max)) {
-					max = value;
-					max_action = action;
-				}
-			}
-			if (max_action != null) {
-				policy.put(state, max_action);
-			}
-		}
-
-		return policy;
 	}
 
 	public double getTotal(State pState) {
@@ -215,10 +192,8 @@ public class QTable<I extends QTableItem> extends StateActionTable<I> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void updateQ(MDP model, double qValue, State state, Action action, double reward,
-			State nextState) {
-		put(state, action, (I) new QTableItem(qValue, reward, incFrequency(state, action),
-				nextState));
+	public void updateQ(MDP model, double qValue, State state, Action action, double reward, State nextState) {
+		put(state, action, (I) new QTableItem(qValue, reward, incFrequency(state, action), nextState));
 	}
 
 	public String toString(MDP model) {

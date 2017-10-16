@@ -1,6 +1,6 @@
 package org.jalt.model.algorithm.stoppingcriterium;
 
-import org.jalt.model.algorithm.iteration.IterationValues;
+import org.jalt.model.algorithm.rl.dp.IterationValues;
 
 /**
  *

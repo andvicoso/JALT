@@ -11,7 +11,7 @@ import org.jalt.model.state.State;
  * 
  * @author andvicoso
  */
-public abstract class ProblemFactory {
+public abstract class ProblemFactory<M extends MDP> {
 
 	private List<State> usedStates;
 	private static final Random random = new Random();
@@ -19,7 +19,7 @@ public abstract class ProblemFactory {
 	public ProblemFactory() {
 	}
 
-	protected State getRandomEmptyState(final MDP pModel) {
+	protected State getRandomEmptyState(final M pModel) {
 		State st;
 		do {
 			st = getRandomState(pModel);
@@ -38,8 +38,8 @@ public abstract class ProblemFactory {
 		return states;
 	}
 
-	public List<State> getRandomEmptyStates(final MDP pModel, int pNum) {
-		final List<State> states = new ArrayList<State>();
+	public List<State> getRandomEmptyStates(final M pModel, int pNum) {
+		final List<State> states = new ArrayList<State>(pNum);
 		for (int i = 0; i < pNum; i++) {
 			states.add(getRandomEmptyState(pModel));
 		}
@@ -51,9 +51,9 @@ public abstract class ProblemFactory {
 		return (State) pModel.getStates().toArray()[index];
 	}
 
-	protected abstract Problem<?> doCreate();
+	protected abstract Problem<M> doCreate();
 
-	public Problem<?> create() {
+	public Problem<M> create() {
 		usedStates = new ArrayList<State>();
 		return doCreate();
 	}
